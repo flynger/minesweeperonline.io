@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <title>Minesweeper</title>
+  <link href="libraries/jquery-ui.css" rel="stylesheet" />
+  <link href="style.css" rel="stylesheet" />
+  <script src="libraries/jquery-3.6.0.js"></script>
+  <script src="libraries/jquery-ui.js"></script>
+  <script type="text/javascript" src="minesweeper.js"></script>
+</head>
+<body>
+  <h1>Minesweeper</h1>
+  <p>Click to reveal a location. Right-click to flag/unflag a location.</p>
+  <!-- <table id="difficulty">
+    <p>Start new game:
+      <a href="#" onclick="minesweeper('beginner');">Beginner</a>
+      <a href="#" onclick="minesweeper('intermediate');">Intermediate</a>
+      <a href="#" onclick="minesweeper('expert');">Expert</a>
+      <a href="#" onclick="minesweeper('custom');">Custom</a>
+    </p>
+  </div> -->
+  <table cellspacing="0" cellpadding="2" id="options" class="dialog" style="display: table;">
+    <tbody><tr class="dialog-title">
+        <td style="padding: 3px;">Game</td>
+        <td colspan="3" style="padding: 3px; text-align: right;">
+            <span id="options-close" class="dialog-close" title="close this box">×</span>
+        </td>
+    </tr>
+    <tr class="dialog-bar">
+        <td></td>
+        <td>Height</td>
+        <td>Width</td>
+        <td>Mines</td>
+    </tr>
+    <tr>
+        <td><label><input type="radio" name="difficulty" checked="checked" value="BEGINNER"> <strong>Beginner</strong></label></td>
+        <td>9</td>
+        <td>9</td>
+        <td>10</td>
+    </tr>
+    <tr>
+        <td><label><input type="radio" name="difficulty" value="INTERMEDIATE"> <strong>Intermediate</strong></label></td>
+        <td>16</td>
+        <td>16</td>
+        <td>40</td>
+    </tr>
+    <tr>
+        <td><label><input type="radio" name="difficulty" value="EXPERT"> <strong>Expert</strong></label></td>
+        <td>16</td>
+        <td>30</td>
+        <td>99</td>
+    </tr>
+    <tr>
+        <td><label><input type="radio" name="difficulty" id="custom" value="CUSTOM"> Custom</label></td>
+        <td><input type="number" min="1" class="difficultySelect" value="20" id="custom_height" onclick="$('#custom').prop('checked', true);" onchange="Minesweeper.updateCustomSettings()"></td>
+        <td><input type="number" min="1" class="difficultySelect" value="30" id="custom_width" onclick="$('#custom').prop('checked', true);" onchange="Minesweeper.updateCustomSettings()"></td>
+        <td><input type="number" min="0" class="difficultySelect" value="145" id="custom_mines" onclick="$('#custom').prop('checked', true);" onchange="Minesweeper.updateCustomSettings()"></td>
+    </tr>
+    <tr class="dialog-bar">
+        <td><input type="button" class="button" value="New Game" style="vertical-align: middle;" onclick="Minesweeper.startGame()"></td>
+        <td colspan="3">
+            <label style="margin-bottom: 0;"><input type="checkbox" id="marks"> Marks (?)</label>
+        </td>
+    </tr>
+</tbody></table>
+  <div id="minesweeper"></div>
+  <!--<script type="text/javascript">minesweeper("minesweeper", "beginner");</script>-->
+</body>
+</html>
