@@ -4,7 +4,16 @@ var Minesweeper = {
     EXPERT: { height: 16, width: 30, mines: 99 },
     CUSTOM: { height: 20, width: 30, mines: 145 },
     startGame() {
+        document.getElementById("game").innerHTML = "";
         this.settings = this[$("input[name='difficulty']:checked").val()];
+        document.getElementById("game").style.width = this.settings.width * 16 + "px";
+        document.getElementById("game").style.height = this.settings.height * 16 + "px";
+        for (var i = 1; i <= this.settings.height; i++) {
+            for (var j = 1; j <= this.settings.width; j++) {
+                document.getElementById("game").innerHTML += '<div class="square blank" id="' + i + '_' + j + '"></div>';
+            }
+            document.getElementById("game").innerHTML += "<br>";
+        }
     },
     updateCustomSettings() {
         this.CUSTOM = { height: $("#custom_height").val(), width: $("#custom_width").val(), mines: $("#custom_mines").val() };
