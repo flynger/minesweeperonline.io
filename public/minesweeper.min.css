@@ -4,19 +4,17 @@
 
 #game {
     background-color: silver;
+    user-select: none;
 }
 
 #game div {
-    background-image: url('res/sprites.png');
     float: left;
     line-height: 0;
     font-size: 0
 }
 
-br {
-    display: block; /* makes it have a width */
-    content: ""; /* clears default height */
-    margin-top: 0; /* change this to whatever height you want it */
+.z100 #game div {
+    background-image: url('res/sprites.png');
 }
 
 .z100 .time0 {
@@ -83,6 +81,12 @@ br {
     background-position: -130px 0;
     width: 13px;
     height: 23px
+}
+
+.z100 .empty {
+    background-position: 0 -23px;
+    width: 16px;
+    height: 16px
 }
 
 .z100 .open0 {
@@ -235,7 +239,7 @@ br {
     height: 10px
 }
 
-.z100 .bordertb {
+.z100 .border-h {
     background-position: -40px -81px;
     width: 16px;
     height: 10px
@@ -253,13 +257,13 @@ br {
     height: 10px
 }
 
-.z100 .borderlr {
+.z100 .border-v {
     background-position: -134px -39px;
     width: 10px;
     height: 16px
 }
 
-.z100 .borderlrlong {
+.z100 .border-vlong {
     background-position: -134px -39px;
     width: 10px;
     height: 32px
@@ -371,6 +375,12 @@ br {
     background-position: -195px 0;
     width: 20px;
     height: 35px
+}
+
+.z150 .empty {
+    background-position: 0 -35px;
+    width: 24px;
+    height: 24px
 }
 
 .z150 .open0 {
@@ -523,7 +533,7 @@ br {
     height: 15px
 }
 
-.z150 .bordertb {
+.z150 .border-h {
     background-position: -60px -122px;
     width: 24px;
     height: 15px
@@ -541,13 +551,13 @@ br {
     height: 15px
 }
 
-.z150 .borderlr {
+.z150 .border-v {
     background-position: -201px -59px;
     width: 15px;
     height: 24px
 }
 
-.z150 .borderlrlong {
+.z150 .border-vlong {
     background-position: -201px -59px;
     width: 15px;
     height: 48px
@@ -588,7 +598,7 @@ br {
 }
 
 .z200 #game div {
-    background-image: url('sprite200.gif')
+    background-image: url('res/sprites.png')
 }
 
 .night-mode .z200 #game div {
@@ -659,6 +669,12 @@ br {
     background-position: -260px 0;
     width: 26px;
     height: 46px
+}
+
+.z200 .empty {
+    background-position: 0 -46px;
+    width: 32px;
+    height: 32px
 }
 
 .z200 .open0 {
@@ -811,7 +827,7 @@ br {
     height: 20px
 }
 
-.z200 .bordertb {
+.z200 .border-h {
     background-position: -80px -162px;
     width: 32px;
     height: 20px
@@ -829,13 +845,13 @@ br {
     height: 20px
 }
 
-.z200 .borderlr {
+.z200 .border-v {
     background-position: -268px -78px;
     width: 20px;
     height: 32px
 }
 
-.z200 .borderlrlong {
+.z200 .border-vlong {
     background-position: -268px -78px;
     width: 20px;
     height: 64px
