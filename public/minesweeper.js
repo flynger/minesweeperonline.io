@@ -46,24 +46,29 @@ class Minesweeper {
 
         // set the html onto the grid
         $("#game").html(grid);
+        $("#game").data("game", this);
+        console.log($("#game").data("game"));
 
         // create mouse events
-        $("#game").on("mouseup", {}, function (e) {
+        $("#game").on("mouseup", {game: $("#game").data("game")}, function (e) {
             // NO THIS
+            var game = e.data.game;
             mouseHeldDown = false;
             e.preventDefault();
             if ($(e.target).hasClass("empty")) {
                 var id = $(e.target).attr("id").split("_");
-                var x = id[1];
-                var y = id[0];
-                if (!minesweeper.GRID) {
-                    minesweeper.createBoard(x, y, minesweeper.settings.width, minesweeper.settings.height, minesweeper.settings.mines);
+                var x = +id[1];
+                var y = +id[0];
+                console.log(game);
+                if (game.GRID.length == 0) {
+                    game.GRID = game.createBoard(x, y, game.settings.width, game.settings.height, game.settings.mines);
                 }
-                var cell = minesweeper.GRID[y][x];
+                console.log(game);
+                var cell = game.GRID[y][x];
                 if (cell === "X") {
-                    for (var row in minesweeper.GRID) {
-                        for (var col in minesweeper.GRID[row]) {
-                            if (minesweeper.GRID[row][col] === "X") {
+                    for (var row in game.GRID) {
+                        for (var col in game.GRID[row]) {
+                            if (game.GRID[row][col] === "X") {
                                 $("#" + row + "_" + col).attr("class", "square bombrevealed");
                             }
                         }
@@ -109,46 +114,44 @@ class Minesweeper {
         return '<div class="' + type + idText + '"></div>';
     }
     createBoard(startX, startY, width, height, mines) {
-        this.GRID = new Array(height).fill("");
-        for (var row in this.GRID) {
-            this.GRID[row] = new Array(width).fill("0");
+        var grid = new Array(height).fill("");
+        for (var row in grid) {
+            grid[row] = new Array(width).fill("0");
         }
 
         for (var v = -1; v <= 1; v++) {
             for (var h = -1; h <= 1; h++) {
-                if (this.GRID[startY + v] && this.GRID[startY + v][startX + h]) this.GRID[startY + v][startX + h] = "SAFE";
+                if (grid[startY + v] && grid[startY + v][startX + h] && (width * height - mines >= 9 || (h == 0 && v == 0))) grid[startY + v][startX + h] = "SAFE";
             }
         }
 
         while (mines > 0) {
             var x = randomNumber(0, width - 1);
             var y = randomNumber(0, height - 1);
-            if (this.GRID[y][x] !== "X" && this.GRID[y][x] !== "SAFE") {
-                this.GRID[y][x] = "X";
+            if (grid[y][x] !== "X" && grid[y][x] !== "SAFE") {
+                grid[y][x] = "X";
                 mines--;
             }
         }
 
-        for (var row in this.GRID) {
-            for (var col in this.GRID[row]) {
-                if (this.GRID[row][col] !== "X") {
-                    this.GRID[row][col] = this.countMines(+col, +row);
+        for (var row in grid) {
+            for (var col in grid[row]) {
+                if (grid[row][col] !== "X") {
+                    grid[row][col] = this.countMines(grid, +col, +row);
                 }
             }
         }
-        console.log(this.GRID);
+        console.log(grid);
+        return grid;
     }
-    countMines(x, y) {
+    countMines(grid, x, y) {
         var mines = 0;
         for (var v = -1; v <= 1; v++) {
             for (var h = -1; h <= 1; h++) {
-                if (this.GRID[y + v] && this.GRID[y + v][x + h] && this.GRID[y + v][x + h] === "X") mines++;
+                if (grid[y + v] && grid[y + v][x + h] && grid[y + v][x + h] === "X") mines++;
             }
         }
         return mines;
-    }
-    getGrid() {
-        return this.GRID;
     }
 }
 
