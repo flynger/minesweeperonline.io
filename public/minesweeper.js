@@ -1,3 +1,5 @@
+var socket = io.connect("localhost:3000");
+
 var mouseHeldDown = false;
 
 class Minesweeper {
