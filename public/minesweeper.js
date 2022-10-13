@@ -1,4 +1,62 @@
-var socket = io.connect("localhost:3000");
+var latency = 0;
+var client = {
+  socket: null,
+  init: (link) => {
+    client.socket = io.connect(link);
+
+    client.socket.on('pong', (ms) => {
+      latency = ms;
+    });
+    client.socket.on("loginFail", () => {
+      alert("Login failed. Your username or password is incorrect.");
+    });
+    client.socket.on("loginSuccess", (data) => {
+      //alert("You have logged in successfully.");
+    });
+    client.socket.on("signUp", (data) => {
+      alert("Your account has been created and you have been logged in.");
+    });
+    client.socket.on("signUpExists", (data) => {
+      alert("Sign up failed. This username has already been taken.");
+    });
+    client.socket.on("signUpFail", (data) => {
+      alert("Sign up failed. Invalid parameters.");
+    });
+    client.socket.on("nameError", (data) => {
+      alert("Invalid username. A username may only include alphanumeric characters, underscores, and be a length of 3 to 16 characters.");
+    });
+    client.socket.on("passError", (data) => {
+      alert("Invalid password. A password must include 1 lowercase letter, 1 uppercase letter, 1 number, and be at least 8 characters long.");
+    });
+    client.socket.on("doubleError", (data) => {
+      alert("This user is already logged in.");
+    });
+
+    client.socket.on("kickEvent", (data) => {
+      if (data.kicked) {
+        alert("You have been kicked from the server by " + data.name + ".");
+        client.socket.disconnect();
+      }
+    });
+    client.socket.on("onConnect", (data) => {
+
+    });
+    client.socket.on("sendDisconnect", (data) => {
+      if (players[data.id] && players[data.id].name == data.id) {
+        objects.layers[2].splice(objects.layers[2].indexOf(players[data.id]), 1);
+        delete players[data.id];
+      }
+    });
+    client.socket.on("serverDown", () => {
+      setInterval(addChatMessage, 250, {name: "YourMom", message: "<text style=\"color: red;\">Time to sleep little timmy</text>"});
+      //addChatMessage();
+    });
+  },
+  send: (data, key) => {
+    if (!key) key = "send";
+    client.socket.emit(key, data);
+  }
+}
 
 var mouseHeldDown = false;
 
