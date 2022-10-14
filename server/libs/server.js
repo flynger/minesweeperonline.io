@@ -48,8 +48,9 @@
       io.sockets.emit(key, data);
     };
     module.exports.emit = function (socketid, data, key="emit") {
-      if (!module.exports.socketExists(socketid)) return;
-      io.sockets.connected[socketid].emit(key, data);
+      var targetSocket = io.sockets.sockets.get(socketid);
+      if (!targetSocket) return;
+      targetSocket.emit(key, data);
     };
   }
   module.exports.on = function (key, fnc) {
@@ -60,13 +61,6 @@
   }
 
   module.exports.kick = module.exports.onDisconnect;
-
-  module.exports.socketExists = function (socketid) {
-    if(io.sockets.connected[socketid]) {
-      return true;
-    }
-    return false;
-  }
 
   module.exports.getAllSockets = function () {
     return io.sockets.connected;

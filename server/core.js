@@ -16,17 +16,21 @@ server.on("signUp", (data) => {
 });
 
 // input events
-server.on("playerInput", (data) => {
-    server.emit(data.id, {msg: "you're bad"}, "alertMessage");    
+server.on("playerInput", (id) => {
+    server.emit(id, {msg: "you're bad"}, "alertMessage");    
 });
 
 server.on("chatMessage", (data) => {
 
 });
+server.on("Alert", (data) => {
+
+});
+
 
 // connection events
 server.onConnect = (socket) => {
-    console.log("connection!");
+    console.log(socket.id + " connected!");
     socket.emit("onConnect", { id: socket.id });
 }
 

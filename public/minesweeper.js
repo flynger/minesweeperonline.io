@@ -51,12 +51,22 @@ var client = {
       setInterval(addChatMessage, 250, {name: "YourMom", message: "<text style=\"color: red;\">Time to sleep little timmy</text>"});
       //addChatMessage();
     });
+    client.socket.on("alertMessage", (data) => {
+        alert(data.msg);
+    });
+
   },
   send: (data, key) => {
     if (!key) key = "send";
     client.socket.emit(key, data);
   }
 }
+
+function sendEvent(name) {
+    client.send(client.socket.id, name);
+}
+
+client.init("localhost:3000");
 
 var mouseHeldDown = false;
 
@@ -67,9 +77,9 @@ class Minesweeper {
         this.BEGINNER = { height: 9, width: 9, mines: 10 },
         this.INTERMEDIATE = { height: 16, width: 16, mines: 40 },
         this.EXPERT = { height: 16, width: 30, mines: 99 },
-        this.CUSTOM = { height: 20, width: 30, mines: 145 },
+        this.CUSTOM = { height: 20, width: 30, mines: 145},
         this.GRID = []
-    }
+    } 
     startGame() {
         // get difficulty
         this.settings = this[$("input[name='difficulty']:checked").val()];
