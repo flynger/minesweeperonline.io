@@ -7,8 +7,8 @@
 */
 
 (function () {
-  var express = require('express');
-  var socket = require('socket.io');
+  var express = require('./node_modules/express/index');
+  var socket = require('./node_modules/socket.io/dist/index');
 
   var color = require('./color');
   var app = express();
