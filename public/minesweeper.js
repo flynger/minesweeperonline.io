@@ -66,7 +66,7 @@ function sendEvent(name) {
     client.send(client.socket.id, name);
 }
 
-client.init("localhost:3000");
+client.init("73.225.174.140:3000");
 
 class Minesweeper {
     constructor() {
@@ -152,7 +152,7 @@ class Minesweeper {
             switch (e.which) {
                 case 1:
                     if ($(e.target).hasClass("blank")) {
-                        $(e.target).attr("class", "empty");
+                        $(e.target).attr("class", "cell empty");
                     }
                     break;
                 case 2:
@@ -161,7 +161,7 @@ class Minesweeper {
                 case 3:
                     if ($(e.target).hasClass("blank")) {
                         // if cell blank, add flag
-                        $(e.target).attr("class", "bombflagged");
+                        $(e.target).attr("class", "cell bombflagged");
                     } else if ($(e.target).hasClass("bombflagged")) {
                         // if flag, revert to blank
                         $(e.target).attr("class", "blank");
