@@ -599,7 +599,7 @@
 
 .z200 #game div {
     background-image: url('res/sprites.png');
-    /*filter: hue-rotate(60deg) blur(10px) sepia(60%);*/
+    /*filter: invert(100%) hue-rotate(80deg);*/
 }
 
 .night-mode .z200 #game div {

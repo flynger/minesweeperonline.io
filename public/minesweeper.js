@@ -129,13 +129,12 @@ class Minesweeper {
                             game.GRID = game.createBoard(x, y, game.settings.width, game.settings.height, game.settings.mines);
                         }
                         game.clearCell(x, y);
+                    } else if (game.satisfyFlags(x, y)) {
+                        game.clearCells(x, y);
                     }
                     break;
                 case 2:
                     //alert('Middle mouse button is pressed');
-                    if (game.satisfyFlags(x, y)) {
-                        game.clearCells(x, y);
-                    }
                     break;
                 case 3:
                     // clear cells around mouse
