@@ -246,8 +246,14 @@ class Minesweeper {
         if (cell === "X") {
             for (let row in this.GRID) {
                 for (let col in this.GRID[row]) {
+                    var isFlagged = this.getCanvasCell(col, row).hasClass("bombflagged");
                     if (this.GRID[row][col] === "X") {
-                        this.getCanvasCell(col, row).attr("class", "square bombrevealed");
+                        if (!isFlagged) {
+                            this.getCanvasCell(col, row).attr("class", "square bombrevealed");
+                        }
+                    }
+                    else if (isFlagged) {
+                        this.getCanvasCell(col, row).attr("class", "square bombmisflagged");
                     }
                 }
             }
