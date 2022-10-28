@@ -48,11 +48,14 @@ var client = {
             }
         });
         client.socket.on("serverDown", () => {
-            setInterval(addChatMessage, 250, { name: "YourMom", message: "<text style=\"color: red;\">Time to sleep little timmy</text>" });
+            setInterval(addChatMessage, 250, { user: "YourMom", msg: "<text style=\"color: red;\">Time to sleep little timmy</text>" });
             //addChatMessage();
         });
         client.socket.on("alertMessage", (data) => {
             alert(data.msg);
+        });
+        client.socket.on("chatMessage", (data) => {
+            addChatMessage(data.user, data.msg);
         });
 
     },
@@ -66,7 +69,8 @@ function sendEvent(name) {
     client.send(client.socket.id, name);
 }
 
-client.init("73.225.174.140:3000");
+// client.init("73.225.174.140:3000");
+client.init("localhost:3000");
 
 class Minesweeper {
     constructor() {
@@ -194,6 +198,13 @@ class Minesweeper {
                     break;
                 default:
                 // nothing
+            }
+        });
+
+        $("#chatInput").on('keypress', function (e) {
+            if ($("#chatInput:focus") && $("#chatInput").val() && e.which === 13) {
+                client.socket.emit({ id: client.socket.id, msg: $("#chatInput").val() }, "chatMessage");
+                $("#chatInput").val("");
             }
         });
     }
@@ -337,4 +348,8 @@ class Minesweeper {
 
 function randomNumber(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function addChatMessage(user, msg) {
+    $("#chatText").html($("#chatText").html() + "<br> " + user + " said: " + msg);
 }

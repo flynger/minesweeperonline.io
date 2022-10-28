@@ -598,7 +598,7 @@
 }
 
 .z200 #game div {
-    background-image: url('res/sprites.png');
+    background-image: url('res/darksprites.png');
     /*filter: invert(100%) hue-rotate(80deg);*/
 }
 

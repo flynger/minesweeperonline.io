@@ -46,3 +46,8 @@ body {
     font-size: 20px;
     transition-duration: 0.07s;
 }
+#chat {
+    position: absolute;
+    right: 20%;
+    top: 30%;
+}

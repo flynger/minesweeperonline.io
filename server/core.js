@@ -21,8 +21,10 @@ server.on("playerInput", (id) => {
 });
 
 server.on("chatMessage", (data) => {
-
+    console.log("chat receive")
+    server.send({ user: "anon" + data.id.substring(0, 4), msg: data.msg },"chatMessage");
 });
+
 server.on("Alert", (data) => {
 
 });
