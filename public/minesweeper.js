@@ -70,7 +70,8 @@ function sendEvent(name) {
 }
 
 // client.init("73.225.174.140:3000");
-client.init("localhost:3000");
+// client.init("localhost:3000");
+client.init("10.40.30.150:3000");
 
 class Minesweeper {
     constructor() {
@@ -202,8 +203,9 @@ class Minesweeper {
         });
 
         $("#chatInput").on('keypress', function (e) {
+            // check ENTER go send chat
             if ($("#chatInput:focus") && $("#chatInput").val() && e.which === 13) {
-                client.socket.emit({ id: client.socket.id, msg: $("#chatInput").val() }, "chatMessage");
+                client.send({ id: client.socket.id, msg: $("#chatInput").val() }, "chatMessage");
                 $("#chatInput").val("");
             }
         });
