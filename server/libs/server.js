@@ -32,18 +32,19 @@
       cookie: false
     });
 
-    io.sockets.on('connection', newConnection);
-
-
-    function newConnection(socket) {
+    io.on('connection', (socket) => {
       module.exports.onConnect(socket);
-      socket.on('disconnect', () => module.exports.onDisconnect(socket));
+      socket.on('disconnect', () => {
+        module.exports.onDisconnect(socket)
+        console.log(color.red, socket.id);
+      });
       // module.exports.keywords(socket);
       for (var i = 0; i < lst.length; i++) {
         socket.on(lst[i].key, lst[i].func);
       }
-      //console.log(color.green, socket.id);
-    };
+      console.log(color.green, socket.id);
+    });
+
     module.exports.send = function (data, key="send") {
       io.sockets.emit(key, data);
     };

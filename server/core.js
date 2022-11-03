@@ -22,10 +22,10 @@ server.on("playerInput", (id) => {
     server.emit(id, {msg: "you're bad"}, "alertMessage");    
 });
 
-server.on("chatMessage", (data) => {
+server.on("chatMessage", (socket) => {
     console.log("chat receive")
-    if (filterMessage(data)) {
-        server.send({ user: "anon" + data.id.substring(0, 4), msg: data.msg },"chatMessage")
+    if (filterMessage(socket.data)) {
+        server.send({ user: "anon" + socket.id.substring(0, 4), msg: socket.data.msg },"chatMessage")
     }
 });
 
@@ -36,7 +36,6 @@ server.on("Alert", (data) => {
 
 // connection events
 server.onConnect = (socket) => {
-    console.log(socket.id + " connected!");
     socket.emit("onConnect", { id: socket.id });
 }
 

@@ -205,7 +205,8 @@ class Minesweeper {
         $("#chatInput").on('keypress', function (e) {
             // check ENTER go send chat
             if ($("#chatInput:focus") && $("#chatInput").val() && e.which === 13) {
-                client.send({ id: client.socket.id, msg: $("#chatInput").val() }, "chatMessage");
+                client.socket.data = { msg: $("#chatInput").val() };
+                client.send(client.socket, "chatMessage");
                 $("#chatInput").val("");
             }
         });
