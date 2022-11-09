@@ -22,10 +22,10 @@ server.on("playerInput", (id) => {
     server.emit(id, {msg: "you're bad"}, "alertMessage");    
 });
 
-server.on("chatMessage", (socket) => {
+server.on("chatMessage", (data) => {
     console.log("chat receive")
-    if (filterMessage(socket.data)) {
-        server.send({ user: "anon" + socket.id.substring(0, 4), msg: socket.data.msg },"chatMessage")
+    if (filterMessage(data)) {
+        server.send({ user: "anon" + data.id.substring(0, 4), msg: data.msg },"chatMessage")
     }
 });
 

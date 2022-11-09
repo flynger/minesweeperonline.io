@@ -1,74 +1,16 @@
 var latency = 0;
-var client = {
-    socket: null,
-    init: (link) => {
-        client.socket = io.connect(link);
+var link = "10.40.30.150:3000";
+var socket = io.connect(link);
 
-        client.socket.on('pong', (ms) => {
-            latency = ms;
-        });
-        // client.socket.on("loginFail", () => {
-        //     alert("Login failed. Your username or password is incorrect.");
-        // });
-        // client.socket.on("loginSuccess", (data) => {
-        //     //alert("You have logged in successfully.");
-        // });
-        // client.socket.on("signUp", (data) => {
-        //     alert("Your account has been created and you have been logged in.");
-        // });
-        // client.socket.on("signUpExists", (data) => {
-        //     alert("Sign up failed. This username has already been taken.");
-        // });
-        // client.socket.on("signUpFail", (data) => {
-        //     alert("Sign up failed. Invalid parameters.");
-        // });
-        // client.socket.on("nameError", (data) => {
-        //     alert("Invalid username. A username may only include alphanumeric characters, underscores, and be a length of 3 to 16 characters.");
-        // });
-        // client.socket.on("passError", (data) => {
-        //     alert("Invalid password. A password must include 1 lowercase letter, 1 uppercase letter, 1 number, and be at least 8 characters long.");
-        // });
-        // client.socket.on("doubleError", (data) => {
-        //     alert("This user is already logged in.");
-        // });
-
-        // client.socket.on("kickEvent", (data) => {
-        //     if (data.kicked) {
-        //         alert("You have been kicked from the server by " + data.name + ".");
-        //         client.socket.disconnect();
-        //     }
-        // });
-        // client.socket.on("onConnect", (data) => {
-
-        // });
-        // client.socket.on("sendDisconnect", (data) => {
-            
-        // });
-        // client.socket.on("serverDown", () => {
-        //     setInterval(addChatMessage, 250, { user: "YourMom", msg: "<text style=\"color: red;\">Time to sleep little timmy</text>" });
-        //     //addChatMessage();
-        // });
-        client.socket.on("alertMessage", (data) => {
-            alert(data.msg);
-        });
-        client.socket.on("chatMessage", (data) => {
-            addChatMessage(data.user, data.msg);
-        });
-
-    },
-    send: (data, key) => {
-        if (!key) key = "send";
-        client.socket.emit(key, data);
-    }
-}
-
-function sendEvent(name) {
-    client.send(client.socket.id, name);
-}
-
-// client.init("73.225.174.140:3000");
-// client.init("localhost:3000");
-client.init("10.40.30.150:3000");
+socket.on('pong', (ms) => {
+    latency = ms;
+});
+socket.on("alertMessage", (data) => {
+    alert(data.msg);
+});
+socket.on("chatMessage", (data) => {
+    addChatMessage(data.user, data.msg);
+});
 
 class Minesweeper {
     constructor() {
@@ -86,6 +28,103 @@ class Minesweeper {
 
         // reset board
         this.GRID = [];
+        this.resetBoard();
+
+        // create mouse events
+        $("#game").on("mouseup", e => {
+            e.preventDefault();
+            let [x, y] = this.getCellFromID($(e.target).attr("id"));
+            switch (e.which) {
+                case 1:
+                    if ($(e.target).hasClass("empty")) {
+                        if (minesweeper.GRID.length == 0) {
+                            minesweeper.GRID = minesweeper.createBoard(x, y, minesweeper.settings.width, minesweeper.settings.height, minesweeper.settings.mines);
+                        }
+                        minesweeper.clearCell(x, y);
+                    } else if (minesweeper.satisfyFlags(x, y)) {
+                        minesweeper.clearCells(x, y);
+                    }
+                    break;
+                case 2:
+                    //alert('Middle mouse button is pressed');
+                    break;
+                case 3:
+                    // clear cells around mouse
+                    // if (game.satisfyFlags(x, y)) {
+                    //     game.clearCells(x, y);
+                    // }
+                    break;
+                default:
+                    alert('Nothing');
+            }
+        });
+
+        $("#game").unbind("mousedown").on("mousedown", e => {
+            e.preventDefault();
+            switch (e.which) {
+                case 1:
+                    if ($(e.target).hasClass("blank")) {
+                        $(e.target).attr("class", "cell empty");
+                    }
+                    break;
+                case 2:
+                    //alert('Middle mouse button is pressed');
+                    break;
+                case 3:
+                    if ($(e.target).hasClass("blank")) {
+                        // if cell blank, add flag
+                        $(e.target).attr("class", "cell bombflagged");
+                    } else if ($(e.target).hasClass("bombflagged")) {
+                        // if flag, revert to blank
+                        $(e.target).attr("class", "blank");
+                    } else if (e.which == 1) {
+                        // if left click is on, clear cells
+                        minesweeper.clearCells(x, y);
+                    }
+                    break;
+                default:
+                    alert('Nothing');
+            }
+        });
+
+        $("#game").on("mouseout", e => {
+            e.preventDefault();
+            if ($(e.target).hasClass("empty")) {
+                $(e.target).attr("class", "blank");
+            }
+        });
+
+        $("#game").on("mouseover", e => {
+            e.preventDefault();
+            switch (e.buttons) {
+                case 1:
+                    let [x, y] = this.getCellFromID($(e.target).attr("id"));
+                    minesweeper.selectCell(x, y);
+                    break;
+                case 3:
+                    //selectCell(x, y);
+                    break;
+                default:
+                // nothing
+            }
+        });
+
+        $("#chatInput").on('keypress', function (e) {
+            // check ENTER
+            if ($("#chatInput:focus") && $("#chatInput").val() && e.which === 13) {
+                var typedMessage = $("#chatInput").val();
+                // send chat to server
+                if (typedMessage == "/ping") {
+                    addChatMessage("Your ping is " + latency + "ms.")
+                } else {
+                    socket.emit({ id: client.socket.id, msg: typedMessage }, "chatMessage");
+                }
+                // clear chat
+                $("#chatInput").val("");
+            }
+        }); 
+    }
+    resetBoard() {
         $("#game").html("");
         $("#game").width(this.settings.width * this.TILE_SIZE + this.BORDER * 2);
         $("#game").height(this.settings.height * this.TILE_SIZE + this.BORDER * 2);
@@ -116,97 +155,6 @@ class Minesweeper {
 
         // set the html onto the grid
         $("#game").html(grid);
-        $("#game").data("game", this);
-        console.log($("#game").data("game"));
-
-        // create mouse events
-        $("#game").on("mouseup", { game: $("#game").data("game") }, e => {
-            e.preventDefault();
-            let game = e.data.game;
-            let [x, y] = this.getCellFromID($(e.target).attr("id"));
-            switch (e.which) {
-                case 1:
-                    if ($(e.target).hasClass("empty")) {
-                        if (game.GRID.length == 0) {
-                            game.GRID = game.createBoard(x, y, game.settings.width, game.settings.height, game.settings.mines);
-                        }
-                        game.clearCell(x, y);
-                    } else if (game.satisfyFlags(x, y)) {
-                        game.clearCells(x, y);
-                    }
-                    break;
-                case 2:
-                    //alert('Middle mouse button is pressed');
-                    break;
-                case 3:
-                    // clear cells around mouse
-                    // if (game.satisfyFlags(x, y)) {
-                    //     game.clearCells(x, y);
-                    // }
-                    break;
-                default:
-                    alert('Nothing');
-            }
-        });
-
-        $("#game").unbind("mousedown").on("mousedown", { game: $("#game").data("game") }, e => {
-            e.preventDefault();
-            switch (e.which) {
-                case 1:
-                    if ($(e.target).hasClass("blank")) {
-                        $(e.target).attr("class", "cell empty");
-                    }
-                    break;
-                case 2:
-                    //alert('Middle mouse button is pressed');
-                    break;
-                case 3:
-                    if ($(e.target).hasClass("blank")) {
-                        // if cell blank, add flag
-                        $(e.target).attr("class", "cell bombflagged");
-                    } else if ($(e.target).hasClass("bombflagged")) {
-                        // if flag, revert to blank
-                        $(e.target).attr("class", "blank");
-                    } else if (e.which == 1) {
-                        // if left click is on, clear cells
-                        e.data.game.clearCells(x, y);
-                    }
-                    break;
-                default:
-                    alert('Nothing');
-            }
-        });
-
-        $("#game").on("mouseout", e => {
-            e.preventDefault();
-            if ($(e.target).hasClass("empty")) {
-                $(e.target).attr("class", "blank");
-            }
-        });
-
-        $("#game").on("mouseover", { game: $("#game").data("game") }, e => {
-            e.preventDefault();
-            switch (e.buttons) {
-                case 1:
-                    let [x, y] = this.getCellFromID($(e.target).attr("id"));
-                    e.data.game.selectCell(x, y);
-                    break;
-                case 3:
-                    //selectCell(x, y);
-                    break;
-                default:
-                // nothing
-            }
-        });
-
-        $("#chatInput").on('keypress', function (e) {
-            // check ENTER go send chat
-            if ($("#chatInput:focus") && $("#chatInput").val() && e.which === 13) {
-                client.socket.data = { msg: $("#chatInput").val() };
-                client.send(client.socket, "chatMessage");
-                $("#chatInput").val("");
-            }
-        });
     }
     updateCustomSettings() {
         this.CUSTOM = { height: +$("#custom_height").val(), width: +$("#custom_width").val(), mines: +$("#custom_mines").val() };
@@ -352,4 +300,8 @@ function randomNumber(min, max) {
 
 function addChatMessage(user, msg) {
     $("#chatText").html($("#chatText").html() + "<br> " + user + " said: " + msg);
+}
+
+function addChatMessage(msg) {
+    $("#chatText").html($("#chatText").html() + "<br> <text color='red'>" + msg + "</text>");
 }
