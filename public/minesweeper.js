@@ -31,9 +31,9 @@ class Minesweeper {
         this.resetBoard();
 
         // create mouse events
-        $("#game").on("mouseup", e => {
+        $("#game").on('mouseup', e => {
             e.preventDefault();
-            let [x, y] = this.getCellFromID($(e.target).attr("id"));
+            let [x, y] = this.getCellFromID($(e.target).attr('id'));
             switch (e.which) {
                 case 1:
                     if ($(e.target).hasClass("empty")) {
@@ -55,11 +55,11 @@ class Minesweeper {
                     // }
                     break;
                 default:
-                    alert('Nothing');
+                    alert("Nothing");
             }
         });
 
-        $("#game").unbind("mousedown").on("mousedown", e => {
+        $("#game").unbind('mousedown').on("mousedown", e => {
             e.preventDefault();
             switch (e.which) {
                 case 1:
@@ -87,25 +87,29 @@ class Minesweeper {
             }
         });
 
-        $("#game").on("mouseout", e => {
+        $("#game").on('mouseout', e => {
             e.preventDefault();
             if ($(e.target).hasClass("empty")) {
                 $(e.target).attr("class", "blank");
             }
         });
 
-        $("#game").on("mouseover", e => {
+        $("#game").on('mouseover', e => {
+            let [x, y] = this.getCellFromID($(e.target).attr("id"));
             e.preventDefault();
             switch (e.buttons) {
                 case 1:
-                    let [x, y] = this.getCellFromID($(e.target).attr("id"));
-                    minesweeper.selectCell(x, y);
+                    this.selectCell(x, y);
                     break;
                 case 3:
                     //selectCell(x, y);
                     break;
                 default:
                 // nothing
+            }
+            // check SPACE
+            if (keyIsDown(32)) {
+                this.clearCells(x, y);
             }
         });
 
