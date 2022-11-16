@@ -1,7 +1,10 @@
 var latency = 0;
-var link = "10.40.30.150:3000";
+var link = "10.40.30.150";
 var socket = io.connect(link);
 
+socket.on('connect', (ms) => {
+    // connect event
+});
 socket.on('pong', (ms) => {
     latency = ms;
 });
