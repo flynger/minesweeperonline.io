@@ -1,5 +1,5 @@
 var latency = 0;
-var link = "10.40.30.150";
+var link = "localhost:3000";
 var socket = io.connect(link);
 
 socket.on('connect', (ms) => {
@@ -124,7 +124,7 @@ class Minesweeper {
                 if (typedMessage == "/ping") {
                     addChatMessage("Your ping is " + latency + "ms.")
                 } else {
-                    socket.emit({ id: client.socket.id, msg: typedMessage }, "chatMessage");
+                    socket.emit({ msg: typedMessage }, "chatMessage");
                 }
                 // clear chat
                 $("#chatInput").val("");
