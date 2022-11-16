@@ -12,6 +12,12 @@ socket.on("chatMessage", (data) => {
     addChatMessage(data.user, data.msg);
 });
 
+var minesweeper;
+function setup() {
+    minesweeper = new Minesweeper();
+    minesweeper.startGame();
+}
+
 class Minesweeper {
     constructor() {
         this.TILE_SIZE = 32,
@@ -71,16 +77,8 @@ class Minesweeper {
                     //alert('Middle mouse button is pressed');
                     break;
                 case 3:
-                    if ($(e.target).hasClass("blank")) {
-                        // if cell blank, add flag
-                        $(e.target).attr("class", "cell bombflagged");
-                    } else if ($(e.target).hasClass("bombflagged")) {
-                        // if flag, revert to blank
-                        $(e.target).attr("class", "blank");
-                    } else if (e.which == 1) {
-                        // if left click is on, clear cells
-                        minesweeper.clearCells(x, y);
-                    }
+                    let [x, y] = this.getCellFromID($(e.target).attr("id"));
+                    this.flagAndClear($(e.target), x, y, e.which == 1);
                     break;
                 default:
                     alert('Nothing');
@@ -95,21 +93,23 @@ class Minesweeper {
         });
 
         $("#game").on('mouseover', e => {
-            let [x, y] = this.getCellFromID($(e.target).attr("id"));
-            e.preventDefault();
-            switch (e.buttons) {
-                case 1:
-                    this.selectCell(x, y);
-                    break;
-                case 3:
-                    //selectCell(x, y);
-                    break;
-                default:
-                // nothing
-            }
-            // check SPACE
-            if (keyIsDown(32)) {
-                this.clearCells(x, y);
+            if ($(e.target).hasClass("cell")) {
+                let [x, y] = this.getCellFromID($(e.target).attr("id"));
+                e.preventDefault();
+                switch (e.buttons) {
+                    case 1:
+                        this.selectCell(x, y);
+                        break;
+                    case 3:
+                        //selectCell(x, y);
+                        break;
+                    default:
+                    // nothing
+                }
+                // check SPACE
+                if (keyIsDown(32)) {
+                    this.flagAndClear($(e.target), x, y, true);
+                }
             }
         });
 
@@ -126,7 +126,7 @@ class Minesweeper {
                 // clear chat
                 $("#chatInput").val("");
             }
-        }); 
+        });
     }
     resetBoard() {
         $("#game").html("");
@@ -257,6 +257,18 @@ class Minesweeper {
         //         if (this.getCanvasCell(thisX, thisY).length && this.getCanvasCell(thisX, thisY).hasClass("blank")) this.clearCell(thisX, thisY);
         //     }
         // }
+    }
+    flagAndClear(cell, x, y, clearCondition) {
+        if (cell.hasClass("blank")) {
+            // if cell blank, add flag
+            cell.attr("class", "cell bombflagged");
+        } else if (cell.hasClass("bombflagged")) {
+            // if flag, revert to blank
+            cell.attr("class", "blank");
+        } else if (clearCondition) {
+            // if left click is on, clear cells
+            minesweeper.clearCells(x, y);
+        }
     }
     getCanvasCell(x, y) {
         return $("#" + y + "_" + x);

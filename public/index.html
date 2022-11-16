@@ -4,16 +4,18 @@
   <title>Minesweeper</title>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.0/socket.io.min.js"></script>
-  <script src="libraries/p5.min.js"></script>
-  <script src="libraries/p5.dom.min.js"></script>
-  <script src="libraries/p5.play.js"></script>
-  <script src="libraries/p5.sound.min.js"></script>
-  <script src="libraries/joy.js"></script>
-  <link href="libraries/jquery-ui.css" rel="stylesheet" />
-  <link href="style.css" rel="stylesheet" />
-  <link href="minesweeper.min.css" rel="stylesheet" />
+
   <script src="libraries/jquery-3.6.0.js"></script>
   <script src="libraries/jquery-ui.js"></script>
+  <!-- <script src="libraries/p5.min.js"></script>
+  <script src="libraries/p5.dom.min.js"></script>
+  <script src="libraries/p5.play.js"></script>
+  <script src="libraries/p5.sound.min.js"></script> -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.5.0/p5.min.js"></script>
+  <link href="libraries/jquery-ui.css" rel="stylesheet" />
+
+  <link href="style.css" rel="stylesheet" />
+  <link href="minesweeper.min.css" rel="stylesheet" />
   <script src="minesweeper.js"></script>
 </head>
 <body oncontextmenu="return false;">
@@ -73,8 +75,4 @@
       <input id="chatInput" type="text">
   </div>
 </body>
-<script type="text/javascript">
-    var minesweeper = new Minesweeper();
-    minesweeper.startGame();
-    </script>
 </html>
