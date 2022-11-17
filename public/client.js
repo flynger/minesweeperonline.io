@@ -42,10 +42,11 @@ class Minesweeper {
         // create mouse events
         $("#game").on("mouseup", e => {
             e.preventDefault();
-            let [x, y] = this.getCellFromID($(e.target).attr("id"));
+            let cell = $(e.target);
+            let [x, y] = this.getCellFromID(cell.attr("id"));
             switch (e.which) {
                 case 1:
-                    if ($(e.target).hasClass("empty")) {
+                    if (cell.hasClass("empty")) {
                         if (minesweeper.GRID.length == 0) {
                             minesweeper.GRID = minesweeper.createBoard(x, y, minesweeper.settings.width, minesweeper.settings.height, minesweeper.settings.mines);
                         }
@@ -70,6 +71,7 @@ class Minesweeper {
 
         $("#game").unbind("mousedown").on("mousedown", e => {
             e.preventDefault();
+            let cell = $(e.target);
             switch (e.which) {
                 case 1:
                     if ($(e.target).hasClass("blank")) {
@@ -80,7 +82,7 @@ class Minesweeper {
                     //alert("Middle mouse button is pressed");
                     break;
                 case 3:
-                    let [x, y] = this.getCellFromID($(e.target).attr("id"));
+                    let [x, y] = this.getCellFromID(cell.attr("id"));
                     this.flagAndClear(x, y, e.which == 1);
                     break;
                 default:
@@ -90,14 +92,16 @@ class Minesweeper {
 
         $("#game").on("mouseout", e => {
             e.preventDefault();
-            if ($(e.target).hasClass("empty")) {
-                $(e.target).attr("class", "blank");
+            let cell = $(e.target);
+            if (cell.hasClass("empty")) {
+                cell.attr("class", "blank");
             }
         });
 
         $("#game").on("mouseover", e => {
-            if ($(e.target).hasClass("cell")) {
-                let [x, y] = this.getCellFromID($(e.target).attr("id"));
+            let cell = $(e.target);
+            if (cell.hasClass("cell")) {
+                let [x, y] = this.getCellFromID(cell.attr("id"));
                 e.preventDefault();
                 switch (e.buttons) {
                     case 1:
