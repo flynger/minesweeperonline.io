@@ -52,7 +52,7 @@ class Minesweeper {
                         }
                         minesweeper.clearCell(x, y);
                     } else if (minesweeper.satisfyFlags(x, y)) {
-                        minesweeper.clearCells(x, y);
+                        minesweeper.clearCells(x, y, false);
                     }
                     break;
                 case 2:
@@ -250,12 +250,12 @@ class Minesweeper {
         this.getCanvasCell(x, y).attr("class", classToAdd);
         // if a 0, open nearby cells
         if (cell === 0) {
-            this.clearCells(x, y);
+            this.clearCells(x, y, true);
         }
     }
-    clearCells(x, y) {
+    clearCells(x, y, overrideFlags) {
         this.doCellOperation(x, y, (thisX, thisY, thisCell) => {
-            if (thisCell.hasClass("blank")) this.clearCell(thisX, thisY);
+            if (thisCell.hasClass("blank") || (overrideFlags && thisCell.hasClass("bombflagged"))) this.clearCell(thisX, thisY);
         });
         // for (let v = -1; v <= 1; v++) {
         //     for (let h = -1; h <= 1; h++) {
@@ -275,7 +275,7 @@ class Minesweeper {
             cell.attr("class", "blank");
         } else if (clearCondition) {
             // if left click is on, clear cells
-            minesweeper.clearCells(x, y);
+            minesweeper.clearCells(x, y, false);
         }
     }
     getCanvasCell(x, y) {
