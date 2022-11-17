@@ -124,7 +124,7 @@ class Minesweeper {
                 if (typedMessage == "/ping") {
                     addChatMessage("Your ping is " + latency + "ms.")
                 } else {
-                    socket.emit({ msg: typedMessage }, "chatMessage");
+                    socket.emit("chatMessage", { msg: typedMessage });
                 }
                 // clear chat
                 $("#chatInput").val("");

@@ -79,7 +79,7 @@ server.on('playerInput', (socket, id) => {
 server.on('chatMessage', (socket, data) => {
     let message = filterMessage(data.msg);
 
-    console.log(socket);
+    //console.log('Message Sent');
     // if msg too long send an error back, else send it to all users
     if (message.length > 50) {
         socket.emit({ user: "Server", msg: `Your message is longer than 50 characters. (${message.length} characters)` }, 'chatMessage');
