@@ -126,7 +126,7 @@ class Minesweeper {
                 var typedMessage = $("#chatInput").val();
                 // send chat to server
                 if (typedMessage == "/ping") {
-                    addChatMessage("Your ping is " + latency + "ms.")
+                    addServerMessage("Your ping is " + latency + "ms.")
                 } else {
                     socket.emit("chatMessage", { msg: typedMessage });
                 }
@@ -326,6 +326,6 @@ function addChatMessage(user, msg) {
     $("#chatText").html($("#chatText").html() + "<br> " + user + " said: " + msg);
 }
 
-// function addChatMessage(msg) {
-//     $("#chatText").html($("#chatText").html() + "<br> <text color='red'>" + msg + "</text>");
-// }
+function addServerMessage(msg) {
+    $("#chatText").html($("#chatText").html() + "<br> <text color='red'>" + msg + "</text>");
+}
