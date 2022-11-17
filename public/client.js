@@ -320,7 +320,3 @@ function randomNumber(min, max) {
 function addChatMessage(user, msg) {
     $("#chatText").html($("#chatText").html() + "<br> " + user + " said: " + msg);
 }
-
-function addChatMessage(msg) {
-    $("#chatText").html($("#chatText").html() + "<br> <text color='red'>" + msg + "</text>");
-}
