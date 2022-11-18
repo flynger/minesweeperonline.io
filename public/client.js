@@ -248,12 +248,12 @@ class Minesweeper {
             classToAdd = "bombdeath";
         } else {
             classToAdd = "open" + cell;
+            this.OPENCELLS++;
         }
         // open the cell
         this.getCanvasCell(x, y).attr("class", classToAdd);
         
         // checks if all possible cleared cells are cleared
-        this.OPENCELLS++;
         if(this.OPENCELLS === this.TOTALCELLS) {
             for (let row in this.GRID) {
                 for (let col in this.GRID[row]) {
