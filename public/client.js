@@ -252,6 +252,7 @@ class Minesweeper {
         // open the cell
         this.getCanvasCell(x, y).attr("class", classToAdd);
         
+        // checks if all possible cleared cells are cleared
         this.OPENCELLS++;
         if(this.OPENCELLS === this.TOTALCELLS) {
             for (let row in this.GRID) {
