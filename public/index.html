@@ -4,7 +4,8 @@
   <title>Minesweeper</title>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.0/socket.io.min.js"></script>
-
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    
   <script src="libraries/jquery-3.6.0.js"></script>
   <script src="libraries/jquery-ui.js"></script>
   <!-- <script src="libraries/p5.min.js"></script>
@@ -19,7 +20,13 @@
   <script src="client.js"></script>
 </head>
 <body oncontextmenu="return false;">
+</body>
   <h1>Minesweeper</h1>
+    </tbody>
+        <div id="settingsButton">
+            <button onclick="location.href='settings.html'" class="button"><i class="fa fa-cog"></i></button>
+        </div>
+    </body>
   <p>Click to reveal a location. Right-click to flag/unflag a location.</p>
   <table cellspacing="0" cellpadding="2" id="options" class="dialog" style="display: table;">
     <tbody><tr class="dialog-title">
