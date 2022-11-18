@@ -1,85 +1,99 @@
 <!DOCTYPE html>
 <html lang="en-US">
-<head>
-  <title>Minesweeper</title>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.0/socket.io.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    
-  <script src="libraries/jquery-3.6.0.js"></script>
-  <script src="libraries/jquery-ui.js"></script>
-  <!-- <script src="libraries/p5.min.js"></script>
+<head>
+    <title>Minesweeper</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.0/socket.io.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <script src="libraries/jquery-3.6.0.js"></script>
+    <script src="libraries/jquery-ui.js"></script>
+    <!-- <script src="libraries/p5.min.js"></script>
   <script src="libraries/p5.dom.min.js"></script>
   <script src="libraries/p5.play.js"></script>
   <script src="libraries/p5.sound.min.js"></script> -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.5.0/p5.min.js"></script>
-  <link href="libraries/jquery-ui.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.5.0/p5.min.js"></script>
+    <link href="libraries/jquery-ui.css" rel="stylesheet" />
 
-  <link href="style.css" rel="stylesheet" />
-  <link href="minesweeper.min.css" rel="stylesheet" />
-  <script src="client.js"></script>
+    <link href="style.css" rel="stylesheet" />
+    <link href="minesweeper.min.css" rel="stylesheet" />
+    <script src="client.js"></script>
+    <div id="homeButton">
+        <a href="index.html"><img src="res/logo.png" /></a>
+    </div>
 </head>
+
 <body oncontextmenu="return false;">
-</body>
-  <h1>Minesweeper</h1>
-    </tbody>
-        <div id="settingsButton">
-            <button onclick="location.href='settings.html'" class="button"><i class="fa fa-cog"></i></button>
-        </div>
-    </body>
-  <p>Click to reveal a location. Right-click to flag/unflag a location.</p>
-  <table cellspacing="0" cellpadding="2" id="options" class="dialog" style="display: table;">
-    <tbody><tr class="dialog-title">
-        <td style="padding: 3px;">Game</td>
-        <td colspan="3" style="padding: 3px; text-align: right;">
-            <span id="options-close" class="dialog-close" title="close this box">×</span>
-        </td>
-    </tr>
-    <tr class="dialog-bar">
-        <td></td>
-        <td>Height</td>
-        <td>Width</td>
-        <td>Mines</td>
-    </tr>
-    <tr>
-        <td><label><input type="radio" name="difficulty" value="BEGINNER"> <strong>Beginner</strong></label></td>
-        <td>9</td>
-        <td>9</td>
-        <td>10</td>
-    </tr>
-    <tr>
-        <td><label><input type="radio" name="difficulty" value="INTERMEDIATE"> <strong>Intermediate</strong></label></td>
-        <td>16</td>
-        <td>16</td>
-        <td>40</td>
-    </tr>
-    <tr>
-        <td><label><input type="radio" name="difficulty" checked="checked" value="EXPERT"> <strong>Expert</strong></label></td>
-        <td>16</td>
-        <td>30</td>
-        <td>99</td>
-    </tr>
-    <tr>
-        <td><label><input type="radio" name="difficulty" id="custom" value="CUSTOM"> Custom</label></td>
-        <td><input type="number" min="1" class="difficulty-select" value="20" id="custom_height" onclick="$('#custom').prop('checked', true);" onchange="minesweeper.updateCustomSettings()"></td>
-        <td><input type="number" min="1" class="difficulty-select" value="30" id="custom_width" onclick="$('#custom').prop('checked', true);" onchange="minesweeper.updateCustomSettings()"></td>
-        <td><input type="number" min="0" class="difficulty-select" value="145" id="custom_mines" onclick="$('#custom').prop('checked', true);" onchange="minesweeper.updateCustomSettings()"></td>
-    </tr>
-    <tr class="dialog-bar">
-        <td><input type="button" class="button" value="New Game" style="vertical-align: middle;" onclick="minesweeper.startGame()"></td>
-        <!-- <td colspan="3">
+    <div id="settingsButton">
+        <button onclick="location.href='settings.html'" class="button"><i class="fa fa-cog"></i></button>
+    </div>
+    <p>Click to reveal a location. Right-click to flag/unflag a location.</p>
+    <table cellspacing="0" cellpadding="2" id="options" class="dialog" style="display: table;">
+        <tbody>
+            <tr class="dialog-title">
+                <td style="padding: 3px;">Game</td>
+                <td colspan="3" style="padding: 3px; text-align: right;">
+                    <span id="options-close" class="dialog-close" title="close this box">×</span>
+                </td>
+            </tr>
+            <tr class="dialog-bar">
+                <td></td>
+                <td>Height</td>
+                <td>Width</td>
+                <td>Mines</td>
+            </tr>
+            <tr>
+                <td><label><input type="radio" name="difficulty" value="BEGINNER"> <strong>Beginner</strong></label>
+                </td>
+                <td>9</td>
+                <td>9</td>
+                <td>10</td>
+            </tr>
+            <tr>
+                <td><label><input type="radio" name="difficulty" value="INTERMEDIATE">
+                        <strong>Intermediate</strong></label></td>
+                <td>16</td>
+                <td>16</td>
+                <td>40</td>
+            </tr>
+            <tr>
+                <td><label><input type="radio" name="difficulty" checked="checked" value="EXPERT">
+                        <strong>Expert</strong></label></td>
+                <td>16</td>
+                <td>30</td>
+                <td>99</td>
+            </tr>
+            <tr>
+                <td><label><input type="radio" name="difficulty" id="custom" value="CUSTOM"> Custom</label></td>
+                <td><input type="number" min="1" class="difficulty-select" value="20" id="custom_height"
+                        onclick="$('#custom').prop('checked', true);" onchange="minesweeper.updateCustomSettings()">
+                </td>
+                <td><input type="number" min="1" class="difficulty-select" value="30" id="custom_width"
+                        onclick="$('#custom').prop('checked', true);" onchange="minesweeper.updateCustomSettings()">
+                </td>
+                <td><input type="number" min="0" class="difficulty-select" value="145" id="custom_mines"
+                        onclick="$('#custom').prop('checked', true);" onchange="minesweeper.updateCustomSettings()">
+                </td>
+            </tr>
+            <tr class="dialog-bar">
+                <td><input type="button" class="button" value="New Game" style="vertical-align: middle;"
+                        onclick="minesweeper.startGame()"></td>
+                <!-- <td colspan="3">
             <label style="margin-bottom: 0;"><input type="checkbox" id="marks"> Marks (?)</label>
         </td> -->
-    </tr>
-</tbody></table>
-  <div id="game-container" class="z200" style="width: 1000px;">
-    <div id="game">
+            </tr>
+        </tbody>
+    </table>
+    <div id="game-container" class="z200" style="width: 1000px;">
+        <div id="game">
+        </div>
     </div>
-  </div>
-  <div id="chat">
-      <p id="chatText" >Chat:</p>
-      <br>
-      <input id="chatInput" type="text">
-  </div>
+    <div id="chat">
+        <p id="chatText">Chat:</p>
+        <br>
+        <input id="chatInput" type="text">
+    </div>
 </body>
+
 </html>

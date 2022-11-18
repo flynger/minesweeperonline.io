@@ -1,5 +1,5 @@
 var latency = 0;
-var link = "localhost:3000";
+var link = "10.140.1.151:3000";
 var socket = io.connect(link);
 
 socket.on("connect", (ms) => {
@@ -117,7 +117,9 @@ class Minesweeper {
                     // nothing
                 }
                 // check SPACE
+
                 if (keyIsDown(32)) {
+
                     this.flagAndClear(x, y, true);
                 }
             }
@@ -252,9 +254,9 @@ class Minesweeper {
         }
         // open the cell
         this.getCanvasCell(x, y).attr("class", classToAdd);
-        
+
         // checks if all possible cleared cells are cleared
-        if(this.OPENCELLS === this.TOTALCELLS) {
+        if (this.OPENCELLS === this.TOTALCELLS) {
             for (let row in this.GRID) {
                 for (let col in this.GRID[row]) {
                     if (this.GRID[row][col] === "X") {
