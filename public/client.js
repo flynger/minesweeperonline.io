@@ -35,6 +35,9 @@ class Minesweeper {
         // get difficulty
         this.settings = this[$("input[name='difficulty']:checked").val()];
 
+        this.TOTALCELLS = (minesweeper.settings.width * minesweeper.settings.height) - minesweeper.settings.mines;
+        this.OPENCELLS = 0;
+
         // reset board
         this.GRID = [];
         this.resetBoard();
@@ -248,6 +251,18 @@ class Minesweeper {
         }
         // open the cell
         this.getCanvasCell(x, y).attr("class", classToAdd);
+        
+        this.OPENCELLS++;
+        if(this.OPENCELLS === this.TOTALCELLS) {
+            for (let row in this.GRID) {
+                for (let col in this.GRID[row]) {
+                    if (this.GRID[row][col] === "X") {
+                        this.getCanvasCell(col, row).attr("class", "bombflagged");
+                    }
+                }
+            }
+        }
+
         // if a 0, open nearby cells
         if (cell === 0) {
             this.clearCells(x, y, true);
