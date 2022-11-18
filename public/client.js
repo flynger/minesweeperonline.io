@@ -96,13 +96,16 @@ class Minesweeper {
         $("#game").on("mouseout", e => {
             e.preventDefault();
             let cell = $(e.target);
+            // console.log(cell);
             if (cell.hasClass("empty")) {
-                cell.attr("class", "blank");
+                cell.attr("class", "cell blank");
             }
         });
 
         $("#game").on("mouseover", e => {
             let cell = $(e.target);
+            // console.log(cell);
+            // console.log(e.buttons);
             if (cell.hasClass("cell")) {
                 let [x, y] = this.getCellFromID(cell.attr("id"));
                 e.preventDefault();
@@ -119,7 +122,6 @@ class Minesweeper {
                 // check SPACE
 
                 if (keyIsDown(32)) {
-
                     this.flagAndClear(x, y, true);
                 }
             }
@@ -156,7 +158,7 @@ class Minesweeper {
         for (let i = 0; i < this.settings.height; i++) {
             grid += this.createImg("border-v");
             for (let j = 0; j < this.settings.width; j++) {
-                grid += this.createImg("blank", i + "_" + j);
+                grid += this.createImg("cell blank", i + "_" + j);
             }
             grid += this.createImg("border-v");
             grid += "<br>";
@@ -249,13 +251,13 @@ class Minesweeper {
             $("#game").off();
             classToAdd = "bombdeath";
         } else {
-            classToAdd = "open" + cell;
+            classToAdd = "cell open" + cell;
             this.OPENCELLS++;
         }
         // open the cell
         this.getCanvasCell(x, y).attr("class", classToAdd);
 
-        // checks if all possible cleared cells are cleared
+        // checks if all possible cleared cells are cleared (win code)
         if (this.OPENCELLS === this.TOTALCELLS) {
             for (let row in this.GRID) {
                 for (let col in this.GRID[row]) {
@@ -290,8 +292,8 @@ class Minesweeper {
             cell.attr("class", "cell bombflagged");
         } else if (cell.hasClass("bombflagged")) {
             // if flag, revert to blank
-            cell.attr("class", "blank");
-        } else if (clearCondition) {
+            cell.attr("class", "cell blank");
+        } else if (clearCondition && this.satisfyFlags(x, y)) {
             // if left click is on, clear cells
             minesweeper.clearCells(x, y, false);
         }
@@ -308,7 +310,7 @@ class Minesweeper {
         let cell = this.getCanvasCell(x, y);
         // if cell exists and is blank
         if (cell.length && cell.hasClass("blank")) {
-            cell.attr("class", "empty");
+            cell.attr("class", "cell empty");
         }
     }
     selectCells(x, y) {

@@ -48,8 +48,8 @@ body {
 }
 #chat {
     position: absolute;
-    right: 20%;
-    top: 30%;
+    right: 50px;
+    top: 250px;
 }
 #chatText {
     width: 200px;
@@ -62,7 +62,7 @@ body {
 
 #settingsButton {
     position: absolute;
-    right: 0%;
-    top: 0%;
+    right: 0px;
+    top: 0px;
     cursor: pointer;
 }
