@@ -66,19 +66,15 @@
             </tr>
             <tr>
                 <td><label><input type="radio" name="difficulty" id="custom" value="CUSTOM"> Custom</label></td>
-                <td><input type="number" min="1" class="difficulty-select" value="20" id="custom_height"
-                        onclick="$('#custom').prop('checked', true);" onchange="minesweeper.updateCustomSettings()">
+                <td><input type="number" min="1" class="difficulty-select" value="20" id="custom_height">
                 </td>
-                <td><input type="number" min="1" class="difficulty-select" value="30" id="custom_width"
-                        onclick="$('#custom').prop('checked', true);" onchange="minesweeper.updateCustomSettings()">
+                <td><input type="number" min="1" class="difficulty-select" value="30" id="custom_width">
                 </td>
-                <td><input type="number" min="0" class="difficulty-select" value="145" id="custom_mines"
-                        onclick="$('#custom').prop('checked', true);" onchange="minesweeper.updateCustomSettings()">
+                <td><input type="number" min="0" class="difficulty-select" value="145" id="custom_mines">
                 </td>
             </tr>
             <tr class="dialog-bar">
-                <td><input type="button" class="button" value="New Game" style="vertical-align: middle;"
-                        onclick="this.blur(); minesweeper.startGame()"></td>
+                <td><input id="startGame" type="button" class="button" value="New Game" style="vertical-align: middle;"></td>
                 <!-- <td colspan="3">
             <label style="margin-bottom: 0;"><input type="checkbox" id="marks"> Marks (?)</label>
         </td> -->

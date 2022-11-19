@@ -672,7 +672,7 @@
     height: 46px
 }
 
-.z200 .empty {
+.z200 .selected {
     background-position: 0 -46px;
     width: 32px;
     height: 32px

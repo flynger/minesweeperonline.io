@@ -19,6 +19,13 @@ var minesweeper;
 function setup() {
     minesweeper = new Minesweeper();
     minesweeper.startGame();
+    // setup events
+    $(".difficulty-select").on("change", minesweeper.updateCustomSettings);
+    $(".difficulty-select").on("click", () => $('#custom').prop('checked', true));
+    $("#startGame").on("click", e => {
+        e.target.blur();
+        minesweeper.startGame();
+    });
 }
 
 class Minesweeper {
@@ -35,7 +42,7 @@ class Minesweeper {
         // get difficulty
         this.settings = this[$("input[name='difficulty']:checked").val()];
 
-        this.TOTALCELLS = (minesweeper.settings.width * minesweeper.settings.height) - minesweeper.settings.mines;
+        this.TOTALCELLS = (this.settings.width * this.settings.height) - this.settings.mines;
         this.OPENCELLS = 0;
 
         var hoverCell, hoverX, hoverY;
@@ -45,20 +52,45 @@ class Minesweeper {
         this.resetBoard();
 
         // create mouse events
-        $("#game").on("mouseup", e => {
+        $("#game").unbind("mousedown").on("mousedown", e => {
             e.preventDefault();
             let cell = $(e.target);
             let [x, y] = this.getCellFromID(cell.attr("id"));
             switch (e.which) {
                 case 1:
-                    if (cell.hasClass("empty")) {
-                        if (minesweeper.GRID.length == 0) {
-                            minesweeper.GRID = minesweeper.createBoard(x, y, minesweeper.settings.width, minesweeper.settings.height, minesweeper.settings.mines);
-                        }
-                        minesweeper.clearCell(x, y);
-                    } else if (minesweeper.satisfyFlags(x, y)) {
-                        minesweeper.clearCells(x, y, false);
+                    if (cell.hasClass("blank")) {
+                        this.selectCell(x, y);
+                    } else if (this.cellIsClear(cell)) {
+                        this.selectCells(x, y);
                     }
+                    break;
+                case 2:
+                    //alert("Middle mouse button is pressed");
+                    break;
+                case 3:
+                    this.flagAndClear(x, y, e.which == 1);
+                    break;
+                default:
+                    alert("Nothing");
+            }
+        });
+
+        $("#game").unbind("mouseup").on("mouseup", e => {
+            e.preventDefault();
+            let cell = $(e.target);
+            let [x, y] = this.getCellFromID(cell.attr("id"));
+            switch (e.which) {
+                case 1:
+                    if (cell.hasClass("selected")) {
+                        // if game doesn't exist, create one
+                        if (this.GRID.length == 0) {
+                            this.GRID = this.createBoard(x, y, this.settings.width, this.settings.height, this.settings.mines);
+                        }
+                        this.clearCell(x, y);
+                    } else if (this.satisfyFlags(x, y)) {
+                        this.clearCells(x, y, false);
+                    }
+                    else this.deselectCells(x, y);
                     break;
                 case 2:
                     //alert("Middle mouse button is pressed");
@@ -74,47 +106,19 @@ class Minesweeper {
             }
         });
 
-        $("#game").unbind("mousedown").on("mousedown", e => {
-            e.preventDefault();
-            let cell = $(e.target);
-            switch (e.which) {
-                case 1:
-                    if ($(e.target).hasClass("blank")) {
-                        $(e.target).attr("class", "cell empty");
-                    }
-                    break;
-                case 2:
-                    //alert("Middle mouse button is pressed");
-                    break;
-                case 3:
-                    let [x, y] = this.getCellFromID(cell.attr("id"));
-                    this.flagAndClear(x, y, e.which == 1);
-                    break;
-                default:
-                    alert("Nothing");
-            }
-        });
-
-        $("#game").on("mouseout", e => {
-            e.preventDefault();
-            let cell = $(e.target);
-            // console.log(cell);
-            if (cell.hasClass("empty")) {
-                cell.attr("class", "cell blank");
-            }
-        });
-
         $("#game").on("mouseover", e => {
             let cell = $(e.target);
-            // console.log(cell);
-            // console.log(e.buttons);
             if (cell.hasClass("cell")) {
                 hoverCell = cell;
                 [hoverX, hoverY] = this.getCellFromID(hoverCell.attr("id"));
                 e.preventDefault();
                 switch (e.buttons) {
                     case 1:
-                        this.selectCell(hoverX, hoverY);
+                        if (cell.hasClass("blank")) {
+                            this.selectCell(hoverX, hoverY);
+                        } else if (this.cellIsClear(cell)) {
+                            this.selectCells(hoverX, hoverY);
+                        }
                         break;
                     case 3:
                         //selectCell(x, y);
@@ -128,11 +132,19 @@ class Minesweeper {
                 hoverX, hoverY = null;
             }
         });
-        
+
+        $("#game").on("mouseout", e => {
+            e.preventDefault();
+            let cell = $(e.target);
+            let [x, y] = this.getCellFromID(cell.attr("id"));
+            // console.log(cell);
+            this.deselectCells(x, y);
+        });
+
         $(document).unbind("keypress").on("keypress", e => {
-            // check SPACE
+            // console.log(hoverCell)
             if (e.which === 32 && e.target == document.body) {
-                //console.log(hoverCell)
+                // check SPACE
                 e.preventDefault();
                 if (hoverCell && hoverCell.hasClass("cell")) {
                     this.flagAndClear(hoverX, hoverY, true);
@@ -143,7 +155,7 @@ class Minesweeper {
         $("#chatInput").on("keypress", e => {
             // check ENTER
             if ($("#chatInput:focus") && $("#chatInput").val() && e.which === 13) {
-                var typedMessage = $("#chatInput").val();
+                let typedMessage = $("#chatInput").val();
                 // send chat to server
                 if (typedMessage == "/ping") {
                     addServerMessage("Your ping is " + latency + "ms.")
@@ -241,7 +253,7 @@ class Minesweeper {
         this.doCellOperation(x, y, (thisX, thisY, thisCell) => {
             if (thisCell.hasClass("bombflagged")) flags++;
         });
-        return this.getCanvasCell(x, y).attr("class").includes("open") && flags === this.GRID[y][x];
+        return this.cellIsClear(this.getCanvasCell(x, y)) && flags === this.GRID[y][x];
     }
     clearCell(x, y) {
         let cell = this.GRID[y][x];
@@ -250,7 +262,7 @@ class Minesweeper {
         if (cell === "X") {
             for (let row in this.GRID) {
                 for (let col in this.GRID[row]) {
-                    var isFlagged = this.getCanvasCell(col, row).hasClass("bombflagged");
+                    let isFlagged = this.getCanvasCell(col, row).hasClass("bombflagged");
                     if (this.GRID[row][col] === "X") {
                         if (!isFlagged) {
                             this.getCanvasCell(col, row).attr("class", "bombrevealed");
@@ -288,15 +300,11 @@ class Minesweeper {
     }
     clearCells(x, y, overrideFlags) {
         this.doCellOperation(x, y, (thisX, thisY, thisCell) => {
-            if (thisCell.hasClass("blank") || (overrideFlags && thisCell.hasClass("bombflagged"))) this.clearCell(thisX, thisY);
+            if (!this.cellIsClear(thisCell) && ((thisCell.hasClass("selected") || overrideFlags))) this.clearCell(thisX, thisY);
         });
-        // for (let v = -1; v <= 1; v++) {
-        //     for (let h = -1; h <= 1; h++) {
-        //         let thisX = x + h;
-        //         let thisY = y + v;
-        //         if (this.getCanvasCell(thisX, thisY).length && this.getCanvasCell(thisX, thisY).hasClass("blank")) this.clearCell(thisX, thisY);
-        //     }
-        // }
+    }
+    cellIsClear(cell) {
+        return cell.attr("class").includes("open");
     }
     flagAndClear(x, y, clearCondition) {
         let cell = this.getCanvasCell(x, y);
@@ -308,7 +316,7 @@ class Minesweeper {
             cell.attr("class", "cell blank");
         } else if (clearCondition && this.satisfyFlags(x, y)) {
             // if left click is on, clear cells
-            minesweeper.clearCells(x, y, false);
+            this.clearCells(x, y, false);
         }
     }
     getCanvasCell(x, y) {
@@ -323,17 +331,27 @@ class Minesweeper {
         let cell = this.getCanvasCell(x, y);
         // if cell exists and is blank
         if (cell.length && cell.hasClass("blank")) {
-            cell.attr("class", "cell empty");
+            cell.attr("class", "cell selected");
         }
     }
     selectCells(x, y) {
-        // if cell exists and is blank
-        for (let v = -1; v <= 1; v++) {
-            for (let h = -1; h <= 1; h++) {
-                let cell = this.getCanvasCell(x + h, y + v);
-                if (cell.length && cell.hasClass("blank")) this.selectCell(x + h, y + v);
-            }
+        // if any of 3x3 is blank, select it
+        this.doCellOperation(x, y, (thisX, thisY, cell) => {
+            this.selectCell(thisX, thisY);
+        });
+    }
+    deselectCell(x, y) {
+        let cell = this.getCanvasCell(x, y);
+        // if cell exists and is selected
+        if (cell.length && cell.hasClass("selected")) {
+            cell.attr("class", "cell blank");
         }
+    }
+    deselectCells(x, y) {
+        // if cell exists and is blank
+        this.doCellOperation(x, y, (thisX, thisY, cell) => {
+            this.deselectCell(thisX, thisY);
+        });
     }
     doCellOperation(x, y, func) {
         for (let ny = y - 1; ny <= y + 1; ny++) {
@@ -342,12 +360,6 @@ class Minesweeper {
                 if (cell.length) func(nx, ny, cell);
             }
         }
-    }
-    deselectAllCells() {
-        // let cell = this.getCanvasCell(x, y);
-        // if ($(cell).hasClass("blank")) {
-        //     $(cell).attr("class", "empty");
-        // }
     }
 }
 
