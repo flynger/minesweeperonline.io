@@ -1,5 +1,5 @@
 var latency = 0;
-var link = "localhost:3000";
+var link = "73.109.23.105:3000";
 var socket = io.connect(link);
 
 socket.on("connect", (ms) => {
@@ -21,7 +21,10 @@ function setup() {
     minesweeper.startGame();
     // setup events
     $(".difficulty-select").on("change", minesweeper.updateCustomSettings);
-    $(".difficulty-select").on("click", () => $('#custom').prop('checked', true));
+    $(".difficulty-select").on("click", e => {
+        e.target.blur(); // TODO: fix this
+        $('#custom').prop('checked', true);
+    });
     $("#startGame").on("click", e => {
         e.target.blur();
         minesweeper.startGame();
@@ -369,6 +372,7 @@ function randomNumber(min, max) {
 
 function addChatMessage(user, msg) {
     $("#chatText").html($("#chatText").html() + "<br> " + user + " said: " + msg);
+    $("#chatText")[0].scrollTo(0, $("#chatText")[0].scrollHeight);
 }
 
 function addServerMessage(msg) {
