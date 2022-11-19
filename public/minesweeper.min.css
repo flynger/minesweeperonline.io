@@ -304,11 +304,11 @@
 }
 
 .z150 #game div {
-    background-image: url('sprite150.gif')
+    /* background-image: url('sprite150.gif') */
 }
 
 .night-mode .z150 #game div {
-    background-image: url('sprite150-night.gif')
+    /* background-image: url('sprite150-night.gif') */
 }
 
 .z150 .time0 {
@@ -603,7 +603,7 @@
 }
 
 .night-mode .z200 #game div {
-    background-image: url('sprite200-night.gif')
+    /* background-image: url('sprite200-night.gif') */
 }
 
 .z200 .time0 {
