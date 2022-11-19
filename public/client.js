@@ -1,5 +1,5 @@
 var latency = 0;
-var link = "10.140.1.151:3000";
+var link = "localhost:3000";
 var socket = io.connect(link);
 
 socket.on("connect", (ms) => {
@@ -37,6 +37,8 @@ class Minesweeper {
 
         this.TOTALCELLS = (minesweeper.settings.width * minesweeper.settings.height) - minesweeper.settings.mines;
         this.OPENCELLS = 0;
+
+        var hoverCell, hoverX, hoverY;
 
         // reset board
         this.GRID = [];
@@ -107,11 +109,12 @@ class Minesweeper {
             // console.log(cell);
             // console.log(e.buttons);
             if (cell.hasClass("cell")) {
-                let [x, y] = this.getCellFromID(cell.attr("id"));
+                hoverCell = cell;
+                [hoverX, hoverY] = this.getCellFromID(hoverCell.attr("id"));
                 e.preventDefault();
                 switch (e.buttons) {
                     case 1:
-                        this.selectCell(x, y);
+                        this.selectCell(hoverX, hoverY);
                         break;
                     case 3:
                         //selectCell(x, y);
@@ -119,15 +122,25 @@ class Minesweeper {
                     default:
                     // nothing
                 }
+            }
+            else {
+                hoverCell = null;
+                hoverX, hoverY = null;
+            }
+        });
+        
+        $(document).on("keypress", e => {
+            e.preventDefault();
+            console.log(hoverCell)
+            if (hoverCell && hoverCell.hasClass("cell")) {
                 // check SPACE
-
-                if (keyIsDown(32)) {
-                    this.flagAndClear(x, y, true);
+                if (e.which === 32) {
+                    this.flagAndClear(hoverX, hoverY, true);
                 }
             }
         });
 
-        $("#chatInput").on("keypress", function (e) {
+        $("#chatInput").on("keypress", e => {
             // check ENTER
             if ($("#chatInput:focus") && $("#chatInput").val() && e.which === 13) {
                 var typedMessage = $("#chatInput").val();
