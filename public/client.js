@@ -1,5 +1,5 @@
 var latency = 0;
-var link = "73.109.23.105:3000";
+var link = "localhost:3000";
 var socket = io.connect(link);
 
 socket.on("connect", (ms) => {
@@ -58,54 +58,58 @@ class Minesweeper {
         $("#game").unbind("mousedown").on("mousedown", e => {
             e.preventDefault();
             let cell = $(e.target);
-            let [x, y] = this.getCellFromID(cell.attr("id"));
-            switch (e.which) {
-                case 1:
-                    if (cell.hasClass("blank")) {
-                        this.selectCell(x, y);
-                    } else if (this.cellIsClear(cell)) {
-                        this.selectCells(x, y);
-                    }
-                    break;
-                case 2:
-                    //alert("Middle mouse button is pressed");
-                    break;
-                case 3:
-                    this.flagAndClear(x, y, e.which == 1);
-                    break;
-                default:
-                    alert("Nothing");
+            if (cell.hasClass("cell")) {
+                let [x, y] = this.getCellFromID(cell.attr("id"));
+                switch (e.which) {
+                    case 1:
+                        if (cell.hasClass("blank")) {
+                            this.selectCell(x, y);
+                        } else if (this.cellIsClear(cell)) {
+                            this.selectCells(x, y);
+                        }
+                        break;
+                    case 2:
+                        //alert("Middle mouse button is pressed");
+                        break;
+                    case 3:
+                        this.flagAndClear(x, y, e.which == 1);
+                        break;
+                    default:
+                        alert("Nothing");
+                }
             }
         });
 
         $("#game").unbind("mouseup").on("mouseup", e => {
             e.preventDefault();
             let cell = $(e.target);
-            let [x, y] = this.getCellFromID(cell.attr("id"));
-            switch (e.which) {
-                case 1:
-                    if (cell.hasClass("selected")) {
-                        // if game doesn't exist, create one
-                        if (this.GRID.length == 0) {
-                            this.GRID = this.createBoard(x, y, this.settings.width, this.settings.height, this.settings.mines);
+            if (cell.hasClass("cell")) {
+                let [x, y] = this.getCellFromID(cell.attr("id"));
+                switch (e.which) {
+                    case 1:
+                        if (cell.hasClass("selected")) {
+                            // if game doesn't exist, create one
+                            if (this.GRID.length == 0) {
+                                this.GRID = this.createBoard(x, y, this.settings.width, this.settings.height, this.settings.mines);
+                            }
+                            this.clearCell(x, y);
+                        } else if (this.satisfyFlags(x, y)) {
+                            this.clearCells(x, y, false);
                         }
-                        this.clearCell(x, y);
-                    } else if (this.satisfyFlags(x, y)) {
-                        this.clearCells(x, y, false);
-                    }
-                    else this.deselectCells(x, y);
-                    break;
-                case 2:
-                    //alert("Middle mouse button is pressed");
-                    break;
-                case 3:
-                    // clear cells around mouse
-                    // if (game.satisfyFlags(x, y)) {
-                    //     game.clearCells(x, y);
-                    // }
-                    break;
-                default:
-                    alert("Nothing");
+                        else this.deselectCells(x, y);
+                        break;
+                    case 2:
+                        //alert("Middle mouse button is pressed");
+                        break;
+                    case 3:
+                        // clear cells around mouse
+                        // if (game.satisfyFlags(x, y)) {
+                        //     game.clearCells(x, y);
+                        // }
+                        break;
+                    default:
+                        alert("Nothing");
+                }
             }
         });
 
@@ -139,9 +143,11 @@ class Minesweeper {
         $("#game").on("mouseout", e => {
             e.preventDefault();
             let cell = $(e.target);
-            let [x, y] = this.getCellFromID(cell.attr("id"));
-            // console.log(cell);
-            this.deselectCells(x, y);
+            if (cell.hasClass("cell")) {
+                let [x, y] = this.getCellFromID(cell.attr("id"));
+                // console.log(cell);
+                this.deselectCells(x, y);
+            }
         });
 
         $(document).unbind("keypress").on("keypress", e => {
