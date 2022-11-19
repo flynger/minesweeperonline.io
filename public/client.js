@@ -20,9 +20,11 @@ function setup() {
     minesweeper = new Minesweeper();
     minesweeper.startGame();
     // setup events
+    $("input[name='difficulty']").on("click", e => {
+        e.target.blur();
+    });
     $(".difficulty-select").on("change", minesweeper.updateCustomSettings);
-    $(".difficulty-select").on("click", e => {
-        e.target.blur(); // TODO: fix this
+    $(".difficulty-select").on("click", () => {
         $('#custom').prop('checked', true);
     });
     $("#startGame").on("click", e => {
@@ -42,6 +44,9 @@ class Minesweeper {
             this.GRID = []
     }
     startGame() {
+        // selects the page so no elements are triggered with space
+        // $(document).select();
+
         // get difficulty
         this.settings = this[$("input[name='difficulty']:checked").val()];
 
