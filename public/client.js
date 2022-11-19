@@ -129,10 +129,10 @@ class Minesweeper {
             }
         });
         
-        $(document).on("keypress", e => {
-            // console.log(hoverCell)
+        $(document).unbind("keypress").on("keypress", e => {
             // check SPACE
             if (e.which === 32 && e.target == document.body) {
+                //console.log(hoverCell)
                 e.preventDefault();
                 if (hoverCell && hoverCell.hasClass("cell")) {
                     this.flagAndClear(hoverX, hoverY, true);
