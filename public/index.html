@@ -72,13 +72,13 @@
             <tr>
                 <td><label><input type="radio" name="difficulty" id="custom" value="CUSTOM"> Custom</label></td>
                 <td><input type="number" min="1" class="difficulty-select" value="20" id="custom_height"
-                        onclick="$('#custom').prop('checked', true);" onchange="minesweeper.updateCustomSettings()">
+                        onclick="$('#custom').prop('checked', true);" onclick="this.blur();" onchange="minesweeper.updateCustomSettings()">
                 </td>
                 <td><input type="number" min="1" class="difficulty-select" value="30" id="custom_width"
-                        onclick="$('#custom').prop('checked', true);" onchange="minesweeper.updateCustomSettings()">
+                        onclick="$('#custom').prop('checked', true);" onclick="this.blur();" onchange="minesweeper.updateCustomSettings()">
                 </td>
                 <td><input type="number" min="0" class="difficulty-select" value="145" id="custom_mines"
-                        onclick="$('#custom').prop('checked', true);" onchange="minesweeper.updateCustomSettings()">
+                        onclick="$('#custom').prop('checked', true);" onclick="this.blur();" onchange="minesweeper.updateCustomSettings()">
                 </td>
             </tr>
             <tr class="dialog-bar">
