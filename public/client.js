@@ -28,12 +28,37 @@ var minesweeper;
 function setup() {
     minesweeper = new Minesweeper();
     minesweeper.startGame();
+    // set difficulty setting mins and maxes
+    $("#custom_height").attr({
+        "min": minesweeper.MIN.height,
+        "max": minesweeper.MAX.height
+    });
+    $("#custom_width").attr({
+        "min": minesweeper.MIN.width,
+        "max": minesweeper.MAX.width
+    });
     // setup events
     $("input[name='difficulty']").on("click", e => {
         e.target.blur();
     });
-    $(".difficulty-select").on("change", minesweeper.updateCustomSettings);
-    $(".difficulty-select").on("click", () => {
+    $(".difficulty-select").on("change", () => {
+        // limit height and width
+        limitInput($("#custom_height"), minesweeper.MIN.height, minesweeper.MAX.height)
+        limitInput($("#custom_width"), minesweeper.MIN.width, minesweeper.MAX.width)
+
+        // limit mines
+        let maxMines = +$("#custom_height").val() * +$("#custom_width").val() - 1;
+        limitInput($("#custom_mines"), minesweeper.MIN.mines, maxMines)
+
+        // update mins and maxes of element
+        $("#custom_mines").attr({
+            "min": maxMines == 0 ? 0 : minesweeper.MIN.mines,
+            "max": maxMines
+        });
+
+        minesweeper.updateCustomSettings();
+    });
+    $(".difficulty-select").on("mousedown", () => {
         $('#custom').prop('checked', true);
     });
     $("#startGame").on("click", e => {
@@ -45,12 +70,14 @@ function setup() {
 class Minesweeper {
     constructor() {
         this.TILE_SIZE = 32,
-            this.BORDER = 20,
-            this.BEGINNER = { height: 9, width: 9, mines: 10 },
-            this.INTERMEDIATE = { height: 16, width: 16, mines: 40 },
-            this.EXPERT = { height: 16, width: 30, mines: 99 },
-            this.CUSTOM = { height: 20, width: 30, mines: 145 },
-            this.GRID = []
+        this.BORDER = 20,
+        this.BEGINNER = { height: 9, width: 9, mines: 10 },
+        this.INTERMEDIATE = { height: 16, width: 16, mines: 40 },
+        this.EXPERT = { height: 16, width: 30, mines: 99 },
+        this.CUSTOM = { height: 20, width: 30, mines: 145 },
+        this.MIN = { height: 1, width: 1, mines: 1 },
+        this.MAX = { height: 36, width: 36 },
+        this.GRID = []
     }
     startGame() {
         // selects the page so no elements are triggered with space
@@ -273,7 +300,7 @@ class Minesweeper {
     // count flags in order to clear area
     satisfyFlags(x, y) {
         let flags = 0;
-        this.doCellOperation(x, y, (thisX, thisY, thisCell) => {
+        this.do3x3Operation(x, y, (thisX, thisY, thisCell) => {
             if (thisCell.hasClass("bombflagged")) flags++;
         });
         return this.cellIsClear(this.getCanvasCell(x, y)) && flags === this.GRID[y][x];
@@ -322,7 +349,7 @@ class Minesweeper {
         }
     }
     clearCells(x, y, overrideFlags) {
-        this.doCellOperation(x, y, (thisX, thisY, thisCell) => {
+        this.do3x3Operation(x, y, (thisX, thisY, thisCell) => {
             if (!this.cellIsClear(thisCell) && ((thisCell.hasClass("selected") || overrideFlags))) this.clearCell(thisX, thisY);
         });
     }
@@ -359,7 +386,7 @@ class Minesweeper {
     }
     selectCells(x, y) {
         // if any of 3x3 is blank, select it
-        this.doCellOperation(x, y, (thisX, thisY, cell) => {
+        this.do3x3Operation(x, y, (thisX, thisY, cell) => {
             this.selectCell(thisX, thisY);
         });
     }
@@ -372,11 +399,11 @@ class Minesweeper {
     }
     deselectCells(x, y) {
         // if cell exists and is blank
-        this.doCellOperation(x, y, (thisX, thisY, cell) => {
+        this.do3x3Operation(x, y, (thisX, thisY, cell) => {
             this.deselectCell(thisX, thisY);
         });
     }
-    doCellOperation(x, y, func) {
+    do3x3Operation(x, y, func) {
         for (let ny = y - 1; ny <= y + 1; ny++) {
             for (let nx = x - 1; nx <= x + 1; nx++) {
                 let cell = this.getCanvasCell(nx, ny);
@@ -390,11 +417,25 @@ function randomNumber(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function limitNumber(val, min, max) {
+    if (val < min) return min;
+    else if (val > max) return max;
+    else return val;
+}
+
+function limitInput(input, min, max) {
+    input.val(limitNumber(+input.val(), min, max));
+}
+
 function addChatMessage(user, msg) {
-    $("#chatText").html($("#chatText").html() + user + " said: " + msg + "<br> ");
-    $("#chatText")[0].scrollTo(0, $("#chatText")[0].scrollHeight);
+    addTextToChat(user + " said: " + msg);
 }
 
 function addServerMessage(msg) {
-    $("#chatText").html($("#chatText").html() + "<text color='red'>" + msg + "</text><br>");
+    addTextToChat("<text style='color:red;'>" + msg + "</text>");
+}
+
+function addTextToChat(text) {
+    $("#chatText").html($("#chatText").html() + text + "<br>");
+    $("#chatText")[0].scrollTo(0, $("#chatText")[0].scrollHeight);
 }
