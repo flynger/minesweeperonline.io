@@ -1,4 +1,15 @@
 /* global */
+@font-face {
+    font-family: Power Clear;
+    src: url('res/fonts/pkmndp.ttf');
+}
+
+/* @font-face {
+    font-family: Power Clear;
+    font-weight: bold;
+    src: url('res/fonts/pkmndpb.ttf');
+} */
+
 body {
     font-family: 'Franklin Gothic', 'Arial Narrow', Arial, sans-serif;
 }

@@ -17,18 +17,17 @@ app.use(
         origin: "*",
     })
 )
-app.get("/profile", function(req, res) {
+app.get("/profile", function (req, res) {
     res.sendFile("../public/profile.html")
 })
-app.get("/settings", function(req, res) {
+app.get("/settings", function (req, res) {
     res.sendFile("../public/settings.html")
 })
 
 var server = app.listen(port, () => console.log(color.blue, `Starting Server: ${name} on port ${port}`));
 var io = socket(server, {
     pingInterval: 900,
-    pingTimeout: 5000,
-    cookie: false
+    pingTimeout: 5000
 });
 
 io.on("connection", (socket) => {
@@ -36,8 +35,8 @@ io.on("connection", (socket) => {
     console.log(color.green, socket.id);
 
     // add events
-    socket.on("ping", (data) => {
-        socket.emit("ping", Date.now() - data);
+    socket.on("ping", (callback) => {
+        callback();
     });
 
     // login events
