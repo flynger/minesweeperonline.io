@@ -2,6 +2,7 @@ var minesweeper;
 function setup() {
     minesweeper = new Minesweeper();
     minesweeper.startGame();
+    setupChat();
     // set difficulty setting mins and maxes
     $("#custom_height").attr({
         "min": minesweeper.MIN.height,
@@ -39,8 +40,6 @@ function setup() {
         e.target.blur();
         minesweeper.startGame();
     });
-
-    setupChat();
 }
 
 class Minesweeper {
