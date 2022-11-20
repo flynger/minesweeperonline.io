@@ -17,9 +17,12 @@ app.use(
         origin: "*",
     })
 )
-// app.get("/", function(req, res) {
-//     res.sendFile("")
-// })
+app.get("/profile", function(req, res) {
+    res.sendFile("../public/profile.html")
+})
+app.get("/settings", function(req, res) {
+    res.sendFile("../public/settings.html")
+})
 
 var server = app.listen(port, () => console.log(color.blue, `Starting Server: ${name} on port ${port}`));
 var io = socket(server, {
@@ -30,65 +33,46 @@ var io = socket(server, {
 
 io.on("connection", (socket) => {
     // connect event
-    server.onConnect(socket);
+    console.log(color.green, socket.id);
 
     // add events
-    for ({ key, func } of lst) {
-        socket.on(key, (data) => func(socket, data));
-    }
+    socket.on("ping", (data) => {
+        socket.emit("ping", Date.now() - data);
+    });
+
+    // login events
+    socket.on("login", (data) => {
+
+    });
+
+    socket.on("signUp", (data) => {
+
+    });
+
+    // input events
+    socket.on("playerInput", (id) => {
+        //socket.emit();
+    });
+
+    socket.on("chatMessage", (data) => {
+        console.log("Message received");
+        let message = filterMessage(data.msg);
+
+        // if msg too long send an error back, else send it to all users
+        if (message.length > 50) {
+            socket.emit("chatMessage", { user: "Server", msg: `Your message is longer than 50 characters. (${message.length} characters)` });
+        } else {
+            io.sockets.emit("chatMessage", { user: "anon" + socket.id.substring(0, 4), msg: message })
+        }
+    });
 
     // add disconnect event
-    // setTimeout(()=>{
-    //     socket.emit({ user: "Server", msg: `Your message is longer than 50 characters. (characters)` }, "chatMessage");
-    // }, 5000);
-    socket.on("disconnect", () => server.onDisconnect(socket));
+    socket.on("disconnect", () => console.log(color.red, socket.id));
 });
 
 /* to broadcast event to all users: io.sockets.emit(key, data);
    to broadcast event to a single socket (without reference): io.sockets.sockets.get(socketid).emit(key, data);
 */
-var lst = [];
-server.on = function (key, func) {
-    lst.push({
-        key: key,
-        func: func
-    });
-}
-
-// connection events
-server.onConnect = (socket) => {
-    console.log(color.green, socket.id);
-}
-
-server.onDisconnect = (socket) => {
-    console.log(color.red, socket.id);
-}
-
-// login events
-server.on("login", (socket, data) => {
-
-});
-
-server.on("signUp", (socket, data) => {
-
-});
-
-// input events
-server.on("playerInput", (socket, id) => {
-    //socket.emit();
-});
-
-server.on("chatMessage", (socket, data) => {
-    console.log("Message received");
-    let message = filterMessage(data.msg);
-
-    // if msg too long send an error back, else send it to all users
-    if (message.length > 50) {
-        socket.emit("chatMessage", { user: "Server", msg: `Your message is longer than 50 characters. (${message.length} characters)` });
-    } else {
-        io.sockets.emit("chatMessage", { user: "anon" + socket.id.substring(0, 4), msg: message })
-    }
-});
 
 // code run on server termination
 process.on("exit", (code) => {
@@ -108,3 +92,13 @@ function filterMessage(message) {
     }
     return message.replace(/<\/?[^>]+(>|$)/g, "");
 }
+
+// var lst = [];
+// server.on = (key, event) => {
+//     lst.push({
+//         key: key,
+//         event: event
+//     });
+// }
+// server.onConnect = (socket) => {}
+// server.onDisconnect = (socket) => {}

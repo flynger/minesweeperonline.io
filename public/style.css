@@ -89,12 +89,13 @@ body {
     top: 250px;
 }
 #chatText {
-    width: 200px;
+    width: 300px;
     height: 400px;
+    overflow-wrap: break-word;
     overflow-y: scroll;
 }
 #chatInput {
-    width: 200px;
+    width: 300px;
 }
 
 #settingsButton {

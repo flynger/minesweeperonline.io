@@ -2,17 +2,21 @@ var latency = 0;
 var link = "localhost:3000";
 var socket = io.connect(link);
 
+setInterval(() => {
+    socket.emit("ping", Date.now());
+}, 1000);
+
 socket.on("connect", (ms) => {
     // connect event
 });
-socket.on("pong", (ms) => {
+socket.on("ping", (ms) => {
     latency = ms;
 });
-socket.on("alertMessage", (data) => {
-    alert(data.msg);
-});
 socket.on("chatMessage", (data) => {
-    addChatMessage(data.user, data.msg);
+    if (data.user == "Server") {
+        addServerMessage(data.msg);
+    }
+    else addChatMessage(data.user, data.msg);
 });
 
 var minesweeper;
@@ -382,10 +386,10 @@ function randomNumber(min, max) {
 }
 
 function addChatMessage(user, msg) {
-    $("#chatText").html($("#chatText").html() + "<br> " + user + " said: " + msg);
+    $("#chatText").html($("#chatText").html() + user + " said: " + msg + "<br> ");
     $("#chatText")[0].scrollTo(0, $("#chatText")[0].scrollHeight);
 }
 
 function addServerMessage(msg) {
-    $("#chatText").html($("#chatText").html() + "<br> <text color='red'>" + msg + "</text>");
+    $("#chatText").html($("#chatText").html() + "<text color='red'>" + msg + "</text><br>");
 }
