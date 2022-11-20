@@ -184,9 +184,9 @@ class Minesweeper {
 
         // top border
         let grid = "";
-        grid += this.createImg("borderjointl");
+        grid += this.createImg("bordertl");
         grid += this.createImg("border-h").repeat(this.settings.width);
-        grid += this.createImg("borderjointr");
+        grid += this.createImg("bordertr");
         grid += "<br>";
 
         // cells
@@ -310,7 +310,7 @@ class Minesweeper {
     }
     clearCells(x, y, overrideFlags) {
         this.do3x3Operation(x, y, (thisX, thisY, thisCell) => {
-            if (!this.cellIsClear(thisCell) && ((thisCell.hasClass("selected") || overrideFlags))) this.clearCell(thisX, thisY);
+            if (!this.cellIsClear(thisCell) && (!thisCell.hasClass("bombflagged") || overrideFlags)) this.clearCell(thisX, thisY);
         });
     }
     cellIsClear(cell) {

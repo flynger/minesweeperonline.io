@@ -57,6 +57,13 @@ body {
     font-size: 20px;
     transition-duration: 0.07s;
 }
+.flag {
+    background: url('res/flag.png') no-repeat;
+    background-size: 32px;
+    width: 32px;
+    height: 40px;
+    display: block;
+}
 .top-nav {
     background-color: #BDBDBD;
     overflow: hidden;
