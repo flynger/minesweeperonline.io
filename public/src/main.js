@@ -233,7 +233,7 @@ class Minesweeper {
     createImg(type, id, style, other) {
         let idText = id ? "' id='" + id : "";
         let styleText = style ? "' style='" + style : "";
-        let otherText = other ? "'" + other : "";
+        let otherText = other ? "' " + other : "";
         return "<div class='" + type + idText + styleText + otherText + "'></div>";
     }
     createBoard(startX, startY, width, height, mines) {

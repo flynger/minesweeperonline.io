@@ -34,8 +34,8 @@ app.get("/login", function (req, res) {
     res.sendFile('login.html', {root: '../public'});
 
 });
-app.get("/signup", function (req, res) {
-    res.sendFile('signup.html', {root: '../public'});
+app.get("/register", function (req, res) {
+    res.sendFile('register.html', {root: '../public'});
 });
 
 var server = app.listen(port, () => console.log(color.blue, `Starting Server: ${name} on port ${port}`));
