@@ -3,6 +3,7 @@ function setup() {
     minesweeper = new Minesweeper();
     minesweeper.startGame();
     setupChat();
+    
     // set difficulty setting mins and maxes
     $("#custom_height").attr({
         "min": minesweeper.MIN.height,
@@ -57,6 +58,10 @@ class Minesweeper {
     startGame() {
         // selects the page so no elements are triggered with space
         // $(document).select();
+        
+        // updates custom settings before creating board
+        $(".difficulty-select").on("change");
+        minesweeper.updateCustomSettings();
 
         // get difficulty
         this.settings = this[$("input[name='difficulty']:checked").val()];
@@ -183,7 +188,7 @@ class Minesweeper {
         $("#game").html("");
         $("#game").width(this.settings.width * this.TILE_SIZE + this.BORDER * 2);
         $("#game").height(this.settings.height * this.TILE_SIZE + this.BORDER * 2);
-
+        
         let grid = "";
         // game gui 
         grid += this.createImg("bordertl");
