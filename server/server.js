@@ -17,6 +17,8 @@ app.use(
         origin: "*",
     })
 );
+
+// url masks
 app.get("/home", function (req, res) {
     res.sendFile('index.html', {root: '../public'});
 
