@@ -45,14 +45,14 @@ function setup() {
 class Minesweeper {
     constructor() {
         this.TILE_SIZE = 32,
-        this.BORDER = 20,
-        this.BEGINNER = { height: 9, width: 9, mines: 10 },
-        this.INTERMEDIATE = { height: 16, width: 16, mines: 40 },
-        this.EXPERT = { height: 16, width: 30, mines: 99 },
-        this.CUSTOM = { height: 20, width: 30, mines: 145 },
-        this.MIN = { height: 1, width: 8, mines: 1 },
-        this.MAX = { height: 36, width: 36 },
-        this.GRID = []
+            this.BORDER = 20,
+            this.BEGINNER = { height: 9, width: 9, mines: 10 },
+            this.INTERMEDIATE = { height: 16, width: 16, mines: 40 },
+            this.EXPERT = { height: 16, width: 30, mines: 99 },
+            this.CUSTOM = { height: 20, width: 30, mines: 145 },
+            this.MIN = { height: 1, width: 8, mines: 1 },
+            this.MAX = { height: 36, width: 36 },
+            this.GRID = []
     }
     startGame() {
         // selects the page so no elements are triggered with space
@@ -63,12 +63,14 @@ class Minesweeper {
 
         this.TOTALCELLS = (this.settings.width * this.settings.height) - this.settings.mines;
         this.OPENCELLS = 0;
+        this.FLAGS = this.settings.mines;
 
         var hoverCell, hoverX, hoverY;
 
         // reset board
         this.GRID = [];
         this.resetBoard();
+        this.updateFlagCounter();
 
         // create mouse events
         $("#game").unbind("mousedown").on("mousedown", e => {
@@ -193,6 +195,7 @@ class Minesweeper {
         grid += this.createImg("time0", "mines_hundreds");
         grid += this.createImg("time0", "mines_tens");
         grid += this.createImg("time0", "mines_ones");
+
         let margin = 364 - (this.TILE_SIZE / 2) * (30 - this.settings.width);
         grid += this.createImg("facesmile", "face", "margin-left:" + margin + "px; margin-right: " + margin + "px;");
         grid += this.createImg("time0", "seconds_hundreds");
@@ -314,6 +317,8 @@ class Minesweeper {
 
         // checks if all possible cleared cells are cleared (win code)
         if (this.OPENCELLS === this.TOTALCELLS) {
+            this.FLAGS = 0;
+            this.updateFlagCounter();
             for (let row in this.GRID) {
                 for (let col in this.GRID[row]) {
                     if (this.GRID[row][col] === "X") {
@@ -340,9 +345,13 @@ class Minesweeper {
         let cell = this.getCanvasCell(x, y);
         if (cell.hasClass("blank")) {
             // if cell blank, add flag
+            this.FLAGS--;
+            this.updateFlagCounter();
             cell.attr("class", "cell bombflagged");
         } else if (cell.hasClass("bombflagged")) {
             // if flag, revert to blank
+            this.FLAGS++;
+            this.updateFlagCounter();
             cell.attr("class", "cell blank");
         } else if (clearCondition && this.satisfyFlags(x, y)) {
             // if left click is on, clear cells
@@ -390,6 +399,19 @@ class Minesweeper {
                 if (cell.length) func(nx, ny, cell);
             }
         }
+    }
+    updateFlagCounter() {
+        let flagString = "" + limitNumber(this.FLAGS, -99, 999);
+        while (flagString.length < 3) {
+            if (+flagString < 0) {
+                flagString = "-0" + -+flagString;
+                break;
+            }
+            flagString = "0" + flagString;
+        }
+        $("#mines_ones").attr("class", "time" + flagString[2]);
+        $("#mines_tens").attr("class", "time" + flagString[1]);
+        $("#mines_hundreds").attr("class", "time" + flagString[0]);
     }
 }
 

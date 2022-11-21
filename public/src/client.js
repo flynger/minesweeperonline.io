@@ -1,5 +1,5 @@
 var latency = -1;
-var link = "73.109.23.105:3000"; //73.109.23.105
+var link = "localhost:3000"; //73.109.23.105
 var socket = io.connect(link);
 
 setInterval(() => {

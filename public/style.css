@@ -12,7 +12,12 @@
 
 body {
     font-family: 'Franklin Gothic', 'Arial Narrow', Arial, sans-serif;
+    margin: 0;
 }
+
+/* #header {
+    margin-top: 0%;
+} */
 
 .button {
     display: flex;
@@ -74,7 +79,7 @@ body {
 .top-nav {
     background-color: #BDBDBD;
     overflow: hidden;
-    margin: 0%;
+    margin-top: 0%;
 }
 
 .top-nav a {
@@ -116,7 +121,7 @@ body {
 
 #chat {
     position: absolute;
-    right: 50px;
+    right: 20px;
     top: 250px;
 }
 
