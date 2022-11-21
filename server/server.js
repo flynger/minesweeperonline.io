@@ -16,13 +16,25 @@ app.use(
     cors({
         origin: "*",
     })
-)
+);
+app.get("/home", function (req, res) {
+    res.sendFile('index.html', {root: '../public'});
+
+});
 app.get("/profile", function (req, res) {
-    res.sendFile("../public/profile.html")
-})
+    res.sendFile('profile.html', {root: '../public'});
+
+});
 app.get("/settings", function (req, res) {
-    res.sendFile("../public/settings.html")
-})
+    res.sendFile('settings.html', {root: '../public'});
+});
+app.get("/login", function (req, res) {
+    res.sendFile('login.html', {root: '../public'});
+
+});
+app.get("/signup", function (req, res) {
+    res.sendFile('signup.html', {root: '../public'});
+});
 
 var server = app.listen(port, () => console.log(color.blue, `Starting Server: ${name} on port ${port}`));
 var io = socket(server, {
