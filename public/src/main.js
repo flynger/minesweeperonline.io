@@ -60,7 +60,6 @@ class Minesweeper {
         // $(document).select();
         
         // updates custom settings before creating board
-        $(".difficulty-select").trigger("change");
         minesweeper.updateCustomSettings();
 
         // get difficulty
