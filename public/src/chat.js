@@ -16,7 +16,7 @@ function setupChat() {
 }
 
 function addChatMessage(user, msg) {
-    addTextToChat(user + " said: " + msg);
+    addTextToChat("<b>" + user + ":</b> " + msg);
 }
 
 function addServerMessage(msg) {

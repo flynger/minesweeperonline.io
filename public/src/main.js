@@ -27,7 +27,7 @@ function setup() {
 
         // update mins and maxes of element
         $("#custom_mines").attr({
-            "min": maxMines == 0 ? 0 : minesweeper.MIN.mines,
+            "min": minesweeper.MIN.mines,
             "max": maxMines
         });
 
@@ -50,7 +50,7 @@ class Minesweeper {
         this.INTERMEDIATE = { height: 16, width: 16, mines: 40 },
         this.EXPERT = { height: 16, width: 30, mines: 99 },
         this.CUSTOM = { height: 20, width: 30, mines: 145 },
-        this.MIN = { height: 1, width: 1, mines: 1 },
+        this.MIN = { height: 1, width: 8, mines: 1 },
         this.MAX = { height: 36, width: 36 },
         this.GRID = []
     }
@@ -182,11 +182,29 @@ class Minesweeper {
         $("#game").width(this.settings.width * this.TILE_SIZE + this.BORDER * 2);
         $("#game").height(this.settings.height * this.TILE_SIZE + this.BORDER * 2);
 
-        // top border
         let grid = "";
+        // game gui 
         grid += this.createImg("bordertl");
         grid += this.createImg("border-h").repeat(this.settings.width);
         grid += this.createImg("bordertr");
+        grid += "<br>";
+
+        grid += this.createImg("border-vlong");
+        grid += this.createImg("time0", "mines_hundreds");
+        grid += this.createImg("time0", "mines_tens");
+        grid += this.createImg("time0", "mines_ones");
+        let margin = 364 - (this.TILE_SIZE / 2) * (30 - this.settings.width);
+        grid += this.createImg("facesmile", "face", "margin-left:" + margin + "px; margin-right: " + margin + "px;");
+        grid += this.createImg("time0", "seconds_hundreds");
+        grid += this.createImg("time0", "seconds_tens");
+        grid += this.createImg("time0", "seconds_ones");
+        grid += this.createImg("border-vlong");
+        grid += "<br>";
+
+        // top border
+        grid += this.createImg("borderjointl");
+        grid += this.createImg("border-h").repeat(this.settings.width);
+        grid += this.createImg("borderjointr");
         grid += "<br>";
 
         // cells
@@ -212,9 +230,11 @@ class Minesweeper {
     updateCustomSettings() {
         this.CUSTOM = { height: +$("#custom_height").val(), width: +$("#custom_width").val(), mines: +$("#custom_mines").val() };
     }
-    createImg(type, id) {
+    createImg(type, id, style, other) {
         let idText = id ? "' id='" + id : "";
-        return "<div class='" + type + idText + "'></div>";
+        let styleText = style ? "' style='" + style : "";
+        let otherText = other ? "'" + other : "";
+        return "<div class='" + type + idText + styleText + otherText + "'></div>";
     }
     createBoard(startX, startY, width, height, mines) {
         let grid = new Array(height).fill("");
@@ -310,7 +330,7 @@ class Minesweeper {
     }
     clearCells(x, y, overrideFlags) {
         this.do3x3Operation(x, y, (thisX, thisY, thisCell) => {
-            if (!this.cellIsClear(thisCell) && (!thisCell.hasClass("bombflagged") || overrideFlags)) this.clearCell(thisX, thisY);
+            if (!this.cellIsClear(thisCell) && (thisCell.hasClass("blank") || thisCell.hasClass("selected") || overrideFlags)) this.clearCell(thisX, thisY);
         });
     }
     cellIsClear(cell) {

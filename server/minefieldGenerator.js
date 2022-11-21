@@ -42,14 +42,6 @@ module.exports = class Minesweeper {
         }
         return mines;
     }
-    // count flags in order to clear area
-    satisfyFlags(x, y) {
-        var flags = 0;
-        this.doCellOperation(x, y, (thisX, thisY, thisCell) => {
-            if (thisCell.hasClass("bombflagged")) flags++;
-        });
-        return this.getCanvasCell(x, y).attr('class').includes("open") && flags === this.GRID[y][x];
-    }
     clearCell(x, y) {
         let cell = this.GRID[y][x];
         let classToAdd;
@@ -100,8 +92,4 @@ module.exports = class Minesweeper {
             }
         }
     }
-}
-
-randomNumber(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
 }

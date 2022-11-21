@@ -1,11 +1,11 @@
 // libraries
-const express = require("./libs/node_modules/express/index");
-const socket = require("./libs/node_modules/socket.io/dist/index");
-const cors = require("./libs/node_modules/cors");
+const express = require("./node_modules/express/index");
+const socket = require("./node_modules/socket.io/dist/index");
+const cors = require("./node_modules/cors");
 const color = require("./libs/color");
-const jsonfile = require("./libs/node_modules/jsonfile");
-const fs = require("./libs/node_modules/graceful-fs/graceful-fs");
-const filters = require("./filters");
+const filters = require("./libs/filters");
+const jsonfile = require("./node_modules/jsonfile");
+const fs = require("./node_modules/graceful-fs/graceful-fs");
 
 // server setup
 var app = express();
@@ -61,7 +61,7 @@ io.on("connection", (socket) => {
         if (message.length > 50) {
             socket.emit("chatMessage", { user: "Server", msg: `Your message is longer than 50 characters. (${message.length} characters)` });
         } else {
-            io.sockets.emit("chatMessage", { user: "anon" + socket.id.substring(0, 4), msg: message })
+            io.sockets.emit("chatMessage", { user: "Guest " + socket.id.substring(0, 4), msg: message })
         }
     });
 

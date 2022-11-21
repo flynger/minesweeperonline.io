@@ -2,6 +2,22 @@
     background-image: url('res/sprites-night.png')
 } */
 
+/* #options {
+    position:absolute;
+    top: 100px;
+    left:0;
+    right:0;
+    margin:auto;
+}
+
+#game-container {
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:50px;
+    margin:auto;
+} */
+
 #game {
     background-color: silver;
     user-select: none;
@@ -598,12 +614,12 @@
 }
 
 .z200 #game div {
-    background-image: url('res/darksprites.png');
+    background-image: url('res/sprites.png');
     /*filter: invert(100%) hue-rotate(80deg);*/
 }
 
 .night-mode .z200 #game div {
-    /* background-image: url('sprite200-night.gif') */
+    background-image: url('res/darksprites.png');
 }
 
 .z200 .time0 {
