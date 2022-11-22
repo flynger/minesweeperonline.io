@@ -56,142 +56,30 @@ class Minesweeper {
             this.GRID = []
     }
     startGame() {
-        // selects the page so no elements are triggered with space
-        // $(document).select();
-        
-        // updates custom settings before creating board
-        minesweeper.updateCustomSettings();
-
-        // get difficulty
-        this.settings = this[$("input[name='difficulty']:checked").val()];
-
-        this.TOTALCELLS = (this.settings.width * this.settings.height) - this.settings.mines;
+        // update custom settings before creating board
+        this.updateCustomSettings();
+        this.SETTINGS = this[$("input[name='difficulty']:checked").val()];
+        this.TOTALCELLS = (this.SETTINGS.width * this.SETTINGS.height) - this.SETTINGS.mines;
         this.OPENCELLS = 0;
-        this.FLAGS = this.settings.mines;
+        this.FLAGS = this.SETTINGS.mines;
+        this.hoverCell, this.hoverX, this.hoverY = null;
 
-        var hoverCell, hoverX, hoverY;
-
-        // reset board
+        // reset board and input events
         this.GRID = [];
         this.resetBoard();
         this.updateFlagCounter();
-
-        // create mouse events
-        $("#game").unbind("mousedown").on("mousedown", e => {
-            e.preventDefault();
-            let cell = $(e.target);
-            if (cell.hasClass("cell")) {
-                let [x, y] = this.getCellFromID(cell.attr("id"));
-                switch (e.which) {
-                    case 1:
-                        if (cell.hasClass("blank")) {
-                            this.selectCell(x, y);
-                        } else if (this.cellIsClear(cell)) {
-                            this.selectCells(x, y);
-                        }
-                        break;
-                    case 2:
-                        //alert("Middle mouse button is pressed");
-                        break;
-                    case 3:
-                        this.flagAndClear(x, y, e.which == 1);
-                        break;
-                    default:
-                        alert("Nothing");
-                }
-            }
-        });
-
-        $("#game").unbind("mouseup").on("mouseup", e => {
-            e.preventDefault();
-            let cell = $(e.target);
-            if (cell.hasClass("cell")) {
-                let [x, y] = this.getCellFromID(cell.attr("id"));
-                switch (e.which) {
-                    case 1:
-                        if (cell.hasClass("selected")) {
-                            // if game doesn't exist, create one
-                            if (this.GRID.length == 0) {
-                                this.GRID = this.createBoard(x, y, this.settings.width, this.settings.height, this.settings.mines);
-                            }
-                            this.clearCell(x, y);
-                        } else if (this.satisfyFlags(x, y)) {
-                            this.clearCells(x, y, false);
-                        }
-                        else this.deselectCells(x, y);
-                        break;
-                    case 2:
-                        //alert("Middle mouse button is pressed");
-                        break;
-                    case 3:
-                        // clear cells around mouse
-                        // if (game.satisfyFlags(x, y)) {
-                        //     game.clearCells(x, y);
-                        // }
-                        break;
-                    default:
-                        alert("Nothing");
-                }
-            }
-        });
-
-        $("#game").on("mouseover", e => {
-            let cell = $(e.target);
-            if (cell.hasClass("cell")) {
-                hoverCell = cell;
-                [hoverX, hoverY] = this.getCellFromID(hoverCell.attr("id"));
-                e.preventDefault();
-                switch (e.buttons) {
-                    case 1:
-                        if (cell.hasClass("blank")) {
-                            this.selectCell(hoverX, hoverY);
-                        } else if (this.cellIsClear(cell)) {
-                            this.selectCells(hoverX, hoverY);
-                        }
-                        break;
-                    case 3:
-                        //selectCell(x, y);
-                        break;
-                    default:
-                    // nothing
-                }
-            }
-            else {
-                hoverCell = null;
-                hoverX, hoverY = null;
-            }
-        });
-
-        $("#game").on("mouseout", e => {
-            e.preventDefault();
-            let cell = $(e.target);
-            if (cell.hasClass("cell")) {
-                let [x, y] = this.getCellFromID(cell.attr("id"));
-                // console.log(cell);
-                this.deselectCells(x, y);
-            }
-        });
-
-        $(document).unbind("keypress").on("keypress", e => {
-            // console.log(hoverCell)
-            if (e.which === 32 && e.target == document.body) {
-                // check SPACE
-                e.preventDefault();
-                if (hoverCell && hoverCell.hasClass("cell")) {
-                    this.flagAndClear(hoverX, hoverY, true);
-                }
-            }
-        });
+        this.createMouseEvents();
+        this.createKeyboardEvents();
     }
     resetBoard() {
         $("#game").html("");
-        $("#game").width(this.settings.width * this.TILE_SIZE + this.BORDER * 2);
-        $("#game").height(this.settings.height * this.TILE_SIZE + this.BORDER * 2);
+        $("#game").width(this.SETTINGS.width * this.TILE_SIZE + this.BORDER * 2);
+        $("#game").height(this.SETTINGS.height * this.TILE_SIZE + this.BORDER * 2);
         
         let grid = "";
         // game gui 
         grid += this.createImg("bordertl");
-        grid += this.createImg("border-h").repeat(this.settings.width);
+        grid += this.createImg("border-h").repeat(this.SETTINGS.width);
         grid += this.createImg("bordertr");
         grid += "<br>";
 
@@ -200,7 +88,7 @@ class Minesweeper {
         grid += this.createImg("time0", "mines_tens");
         grid += this.createImg("time0", "mines_ones");
 
-        let margin = 364 - (this.TILE_SIZE / 2) * (30 - this.settings.width);
+        let margin = 364 - (this.TILE_SIZE / 2) * (30 - this.SETTINGS.width);
         grid += this.createImg("facesmile", "face", "margin-left:" + margin + "px; margin-right: " + margin + "px;");
         grid += this.createImg("time0", "seconds_hundreds");
         grid += this.createImg("time0", "seconds_tens");
@@ -210,14 +98,14 @@ class Minesweeper {
 
         // top border
         grid += this.createImg("borderjointl");
-        grid += this.createImg("border-h").repeat(this.settings.width);
+        grid += this.createImg("border-h").repeat(this.SETTINGS.width);
         grid += this.createImg("borderjointr");
         grid += "<br>";
 
         // cells
-        for (let i = 0; i < this.settings.height; i++) {
+        for (let i = 0; i < this.SETTINGS.height; i++) {
             grid += this.createImg("border-v");
-            for (let j = 0; j < this.settings.width; j++) {
+            for (let j = 0; j < this.SETTINGS.width; j++) {
                 grid += this.createImg("cell blank", i + "_" + j);
             }
             grid += this.createImg("border-v");
@@ -226,12 +114,12 @@ class Minesweeper {
 
         // bottom border
         grid += this.createImg("borderbl");
-        for (let j = 1; j <= this.settings.width; j++) {
+        for (let j = 1; j <= this.SETTINGS.width; j++) {
             grid += this.createImg("border-h");
         }
         grid += this.createImg("borderbr");
 
-        // set the html onto the grid
+        // set the grid as html
         $("#game").html(grid);
     }
     updateCustomSettings() {
@@ -273,6 +161,114 @@ class Minesweeper {
         }
         console.log(grid);
         return grid;
+    }
+    createMouseEvents() {
+        $("#game").unbind("mousedown").on("mousedown", e => {
+            e.preventDefault();
+            let cell = $(e.target);
+            if (cell.hasClass("cell")) {
+                let [x, y] = this.getCellFromID(cell.attr("id"));
+                switch (e.which) {
+                    case 1:
+                        if (cell.hasClass("blank")) {
+                            this.selectCell(x, y);
+                        } else if (this.cellIsClear(cell)) {
+                            this.selectCells(x, y);
+                        }
+                        break;
+                    case 2:
+                        //alert("Middle mouse button is pressed");
+                        break;
+                    case 3:
+                        this.flagAndClear(x, y, e.which == 1);
+                        break;
+                    default:
+                        alert("Nothing");
+                }
+            }
+        });
+
+        $("#game").unbind("mouseup").on("mouseup", e => {
+            e.preventDefault();
+            let cell = $(e.target);
+            if (cell.hasClass("cell")) {
+                let [x, y] = this.getCellFromID(cell.attr("id"));
+                switch (e.which) {
+                    case 1:
+                        if (cell.hasClass("selected")) {
+                            // if game doesn't exist, create one
+                            if (this.GRID.length == 0) {
+                                this.GRID = this.createBoard(x, y, this.SETTINGS.width, this.SETTINGS.height, this.SETTINGS.mines);
+                            }
+                            this.clearCell(x, y);
+                        } else if (this.satisfyFlags(x, y)) {
+                            this.clearCells(x, y, false);
+                        }
+                        else this.deselectCells(x, y);
+                        break;
+                    case 2:
+                        //alert("Middle mouse button is pressed");
+                        break;
+                    case 3:
+                        // clear cells around mouse
+                        // if (game.satisfyFlags(x, y)) {
+                        //     game.clearCells(x, y);
+                        // }
+                        break;
+                    default:
+                        alert("Nothing");
+                }
+            }
+        });
+
+        $("#game").on("mouseover", e => {
+            let cell = $(e.target);
+            if (cell.hasClass("cell")) {
+                this.hoverCell = cell;
+                [this.hoverX, this.hoverY] = this.getCellFromID(this.hoverCell.attr("id"));
+                e.preventDefault();
+                switch (e.buttons) {
+                    case 1:
+                        if (cell.hasClass("blank")) {
+                            this.selectCell(this.hoverX, this.hoverY);
+                        } else if (this.cellIsClear(cell)) {
+                            this.selectCells(this.hoverX, this.hoverY);
+                        }
+                        break;
+                    case 3:
+                        //selectCell(x, y);
+                        break;
+                    default:
+                    // nothing
+                }
+            }
+            else {
+                this.hoverCell = null;
+                this.hoverX, this.hoverY = null;
+            }
+        });
+
+        $("#game").on("mouseout", e => {
+            e.preventDefault();
+            let cell = $(e.target);
+            if (cell.hasClass("cell")) {
+                let [x, y] = this.getCellFromID(cell.attr("id"));
+                // console.log(cell);
+                this.deselectCells(x, y);
+            }
+        });
+    }
+    createKeyboardEvents() {
+        $(document).unbind("keypress").on("keypress", e => {
+            // console.log(hoverCell)
+            if (e.which === 32 && e.target == document.body) {
+                // check SPACE
+                e.preventDefault();
+                if (this.hoverCell && this.hoverCell.hasClass("cell")) {
+                    this.flagAndClear(this.hoverX, this.hoverY, true);
+                }
+            }
+        });
     }
     // count mines while generating
     countMines(grid, x, y) {
