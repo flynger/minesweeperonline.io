@@ -1,7 +1,7 @@
 function setupChat() {
     $("#chatInput").on("keypress", e => {
         // check ENTER
-        if ($("#chatInput:focus") && $("#chatInput").val() && e.which === 13) {
+        if ($("#chatInput:focus") && $("#chatInput").val() && e.which === KEYCODE.ENTER) {
             let typedMessage = $("#chatInput").val();
             // send chat to server
             if (typedMessage == "/ping") {
