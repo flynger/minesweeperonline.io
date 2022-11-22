@@ -1,9 +1,20 @@
 var minesweeper;
+
+// custom names for keycodes
+const KEYCODE = {
+    LEFT_CLICK: 1, // LMB
+    RIGHT_CLICK: 3, // RMB
+    ENTER: 13, // ENTER
+    SPACE: 32, // SPACE
+    BACKTICK: 96 // `
+};
+
+// code run on startup
 function setup() {
     minesweeper = new Minesweeper();
     minesweeper.startGame();
     setupChat();
-    
+
     // set difficulty setting mins and maxes
     $("#custom_height").attr({
         "min": minesweeper.MIN.height,
@@ -43,6 +54,7 @@ function setup() {
     });
 }
 
+// minesweeper class
 class Minesweeper {
     constructor() {
         this.TILE_SIZE = 32,
@@ -75,7 +87,7 @@ class Minesweeper {
         $("#game").html("");
         $("#game").width(this.SETTINGS.width * this.TILE_SIZE + this.BORDER * 2);
         $("#game").height(this.SETTINGS.height * this.TILE_SIZE + this.BORDER * 2);
-        
+
         let grid = "";
         // game gui 
         grid += this.createImg("bordertl");
@@ -169,21 +181,18 @@ class Minesweeper {
             if (cell.hasClass("cell")) {
                 let [x, y] = this.getCellFromID(cell.attr("id"));
                 switch (e.which) {
-                    case 1:
+                    case KEYCODE.LEFT_CLICK:
                         if (cell.hasClass("blank")) {
                             this.selectCell(x, y);
                         } else if (this.cellIsClear(cell)) {
                             this.selectCells(x, y);
                         }
                         break;
-                    case 2:
-                        //alert("Middle mouse button is pressed");
-                        break;
-                    case 3:
-                        this.flagAndClear(x, y, e.which == 1);
+                    case KEYCODE.RIGHT_CLICK:
+                        this.flagAndClear(x, y, e.which == KEYCODE.LEFT_CLICK);
                         break;
                     default:
-                        alert("Nothing");
+                    // do nothing
                 }
             }
         });
@@ -194,7 +203,7 @@ class Minesweeper {
             if (cell.hasClass("cell")) {
                 let [x, y] = this.getCellFromID(cell.attr("id"));
                 switch (e.which) {
-                    case 1:
+                    case KEYCODE.LEFT_CLICK:
                         if (cell.hasClass("selected")) {
                             // if game doesn't exist, create one
                             if (this.GRID.length == 0) {
@@ -206,17 +215,8 @@ class Minesweeper {
                         }
                         else this.deselectCells(x, y);
                         break;
-                    case 2:
-                        //alert("Middle mouse button is pressed");
-                        break;
-                    case 3:
-                        // clear cells around mouse
-                        // if (game.satisfyFlags(x, y)) {
-                        //     game.clearCells(x, y);
-                        // }
-                        break;
                     default:
-                        alert("Nothing");
+                    // do nothing
                 }
             }
         });
@@ -261,12 +261,16 @@ class Minesweeper {
     createKeyboardEvents() {
         $(document).unbind("keypress").on("keypress", e => {
             // console.log(hoverCell)
-            if (e.which === 32 && e.target == document.body) {
+            if (e.which === KEYCODE.SPACE && e.target == document.body) {
                 // check SPACE
                 e.preventDefault();
                 if (this.hoverCell && this.hoverCell.hasClass("cell")) {
                     this.flagAndClear(this.hoverX, this.hoverY, true);
                 }
+            } else if (e.which === KEYCODE.BACKTICK && e.target == document.body) {
+                // check BACKTICK
+                e.preventDefault();
+                this.startGame();
             }
         });
     }
