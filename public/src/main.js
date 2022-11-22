@@ -316,6 +316,13 @@ class Minesweeper {
             classToAdd = "cell open" + cell;
             this.OPENCELLS++;
         }
+
+        // if there was a flag update counter
+        if (this.getCanvasCell(x, y).hasClass("bombflagged")) {
+            this.FLAGS++;
+            this.updateFlagCounter();
+        }
+
         // open the cell
         this.getCanvasCell(x, y).attr("class", classToAdd);
 
