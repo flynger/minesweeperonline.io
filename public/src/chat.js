@@ -2,13 +2,15 @@ function setupChat() {
     $("#chatInput").on("keypress", e => {
         // check ENTER
         if ($("#chatInput:focus") && $("#chatInput").val() && e.which === 13) {
-            let typedMessage = $("#chatInput").val();
             // send chat to server
+            let typedMessage = $("#chatInput").val();
+            let roomInput = $("#roomInput").val();
             if (typedMessage == "/ping") {
                 addServerMessage("Your ping is " + latency + "ms.")
             } else {
-                socket.emit("chatMessage", { msg: typedMessage });
+                socket.emit("chatMessage", { msg: typedMessage, room: roomInput });
             }
+            
             // clear chat
             $("#chatInput").val("");
         }
