@@ -59,8 +59,8 @@ io.on("connection", (socket) => {
 
     });
 
-    socket.on("signUp", (data) => {
-
+    socket.on("register", (data) => {
+        console.log("registered : \n" + data.username + "\n" + data.password)
     });
 
     // input events
