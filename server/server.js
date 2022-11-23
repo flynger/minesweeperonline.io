@@ -47,7 +47,7 @@ var io = socket(server, {
 io.on("connection", (socket) => {
     // connect event
     console.log(color.green, socket.id);
-    socket.join("hub")
+    socket.join("global");
 
     // add events
     socket.on("ping", (callback) => {
@@ -69,8 +69,12 @@ io.on("connection", (socket) => {
     });
 
     socket.on("joinRoom", (data) => {
-        socket.join(data.room)
-        io.sockets.emit("chatMessage", {user: "" + socket.id.substring(0, 4), msg: (" successfully joined " + data.room)})
+        if (data.room.length > 15) {
+            socket.emit("chatMessage", { user: "Server", msg: `Your room name is longer than 15 characters. (${data.room.length} characters)` });
+        } else {
+            socket.join(data.room);
+            socket.emit("chatMessage", {user: "Server", msg: ("Successfully joined room: " + data.room)});
+        }
     });
 
     socket.on("chatMessage", (data) => {
@@ -81,13 +85,13 @@ io.on("connection", (socket) => {
         if (message.length > 50) {
             socket.emit("chatMessage", { user: "Server", msg: `Your message is longer than 50 characters. (${message.length} characters)` });
         } else {
-            io.sockets.emit("chatMessage", { user: "Guest " + socket.id.substring(0, 4), msg: message })
+            io.to("global").emit("chatMessage", { user: "Guest " + socket.id.substring(0, 4), msg: message });
         }
     });
 
     //test
     socket.on('test', (number, string, obj) => {
-        console.log(number, string, obj)
+        console.log(number, string, obj);
     })
 
     // add disconnect event
