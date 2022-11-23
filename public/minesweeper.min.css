@@ -314,7 +314,7 @@
     margin-bottom: 3px
 }
 
-.z100 .dialog {
+.z100 .options {
     left: 16px;
     top: 74px
 }
@@ -608,7 +608,7 @@
     margin-bottom: 5px
 }
 
-.z150 .dialog {
+.z150 .options {
     left: 24px;
     top: 102px
 }
@@ -903,7 +903,7 @@
     margin-bottom: 6px
 }
 
-.z200 .dialog {
+.z200 .options {
     left: 30px;
     top: 130px
 }
