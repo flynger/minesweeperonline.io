@@ -1,4 +1,9 @@
 function setupChat() {
+    $("#roomButton").on("click", e => {
+        let roomInput = $("#roomInput").val();
+        socket.emit("joinRoom", {room:roomInput})
+    });
+
     $("#chatInput").on("keypress", e => {
         // check ENTER
         if ($("#chatInput:focus") && $("#chatInput").val() && e.which === 13) {
@@ -8,7 +13,14 @@ function setupChat() {
             if (typedMessage == "/ping") {
                 addServerMessage("Your ping is " + latency + "ms.")
             } else {
-                socket.emit("chatMessage", { msg: typedMessage, room: roomInput });
+                if (roomInput === '') {
+                    socket.emit("chatMessage", {msg: typedMessage})
+                } else
+                {
+                    socket.emit("chatMessage", {msg: typedMessage, room: roomInput})
+                    //this doesn't work
+                    // $("#chatInput").val() = ''
+                }
             }
             
             // clear chat

@@ -67,16 +67,24 @@ io.on("connection", (socket) => {
         //socket.emit();
     });
 
+    socket.on("joinRoom", (data) => {
+        socket.join(data.room)
+        io.sockets.emit("chatMessage", {user: "" + socket.id.substring(0, 4), msg: (" successfully joined " + data.room)})
+    });
+
     socket.on("chatMessage", (data) => {
         console.log("Message received");
-        console.log(`Room: ${data.room}`)
         let message = filterMessage(data.msg);
 
         // if msg too long send an error back, else send it to all users
         if (message.length > 50) {
             socket.emit("chatMessage", { user: "Server", msg: `Your message is longer than 50 characters. (${message.length} characters)` });
         } else {
-            io.sockets.emit("chatMessage", { user: "Guest " + socket.id.substring(0, 4), msg: message })
+            if (data.room) {
+                io.to(data.room).emit("chatMessage", { user: "Guest " + socket.id.substring(0, 4), msg: message })
+            } else {
+                io.sockets.emit("chatMessage", { user: "Guest " + socket.id.substring(0, 4), msg: message })
+            }
         }
     });
 
