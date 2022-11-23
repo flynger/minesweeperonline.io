@@ -1,14 +1,21 @@
 function setupChat() {
+    $("#roomButton").on("click", e => {
+        let roomInput = $("#roomInput").val();
+        socket.emit("joinRoom", {room:roomInput})
+    });
+
     $("#chatInput").on("keypress", e => {
         // check ENTER
         if ($("#chatInput:focus") && $("#chatInput").val() && e.which === KEYCODE.ENTER) {
-            let typedMessage = $("#chatInput").val();
             // send chat to server
+            let typedMessage = $("#chatInput").val();
+            let roomInput = $("#roomInput").val();
             if (typedMessage == "/ping") {
                 addServerMessage("Your ping is " + latency + "ms.")
             } else {
-                socket.emit("chatMessage", { msg: typedMessage });
+                socket.emit("chatMessage", {msg: typedMessage})
             }
+            
             // clear chat
             $("#chatInput").val("");
         }

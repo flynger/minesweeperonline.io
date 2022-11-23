@@ -47,6 +47,7 @@ var io = socket(server, {
 io.on("connection", (socket) => {
     // connect event
     console.log(color.green, socket.id);
+    socket.join("hub")
 
     // add events
     socket.on("ping", (callback) => {
@@ -67,8 +68,13 @@ io.on("connection", (socket) => {
         //socket.emit();
     });
 
+    socket.on("joinRoom", (data) => {
+        socket.join(data.room)
+        io.sockets.emit("chatMessage", {user: "" + socket.id.substring(0, 4), msg: (" successfully joined " + data.room)})
+    });
+
     socket.on("chatMessage", (data) => {
-        console.log("Message received");
+        console.log("Message received, Room: " + new Array(...socket.rooms));
         let message = filterMessage(data.msg);
 
         // if msg too long send an error back, else send it to all users
@@ -78,6 +84,11 @@ io.on("connection", (socket) => {
             io.sockets.emit("chatMessage", { user: "Guest " + socket.id.substring(0, 4), msg: message })
         }
     });
+
+    //test
+    socket.on('test', (number, string, obj) => {
+        console.log(number, string, obj)
+    })
 
     // add disconnect event
     socket.on("disconnect", () => console.log(color.red, socket.id));
