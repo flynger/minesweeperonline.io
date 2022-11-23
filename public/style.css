@@ -142,3 +142,8 @@ body {
     top: 0px;
     cursor: pointer;
 }
+
+#site {
+    margin-left: 10px;
+    margin-right: 10px;
+}
