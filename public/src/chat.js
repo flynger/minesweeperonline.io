@@ -13,14 +13,7 @@ function setupChat() {
             if (typedMessage == "/ping") {
                 addServerMessage("Your ping is " + latency + "ms.")
             } else {
-                if (roomInput === '') {
-                    socket.emit("chatMessage", {msg: typedMessage})
-                } else
-                {
-                    socket.emit("chatMessage", {msg: typedMessage, room: roomInput})
-                    //this doesn't work
-                    // $("#chatInput").val() = ''
-                }
+                socket.emit("chatMessage", {msg: typedMessage})
             }
             
             // clear chat

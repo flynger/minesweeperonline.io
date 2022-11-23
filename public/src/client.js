@@ -5,8 +5,6 @@ const socket = io.connect(link);
 
 //buttons and inputs
 
-socket.emit('test', 8, 'abc', {msg: 'smth'})
-
 setInterval(() => {
     const start = Date.now();
 
