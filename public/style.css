@@ -42,11 +42,11 @@ body {
 }
 
 /* classes */
-.dialog-close {
+.options-close {
     cursor: pointer;
 }
 
-.dialog-title {
+.options-title {
     background-color: rgb(53, 53, 243);
     color: white;
     font-weight: bold;

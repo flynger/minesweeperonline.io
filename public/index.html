@@ -2,7 +2,6 @@
 <html lang="en-US">
 
 <head>
-    <link rel="icon" href="res/flagicon.png">
     <title>Minesweeper</title>
 
     <script src="libraries/jquery-3.6.0.js"></script>
@@ -28,19 +27,18 @@
     <script src="src/chat.js"></script>
 </head>
 
-<div id="header"></div>
-
 <body>
+    <div id="header"></div>
     <!-- <div id="settingsButton">
         <button onclick="location.href='settings.html'" class="button"><i class="fa fa-cog"></i></button>
     </div> -->
     <p>Click to reveal a location. Right-click to flag/unflag a location.</p>
-    <table cellspacing="0" cellpadding="2" id="options" class="dialog" style="display: table;">
+    <table cellspacing="0" cellpadding="2" id="options" class="options" style="display: table;">
         <tbody>
-            <tr class="dialog-title">
+            <tr class="options-title">
                 <td style="padding: 3px;">Game</td>
                 <td colspan="3" style="padding: 3px; text-align: right;">
-                    <span id="options-close" class="dialog-close" title="close this box">×</span>
+                    <span id="options-close" class="options-close" title="close this box">×</span>
                 </td>
             </tr>
             <tr class="dialog-bar">
