@@ -6,7 +6,7 @@ function setupChat() {
 
     $("#chatInput").on("keypress", e => {
         // check ENTER
-        if ($("#chatInput:focus") && $("#chatInput").val() && e.which === 13) {
+        if ($("#chatInput:focus") && $("#chatInput").val() && e.which === KEYCODE.ENTER) {
             // send chat to server
             let typedMessage = $("#chatInput").val();
             let roomInput = $("#roomInput").val();

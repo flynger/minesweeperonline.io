@@ -1,8 +1,20 @@
 var minesweeper;
+
+// custom names for keycodes
+const KEYCODE = {
+    LEFT_CLICK: 1, // LMB
+    RIGHT_CLICK: 3, // RMB
+    ENTER: 13, // ENTER
+    SPACE: 32, // SPACE
+    BACKTICK: 96 // `
+};
+
+// code run on startup
 function setup() {
     minesweeper = new Minesweeper();
     minesweeper.startGame();
     setupChat();
+
     // set difficulty setting mins and maxes
     $("#custom_height").attr({
         "min": minesweeper.MIN.height,
@@ -42,150 +54,44 @@ function setup() {
     });
 }
 
+// minesweeper class
 class Minesweeper {
     constructor() {
         this.TILE_SIZE = 32,
-        this.BORDER = 20,
-        this.BEGINNER = { height: 9, width: 9, mines: 10 },
-        this.INTERMEDIATE = { height: 16, width: 16, mines: 40 },
-        this.EXPERT = { height: 16, width: 30, mines: 99 },
-        this.CUSTOM = { height: 20, width: 30, mines: 145 },
-        this.MIN = { height: 1, width: 8, mines: 1 },
-        this.MAX = { height: 36, width: 36 },
-        this.GRID = []
+            this.BORDER = 20,
+            this.BEGINNER = { height: 9, width: 9, mines: 10 },
+            this.INTERMEDIATE = { height: 16, width: 16, mines: 40 },
+            this.EXPERT = { height: 16, width: 30, mines: 99 },
+            this.CUSTOM = { height: 20, width: 30, mines: 145 },
+            this.MIN = { height: 1, width: 8, mines: 1 },
+            this.MAX = { height: 36, width: 36 },
+            this.GRID = []
     }
     startGame() {
-        // selects the page so no elements are triggered with space
-        // $(document).select();
-
-        // get difficulty
-        this.settings = this[$("input[name='difficulty']:checked").val()];
-
-        this.TOTALCELLS = (this.settings.width * this.settings.height) - this.settings.mines;
+        // update custom settings before creating board
+        this.updateCustomSettings();
+        this.SETTINGS = this[$("input[name='difficulty']:checked").val()];
+        this.TOTALCELLS = (this.SETTINGS.width * this.SETTINGS.height) - this.SETTINGS.mines;
         this.OPENCELLS = 0;
+        this.FLAGS = this.SETTINGS.mines;
+        this.hoverCell, this.hoverX, this.hoverY = null;
 
-        var hoverCell, hoverX, hoverY;
-
-        // reset board
+        // reset board and input events
         this.GRID = [];
         this.resetBoard();
-
-        // create mouse events
-        $("#game").unbind("mousedown").on("mousedown", e => {
-            e.preventDefault();
-            let cell = $(e.target);
-            if (cell.hasClass("cell")) {
-                let [x, y] = this.getCellFromID(cell.attr("id"));
-                switch (e.which) {
-                    case 1:
-                        if (cell.hasClass("blank")) {
-                            this.selectCell(x, y);
-                        } else if (this.cellIsClear(cell)) {
-                            this.selectCells(x, y);
-                        }
-                        break;
-                    case 2:
-                        //alert("Middle mouse button is pressed");
-                        break;
-                    case 3:
-                        this.flagAndClear(x, y, e.which == 1);
-                        break;
-                    default:
-                        alert("Nothing");
-                }
-            }
-        });
-
-        $("#game").unbind("mouseup").on("mouseup", e => {
-            e.preventDefault();
-            let cell = $(e.target);
-            if (cell.hasClass("cell")) {
-                let [x, y] = this.getCellFromID(cell.attr("id"));
-                switch (e.which) {
-                    case 1:
-                        if (cell.hasClass("selected")) {
-                            // if game doesn't exist, create one
-                            if (this.GRID.length == 0) {
-                                this.GRID = this.createBoard(x, y, this.settings.width, this.settings.height, this.settings.mines);
-                            }
-                            this.clearCell(x, y);
-                        } else if (this.satisfyFlags(x, y)) {
-                            this.clearCells(x, y, false);
-                        }
-                        else this.deselectCells(x, y);
-                        break;
-                    case 2:
-                        //alert("Middle mouse button is pressed");
-                        break;
-                    case 3:
-                        // clear cells around mouse
-                        // if (game.satisfyFlags(x, y)) {
-                        //     game.clearCells(x, y);
-                        // }
-                        break;
-                    default:
-                        alert("Nothing");
-                }
-            }
-        });
-
-        $("#game").on("mouseover", e => {
-            let cell = $(e.target);
-            if (cell.hasClass("cell")) {
-                hoverCell = cell;
-                [hoverX, hoverY] = this.getCellFromID(hoverCell.attr("id"));
-                e.preventDefault();
-                switch (e.buttons) {
-                    case 1:
-                        if (cell.hasClass("blank")) {
-                            this.selectCell(hoverX, hoverY);
-                        } else if (this.cellIsClear(cell)) {
-                            this.selectCells(hoverX, hoverY);
-                        }
-                        break;
-                    case 3:
-                        //selectCell(x, y);
-                        break;
-                    default:
-                    // nothing
-                }
-            }
-            else {
-                hoverCell = null;
-                hoverX, hoverY = null;
-            }
-        });
-
-        $("#game").on("mouseout", e => {
-            e.preventDefault();
-            let cell = $(e.target);
-            if (cell.hasClass("cell")) {
-                let [x, y] = this.getCellFromID(cell.attr("id"));
-                // console.log(cell);
-                this.deselectCells(x, y);
-            }
-        });
-
-        $(document).unbind("keypress").on("keypress", e => {
-            // console.log(hoverCell)
-            if (e.which === 32 && e.target == document.body) {
-                // check SPACE
-                e.preventDefault();
-                if (hoverCell && hoverCell.hasClass("cell")) {
-                    this.flagAndClear(hoverX, hoverY, true);
-                }
-            }
-        });
+        this.updateFlagCounter();
+        this.createMouseEvents();
+        this.createKeyboardEvents();
     }
     resetBoard() {
         $("#game").html("");
-        $("#game").width(this.settings.width * this.TILE_SIZE + this.BORDER * 2);
-        $("#game").height(this.settings.height * this.TILE_SIZE + this.BORDER * 2);
+        $("#game").width(this.SETTINGS.width * this.TILE_SIZE + this.BORDER * 2);
+        $("#game").height(this.SETTINGS.height * this.TILE_SIZE + this.BORDER * 2);
 
         let grid = "";
         // game gui 
         grid += this.createImg("bordertl");
-        grid += this.createImg("border-h").repeat(this.settings.width);
+        grid += this.createImg("border-h").repeat(this.SETTINGS.width);
         grid += this.createImg("bordertr");
         grid += "<br>";
 
@@ -193,7 +99,8 @@ class Minesweeper {
         grid += this.createImg("time0", "mines_hundreds");
         grid += this.createImg("time0", "mines_tens");
         grid += this.createImg("time0", "mines_ones");
-        let margin = 364 - (this.TILE_SIZE / 2) * (30 - this.settings.width);
+
+        let margin = 364 - (this.TILE_SIZE / 2) * (30 - this.SETTINGS.width);
         grid += this.createImg("facesmile", "face", "margin-left:" + margin + "px; margin-right: " + margin + "px;");
         grid += this.createImg("time0", "seconds_hundreds");
         grid += this.createImg("time0", "seconds_tens");
@@ -203,14 +110,14 @@ class Minesweeper {
 
         // top border
         grid += this.createImg("borderjointl");
-        grid += this.createImg("border-h").repeat(this.settings.width);
+        grid += this.createImg("border-h").repeat(this.SETTINGS.width);
         grid += this.createImg("borderjointr");
         grid += "<br>";
 
         // cells
-        for (let i = 0; i < this.settings.height; i++) {
+        for (let i = 0; i < this.SETTINGS.height; i++) {
             grid += this.createImg("border-v");
-            for (let j = 0; j < this.settings.width; j++) {
+            for (let j = 0; j < this.SETTINGS.width; j++) {
                 grid += this.createImg("cell blank", i + "_" + j);
             }
             grid += this.createImg("border-v");
@@ -219,12 +126,12 @@ class Minesweeper {
 
         // bottom border
         grid += this.createImg("borderbl");
-        for (let j = 1; j <= this.settings.width; j++) {
+        for (let j = 1; j <= this.SETTINGS.width; j++) {
             grid += this.createImg("border-h");
         }
         grid += this.createImg("borderbr");
 
-        // set the html onto the grid
+        // set the grid as html
         $("#game").html(grid);
     }
     updateCustomSettings() {
@@ -266,6 +173,106 @@ class Minesweeper {
         }
         console.log(grid);
         return grid;
+    }
+    createMouseEvents() {
+        $("#game").unbind("mousedown").on("mousedown", e => {
+            e.preventDefault();
+            let cell = $(e.target);
+            if (cell.hasClass("cell")) {
+                let [x, y] = this.getCellFromID(cell.attr("id"));
+                switch (e.which) {
+                    case KEYCODE.LEFT_CLICK:
+                        if (cell.hasClass("blank")) {
+                            this.selectCell(x, y);
+                        } else if (this.cellIsClear(cell)) {
+                            this.selectCells(x, y);
+                        }
+                        break;
+                    case KEYCODE.RIGHT_CLICK:
+                        this.flagAndClear(x, y, e.which == KEYCODE.LEFT_CLICK);
+                        break;
+                    default:
+                    // do nothing
+                }
+            }
+        });
+
+        $("#game").unbind("mouseup").on("mouseup", e => {
+            e.preventDefault();
+            let cell = $(e.target);
+            if (cell.hasClass("cell")) {
+                let [x, y] = this.getCellFromID(cell.attr("id"));
+                switch (e.which) {
+                    case KEYCODE.LEFT_CLICK:
+                        if (cell.hasClass("selected")) {
+                            // if game doesn't exist, create one
+                            if (this.GRID.length == 0) {
+                                this.GRID = this.createBoard(x, y, this.SETTINGS.width, this.SETTINGS.height, this.SETTINGS.mines);
+                            }
+                            this.clearCell(x, y);
+                        } else if (this.satisfyFlags(x, y)) {
+                            this.clearCells(x, y, false);
+                        }
+                        else this.deselectCells(x, y);
+                        break;
+                    default:
+                    // do nothing
+                }
+            }
+        });
+
+        $("#game").on("mouseover", e => {
+            let cell = $(e.target);
+            if (cell.hasClass("cell")) {
+                this.hoverCell = cell;
+                [this.hoverX, this.hoverY] = this.getCellFromID(this.hoverCell.attr("id"));
+                e.preventDefault();
+                switch (e.buttons) {
+                    case 1:
+                        if (cell.hasClass("blank")) {
+                            this.selectCell(this.hoverX, this.hoverY);
+                        } else if (this.cellIsClear(cell)) {
+                            this.selectCells(this.hoverX, this.hoverY);
+                        }
+                        break;
+                    case 3:
+                        //selectCell(x, y);
+                        break;
+                    default:
+                    // nothing
+                }
+            }
+            else {
+                this.hoverCell = null;
+                this.hoverX, this.hoverY = null;
+            }
+        });
+
+        $("#game").on("mouseout", e => {
+            e.preventDefault();
+            let cell = $(e.target);
+            if (cell.hasClass("cell")) {
+                let [x, y] = this.getCellFromID(cell.attr("id"));
+                // console.log(cell);
+                this.deselectCells(x, y);
+            }
+        });
+    }
+    createKeyboardEvents() {
+        $(document).unbind("keypress").on("keypress", e => {
+            // console.log(hoverCell)
+            if (e.which === KEYCODE.SPACE && e.target == document.body) {
+                // check SPACE
+                e.preventDefault();
+                if (this.hoverCell && this.hoverCell.hasClass("cell")) {
+                    this.flagAndClear(this.hoverX, this.hoverY, true);
+                }
+            } else if (e.which === KEYCODE.BACKTICK && e.target == document.body) {
+                // check BACKTICK
+                e.preventDefault();
+                this.startGame();
+            }
+        });
     }
     // count mines while generating
     countMines(grid, x, y) {
@@ -309,11 +316,20 @@ class Minesweeper {
             classToAdd = "cell open" + cell;
             this.OPENCELLS++;
         }
+
+        // if there was a flag update counter
+        if (this.getCanvasCell(x, y).hasClass("bombflagged")) {
+            this.FLAGS++;
+            this.updateFlagCounter();
+        }
+
         // open the cell
         this.getCanvasCell(x, y).attr("class", classToAdd);
 
         // checks if all possible cleared cells are cleared (win code)
         if (this.OPENCELLS === this.TOTALCELLS) {
+            this.FLAGS = 0;
+            this.updateFlagCounter();
             for (let row in this.GRID) {
                 for (let col in this.GRID[row]) {
                     if (this.GRID[row][col] === "X") {
@@ -340,9 +356,13 @@ class Minesweeper {
         let cell = this.getCanvasCell(x, y);
         if (cell.hasClass("blank")) {
             // if cell blank, add flag
+            this.FLAGS--;
+            this.updateFlagCounter();
             cell.attr("class", "cell bombflagged");
         } else if (cell.hasClass("bombflagged")) {
             // if flag, revert to blank
+            this.FLAGS++;
+            this.updateFlagCounter();
             cell.attr("class", "cell blank");
         } else if (clearCondition && this.satisfyFlags(x, y)) {
             // if left click is on, clear cells
@@ -390,6 +410,19 @@ class Minesweeper {
                 if (cell.length) func(nx, ny, cell);
             }
         }
+    }
+    updateFlagCounter() {
+        let flagString = "" + limitNumber(this.FLAGS, -99, 999);
+        while (flagString.length < 3) {
+            if (+flagString < 0) {
+                flagString = "-0" + -+flagString;
+                break;
+            }
+            flagString = "0" + flagString;
+        }
+        $("#mines_ones").attr("class", "time" + flagString[2]);
+        $("#mines_tens").attr("class", "time" + flagString[1]);
+        $("#mines_hundreds").attr("class", "time" + flagString[0]);
     }
 }
 
