@@ -6,11 +6,13 @@ const color = require("./libs/color");
 const filters = require("./libs/filters");
 const jsonfile = require("./node_modules/jsonfile");
 const fs = require("./node_modules/graceful-fs/graceful-fs");
+const fspromise = require('fs').promises;
 
 // server setup
 var app = express();
 var port = 3000;
 var name = "Minesweeper Online";
+
 app.use(express.static("../public"));
 app.use(
     cors({
@@ -20,22 +22,22 @@ app.use(
 
 // url masks
 app.get("/home", function (req, res) {
-    res.sendFile('index.html', {root: '../public'});
+    res.sendFile('index.html', { root: '../public' });
 
 });
 app.get("/profile", function (req, res) {
-    res.sendFile('profile.html', {root: '../public'});
+    res.sendFile('profile.html', { root: '../public' });
 
 });
 app.get("/settings", function (req, res) {
-    res.sendFile('settings.html', {root: '../public'});
+    res.sendFile('settings.html', { root: '../public' });
 });
 app.get("/login", function (req, res) {
-    res.sendFile('login.html', {root: '../public'});
+    res.sendFile('login.html', { root: '../public' });
 
 });
 app.get("/register", function (req, res) {
-    res.sendFile('register.html', {root: '../public'});
+    res.sendFile('register.html', { root: '../public' });
 });
 
 var server = app.listen(port, () => console.log(color.blue, `Starting Server: ${name} on port ${port}`));
@@ -60,7 +62,33 @@ io.on("connection", (socket) => {
     });
 
     socket.on("register", (data) => {
-        console.log("registered : \n" + data.username + "\n" + data.password)
+        //reading profile usernames
+        let profilesStr;
+        fs.promises.readFile("profiles.json","utf8").then(function (result) {
+            console.log(result);
+            profilesStr = await result;
+        }).catch(function (error) {
+            console.log(error);
+        })
+
+        console.log(profilesStr);
+
+        // let profiles = JSON.parse(profilesStr);
+        // console.log(profiles);
+
+
+        // checking if username already exists
+
+        // for (let i = 0; i < profiles.length; i++) {
+        //     if (data.username == profiles[i].user) {
+        //         socket.emit("usernameExists");
+        //         break;
+        //     }
+        // }
+
+        // console.log("registered : \n" + data.username + "\n" + data.password);
+        // let profile = {name: [data.username], password: [data.password]}
+        // fs.appendFile("profiles.json", profile + ",\n\t");
     });
 
     // input events
@@ -73,7 +101,7 @@ io.on("connection", (socket) => {
             socket.emit("chatMessage", { user: "Server", msg: `Your room name is longer than 15 characters. (${data.room.length} characters)` });
         } else {
             socket.join(data.room);
-            socket.emit("chatMessage", {user: "Server", msg: ("Successfully joined room: " + data.room)});
+            socket.emit("chatMessage", { user: "Server", msg: ("Successfully joined room: " + data.room) });
         }
     });
 
