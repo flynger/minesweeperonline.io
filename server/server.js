@@ -3,10 +3,7 @@ const express = require("./node_modules/express/index");
 const socket = require("./node_modules/socket.io/dist/index");
 const cors = require("./node_modules/cors");
 const color = require("./libs/color");
-const filters = require("./libs/filters");
 const jsonfile = require("./node_modules/jsonfile");
-const fs = require("./node_modules/graceful-fs/graceful-fs");
-const fspromise = require('fs').promises;
 
 // server setup
 var app = express();
@@ -21,30 +18,34 @@ app.use(
 );
 
 // url masks
-app.get("/home", function (req, res) {
+app.get("/home", (req, res) => {
     res.sendFile('index.html', { root: '../public' });
-
 });
-app.get("/profile", function (req, res) {
+app.get("/profile", (req, res) => {
     res.sendFile('profile.html', { root: '../public' });
-
 });
-app.get("/settings", function (req, res) {
+app.get("/settings", (req, res) => {
     res.sendFile('settings.html', { root: '../public' });
 });
-app.get("/login", function (req, res) {
+app.get("/login", (req, res) => {
     res.sendFile('login.html', { root: '../public' });
-
 });
-app.get("/register", function (req, res) {
+app.get("/register", (req, res) => {
     res.sendFile('register.html', { root: '../public' });
 });
 
-var server = app.listen(port, () => console.log(color.blue, `Starting Server: ${name} on port ${port}`));
-var io = socket(server, {
+var expressServer = app.listen(port, () => console.log(color.blue, `Starting Server: ${name} on port ${port}`));
+var io = socket(expressServer, {
     pingInterval: 900,
     pingTimeout: 5000
 });
+
+// our source files
+var server = {
+    io: io
+}
+var chatHandler = require("./src/chatHandler")(server);
+var loginHandler = require("./src/loginHandler")(server);
 
 io.on("connection", (socket) => {
     // connect event
@@ -61,34 +62,9 @@ io.on("connection", (socket) => {
 
     });
 
-    socket.on("register", (data) => {
-        //reading profile usernames
-        let profilesStr;
-        fs.promises.readFile("profiles.json","utf8").then(function (result) {
-            console.log(result);
-            profilesStr = await result;
-        }).catch(function (error) {
-            console.log(error);
-        })
-
-        console.log(profilesStr);
-
-        // let profiles = JSON.parse(profilesStr);
-        // console.log(profiles);
-
-
-        // checking if username already exists
-
-        // for (let i = 0; i < profiles.length; i++) {
-        //     if (data.username == profiles[i].user) {
-        //         socket.emit("usernameExists");
-        //         break;
-        //     }
-        // }
-
-        // console.log("registered : \n" + data.username + "\n" + data.password);
-        // let profile = {name: [data.username], password: [data.password]}
-        // fs.appendFile("profiles.json", profile + ",\n\t");
+    socket.on("register", data => {
+        console.log(`received signup: ${JSON.stringify(data)}`);
+        loginHandler.registerAccount(socket, data);
     });
 
     // input events
@@ -96,7 +72,7 @@ io.on("connection", (socket) => {
         //socket.emit();
     });
 
-    socket.on("joinRoom", (data) => {
+    socket.on("joinRoom", data => {
         if (data.room.length > 15) {
             socket.emit("chatMessage", { user: "Server", msg: `Your room name is longer than 15 characters. (${data.room.length} characters)` });
         } else {
@@ -105,17 +81,7 @@ io.on("connection", (socket) => {
         }
     });
 
-    socket.on("chatMessage", (data) => {
-        console.log("Message received, Room: " + new Array(...socket.rooms));
-        let message = filterMessage(data.msg);
-
-        // if msg too long send an error back, else send it to all users
-        if (message.length > 50) {
-            socket.emit("chatMessage", { user: "Server", msg: `Your message is longer than 50 characters. (${message.length} characters)` });
-        } else {
-            io.to("global").emit("chatMessage", { user: "Guest " + socket.id.substring(0, 4), msg: message });
-        }
-    });
+    socket.on("chatMessage", data => chatHandler.processChat(socket, data));
 
     //test
     socket.on('test', (number, string, obj) => {
@@ -131,22 +97,17 @@ io.on("connection", (socket) => {
 */
 
 // code run on server termination
-process.on("exit", (code) => {
+process.on("SIGINT", () => process.exit(0));
 
+process.on("exit", (code) => {
+    console.log(`Process exited with code: ${code}`);
+    loginHandler.saveAccountData()
+    console.log("Account data saved successfully");
 });
 
 // helper functions
 function randomNumber(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-function filterMessage(message) {
-    for (let i of filters) {
-        if (message.toLowerCase().includes(i)) {
-            message = message.replace(new RegExp(i, "gi"), "*".repeat(i.length));
-        }
-    }
-    return message.replace(/<\/?[^>]+(>|$)/g, "");
 }
 
 // var lst = [];

@@ -12,7 +12,6 @@
   <link href="libraries/jquery-ui.css" rel="stylesheet" />
 
   <link href="style.css" rel="stylesheet" />
-  <link href="minesweeper.min.css" rel="stylesheet" />
   <script src="src/register.js"></script>
   <script>
     $(function () {
@@ -31,6 +30,7 @@
   <div id="register">
     <label for="name">Username</label>
     <input name="username" id="usernameInput" type="text">
+    <div id="nameTaken" style="display: none; color: red;">This username is already in use.</div>
     <br>
     <label for="name">Password</label>
     <input name="password" id="passwordInput" type="text">
