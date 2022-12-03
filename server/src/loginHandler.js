@@ -6,10 +6,10 @@ module.exports = (server) => {
 
     var loginHandler = {
         registerAccount: (socket, data) => {
-            if (accounts[data.username]) {
+            if (accounts[data.username.toLowerCase()]) {
                 socket.emit("usernameExists");
             } else {
-                accounts[data.username] = data.password;
+                accounts[data.username.toLowerCase()] = data.password;
                 socket.emit("accountCreated");
             }
         },
