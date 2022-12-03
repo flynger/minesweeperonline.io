@@ -120,9 +120,63 @@ body {
 }
 
 #chat {
-    position: absolute;
-    right: 20px;
-    top: 250px;
+    position: fixed;
+    right: 5px;
+    bottom: 0%;
+}
+
+#chatBar {
+    width: 300px;
+    height: 25px;
+    background-color: rgba(178, 185, 202, 0.5);
+    user-select: none;
+    text-indent: 5px;
+    border: black;
+    border-style: solid;
+    border-width: 2px;
+    border-bottom-style: none;
+    font-size: 20px;
+}
+
+#chatOptions {
+    display: inline-block;
+    border-width: 2px;
+    height: 22px;
+    font-size: 16px;
+    text-align: center;
+}
+
+#selectGlobal {
+    display: inline-block;
+    width: 60px;
+    border-right-style: solid;
+    border-width: 2px;
+}
+
+#selectRoom {
+    display: inline-block;
+    width: 60px;
+    border-right-style: solid;
+    border-bottom-style: solid;
+    border-width: 2px;
+    background-color: rgba(123, 137, 166, 0.5);
+}
+
+#chatOptionsBlank {
+    float: right;
+    height: 18px;
+    width: 177px;
+    border-bottom-style: solid;
+    border-width: 2px;
+    background-color: rgba(123, 137, 166, 0.5);
+}
+
+#chatOpen {
+    display: none;
+    border: black;
+    border-style: solid;
+    border-width: 2px;
+    background-color: rgba(178, 185, 202, 0.5);
 }
 
 #chatText {
@@ -133,15 +187,15 @@ body {
 }
 
 #chatInput {
-    width: 300px;
+    width: 280px;
 }
 
-#settingsButton {
+/* #settingsButton {
     position: absolute;
     right: 0px;
     top: 0px;
     cursor: pointer;
-}
+} */
 
 #site {
     margin-left: 10px;
