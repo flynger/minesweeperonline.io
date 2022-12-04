@@ -76,7 +76,7 @@ io.on("connection", (socket) => {
     socket.on("joinRoom", data => {
         let room = data.room.toLowerCase();
         if (socket.rooms.has(room)) {
-            socket.emit("chatMessage", { user: "Server", msg: "You're already in that room!" });
+            socket.emit("chatMessage", { user: "Server", msg: "You're already in that room." });
         } else if (room.length > 15) {
             socket.emit("chatMessage", { user: "Server", msg: `Your room name is longer than 15 characters. (${room.length} characters)` });
         } else {
