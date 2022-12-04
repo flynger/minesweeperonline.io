@@ -24,7 +24,7 @@ socket.on("chatMessage", (data) => {
     if (data.user === "Server") {
         addServerMessage(data.msg);
     } else {
-        addChatMessage(data.user, data.msg)
+        addChatMessage(data.user, data.msg);
     }
 });
 

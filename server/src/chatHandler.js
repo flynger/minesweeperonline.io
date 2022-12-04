@@ -4,7 +4,7 @@ module.exports = (server) => {
 
     var chatHandler = {
         processChat: (socket, data) => {
-            console.log("Message received, Room: " + new Array(...socket.rooms));
+            console.log("Message received, Room:", ...socket.rooms);
             let message = filterMessage(data.msg);
 
             // if msg too long send an error back, else send it to all users
