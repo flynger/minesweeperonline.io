@@ -1,43 +1,33 @@
 var chatBarDefault = "0px";
 var chatBarOpen = "425px";
 var currentChat = "Global";
+var chatRooms = ["Global", "Room"];
+var roomColors = {
+    selected: "rgba(217, 220, 229)",
+    unselected: "rgba(150, 150, 170)"
+};
 
 function setupChat() {
+    selectChat("Global");
     $("#chatBar").on("click", e => {
         e.preventDefault();
         switch (e.which) {
             case KEYCODE.LEFT_CLICK:
-                if ($("#chatBar").css("bottom") !== chatBarOpen) {
-                    $("#chatBar").css({ bottom: chatBarOpen });
-                    $("#chatOpen").css({ display: "block" });
-                }
-                else {
-                    $("#chatBar").css({ bottom: chatBarDefault, "border-bottom-style": "none" });
-                    $("#chatOpen").css({ display: "none" });
-                }
+                $("#chatBody").toggle();
         }
     });
-    $("#selectGlobal").on("click", e => {
+    $("#chatRooms").on("click", e => {
         e.preventDefault();
         switch (e.which) {
             case KEYCODE.LEFT_CLICK:
-                if (currentChat === "Room") {
-                    $("#selectGlobal").css({ "background-color": "rgba(178, 185, 202, 0)", "border-bottom-style": "none" });
-                    $("#selectRoom").css({ "background-color": "rgba(123, 137, 166, 0.5)", "border-bottom-style": "solid" });
-                    currentChat = "Global";
-                    addServerMessage("Joined Global Chat");
-                }
-        }
-    });
-    $("#selectRoom").on("click", e => {
-        e.preventDefault();
-        switch (e.which) {
-            case KEYCODE.LEFT_CLICK:
-                if (currentChat === "Global") {
-                    $("#selectGlobal").css({ "background-color": "rgba(123, 137, 166, 0.5)", "border-bottom-style": "solid" });
-                    $("#selectRoom").css({ "background-color": "rgba(178, 185, 202, 0)", "border-bottom-style": "none" });
-                    currentChat = "Room";
-                    addServerMessage("Joined Room Chat");
+                //checks if clicked on room
+                if ($(e.target).attr("name") == "room") {
+                    let roomClickedOn = $(e.target).attr("id").slice(6);
+
+                    //checks if clicked room is different from current room
+                    if (roomClickedOn != currentChat) {
+                        selectChat(roomClickedOn);
+                    }
                 }
         }
     });
@@ -65,7 +55,7 @@ function setupChat() {
 }
 
 function addChatMessage(user, msg) {
-    addTextToChat("<b>" + user + ":</b> " + msg);
+    addTextToChat("<b>" + user + ":</b><text> " + msg + "</text>");
 }
 
 function addServerMessage(msg) {
@@ -75,4 +65,11 @@ function addServerMessage(msg) {
 function addTextToChat(text) {
     $("#chatText").html($("#chatText").html() + text + "<br>");
     $("#chatText")[0].scrollTo(0, $("#chatText")[0].scrollHeight);
+}
+
+function selectChat(chat) {
+    $("#select" + currentChat).css({ "background-color": roomColors.unselected, "border-bottom": "solid black 2px" });
+    $("#select" + chat).css({ "background-color": roomColors.selected, "border-bottom": roomColors.selected + " solid" });
+    currentChat = chat;
+    addServerMessage(`Joined ${chat} Chat`);
 }

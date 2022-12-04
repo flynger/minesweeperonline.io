@@ -18,11 +18,13 @@ module.exports = (server) => {
 
     // helper functions
     function filterMessage(message) {
-        for (let i of filters) {
-            if (message.toLowerCase().includes(i)) {
-                message = message.replace(new RegExp(i, "gi"), "*".repeat(i.length));
-            }
-        }
+        //filter bad so it is retired
+
+        // for (let i of filters) {
+        //     if (message.toLowerCase().includes(i)) {
+        //         message = message.replace(new RegExp(i, "gi"), "*".repeat(i.length));
+        //     }
+        // }
         return message.replace(/<\/?[^>]+(>|$)/g, "");
     }
 

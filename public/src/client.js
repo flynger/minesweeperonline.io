@@ -13,7 +13,7 @@ setInterval(() => {
 
 socket.on("connect", (ms) => {
     // connect event
-    addServerMessage(`You connected with id: ${socket.id}`)
+    addServerMessage(`You connected as user: Guest ${socket.id.substring(0, 4)}`)
 });
 
 socket.on("pong", (ms) => {
