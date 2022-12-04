@@ -4,14 +4,15 @@ module.exports = (server) => {
 
     var chatHandler = {
         processChat: (socket, data) => {
-            console.log("Message received, Room:", ...socket.rooms);
+            console.log("Message received, Room:", data.room);
             let message = filterMessage(data.msg);
+            let room = data.room;
 
             // if msg too long send an error back, else send it to all users
             if (message.length > 50) {
-                socket.emit("chatMessage", { user: "Server", msg: `Your message is longer than 50 characters. (${message.length} characters)` });
+                socket.emit("chatMessage", { user: "Server", room: room, msg: `Your message is longer than 50 characters. (${message.length} characters)` });
             } else {
-                io.to("global").emit("chatMessage", { user: "Guest " + socket.id.substring(0, 4), msg: message });
+                io.to(room).emit("chatMessage", { user: "Guest " + socket.id.substring(0, 4), room: room, msg: message });
             }
         }
     }

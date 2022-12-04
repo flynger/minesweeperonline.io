@@ -1,7 +1,16 @@
 var chatBarDefault = "0px";
 var chatBarOpen = "425px";
 var currentChat = "Global";
-var chatRooms = ["Global", "Room"];
+var chatRooms = {
+    Global: {
+        input: "",
+        output: ""
+    },
+    Room: {
+        input: "",
+        output: ""
+    },
+};
 var roomColors = {
     selected: "rgba(217, 220, 229)",
     unselected: "rgba(150, 150, 170)"
@@ -9,11 +18,15 @@ var roomColors = {
 
 function setupChat() {
     selectChat("Global");
+    for (let room in chatRooms) {
+        addServerMessage(`Joined ${room} Chat`, room);
+    }
     $("#chatBar").on("click", e => {
         e.preventDefault();
         switch (e.which) {
             case KEYCODE.LEFT_CLICK:
                 $("#chatBody").toggle();
+            break;
         }
     });
     $("#chatRooms").on("click", e => {
@@ -27,6 +40,7 @@ function setupChat() {
                     //checks if clicked room is different from current room
                     if (roomClickedOn != currentChat) {
                         selectChat(roomClickedOn);
+                        updateCurrentChat();
                     }
                 }
         }
@@ -45,7 +59,7 @@ function setupChat() {
             if (typedMessage == "/ping") {
                 addServerMessage("Your ping is " + latency + "ms.");
             } else {
-                socket.emit("chatMessage", { msg: typedMessage });
+                socket.emit("chatMessage", { room: currentChat, msg: typedMessage });
             }
 
             // clear chat
@@ -54,22 +68,28 @@ function setupChat() {
     });
 }
 
-function addChatMessage(user, msg) {
-    addTextToChat("<b>" + user + ":</b><text> " + msg + "</text>");
+function addChatMessage(user, msg, room) {
+    addTextToChat("<b>" + user + ":</b><text> " + msg + "</text>", room);
 }
 
-function addServerMessage(msg) {
-    addTextToChat("<text style='color:red;'>" + msg + "</text>");
+function addServerMessage(msg, room="Global") {
+    addTextToChat("<text style='color:red;'>" + msg + "</text>", room);
 }
 
-function addTextToChat(text) {
-    $("#chatText").html($("#chatText").html() + text + "<br>");
+function addTextToChat(text, room) {
+    chatRooms[room].output += text + "<br>";
+    updateCurrentChat();
+}
+
+function updateCurrentChat() {
+    $("#chatText").html(chatRooms[currentChat].output);
     $("#chatText")[0].scrollTo(0, $("#chatText")[0].scrollHeight);
 }
 
 function selectChat(chat) {
-    $("#select" + currentChat).css({ "background-color": roomColors.unselected, "border-bottom": "solid black 2px" });
-    $("#select" + chat).css({ "background-color": roomColors.selected, "border-bottom": roomColors.selected + " solid" });
+    $("#select" + currentChat).css({ "background-color": roomColors.unselected, "border-bottom-style": "solid" });
+    chatRooms[currentChat].input = $("#chatInput").val();
+    $("#select" + chat).css({ "background-color": roomColors.selected, "border-bottom-style": "none" });
+    $("#chatInput").val(chatRooms[chat].input);
     currentChat = chat;
-    addServerMessage(`Joined ${chat} Chat`);
 }

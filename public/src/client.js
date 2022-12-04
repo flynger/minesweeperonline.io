@@ -22,9 +22,9 @@ socket.on("pong", (ms) => {
 
 socket.on("chatMessage", (data) => {
     if (data.user === "Server") {
-        addServerMessage(data.msg);
+        addServerMessage(data.msg, data.room);
     } else {
-        addChatMessage(data.user, data.msg);
+        addChatMessage(data.user, data.msg, data.room);
     }
 });
 
