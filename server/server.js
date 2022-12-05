@@ -76,6 +76,7 @@ io.on("connection", (socket) => {
             Minesweeper.resetBoard(socket);
         }
         let board = Minesweeper.createBoard(socket, settings);
+        Minesweeper.clearBoard(board);
         socket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER });
         if (board.GAMEOVER) {
             Minesweeper.resetBoard(socket);
@@ -96,6 +97,7 @@ io.on("connection", (socket) => {
         if (Minesweeper.hasBoard(socket) && Minesweeper.getBoard(socket).checkCell(data.x, data.y, ["?"])) {
             let board = Minesweeper.getBoard(socket);
             board.clearCell(data.x, data.y);
+            Minesweeper.clearBoard(board);
             socket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER });
             if (board.GAMEOVER) {
                 Minesweeper.resetBoard(socket);

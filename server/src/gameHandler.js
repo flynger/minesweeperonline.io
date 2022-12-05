@@ -9,7 +9,7 @@ module.exports = (server) => {
                 this.MINES = this.FLAGS = mines;
                 this.CLEAREDCELLS = 0, this.TIME = 0;
                 this.TOTALCELLS = width * height - mines;
-                this.GAMEOVER = false;
+                this.CLEARQUEUE = [];
 
                 for (let v = -1; v <= 1; v++) {
                     for (let h = -1; h <= 1; h++) {
@@ -80,7 +80,9 @@ module.exports = (server) => {
                         // clearCells (without the function)
                         for (let v = -1; v <= 1; v++) {
                             for (let h = -1; h <= 1; h++) {
-                                if (!(v == 0 && h == 0) && this.checkCell(x + h, y + v, ["?", "F"])) this.clearCell(x + h, y + v);
+                                if (!(v == 0 && h == 0) && this.checkCell(x + h, y + v, ["?", "F"]) && !this.CLEARQUEUE.includes((x + h) + "," + (y + v))) {
+                                    this.CLEARQUEUE.push((x + h) + "," + (y + v));
+                                }
                             }
                         }
                     }
@@ -112,6 +114,12 @@ module.exports = (server) => {
             // random number between min and max inclusive
             randomNumber(min, max) {
                 return Math.floor(Math.random() * (max - min + 1)) + min;
+            }
+        },
+        clearBoard(board) {
+            while (board.CLEARQUEUE.length > 0) {
+                let cell = board.CLEARQUEUE.shift().split(",");
+                board.clearCell(+cell[0], +cell[1]);
             }
         },
         createBoard(socket, settings) {
