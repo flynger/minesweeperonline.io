@@ -13,7 +13,6 @@ setInterval(() => {
 
 socket.on("connect", (ms) => {
     // connect event
-    addServerMessage(`You connected as user: Guest ${socket.id.substring(0, 4)}`)
 });
 
 socket.on("pong", (ms) => {
@@ -25,6 +24,28 @@ socket.on("chatMessage", (data) => {
         addServerMessage(data.msg, data.room);
     } else {
         addChatMessage(data.user, data.msg, data.room);
+    }
+});
+
+socket.on("roomJoinSuccess", (data) => {
+    if (data.room === requestedRoom.id) {
+        chatRooms[requestedRoom.id] = requestedRoom;
+        updateChatRooms();
+        selectChat(requestedRoom);
+        addServerMessage(`You connected as user: Guest ${socket.id.substring(0, 4)}`, currentChat.id);
+        addServerMessage("Joined chat: " + requestedRoom.displayName, requestedRoom.id);
+        requestedRoom = false;
+    } else {
+        alert(data.requestedRoom);
+        addServerMessage("Something went wrong with joining that room.", currentChat.id);
+    }
+});
+
+socket.on("roomJoinFailure", (data) => {
+    alert(data);
+    if (data.room === requestedRoom.id) {
+        addServerMessage(data.error, currentChat.id);
+        requestedRoom = false;
     }
 });
 

@@ -159,17 +159,8 @@ body {
     user-select: none;
 }
 
-#selectGlobal {
+.selectRoom {
     float: left;
-    width: 60px;
-    text-align: center;
-    border-right-style: solid;
-    border-bottom-style: none;
-    border-width: 2px;
-}
-
-#selectRoom {
-    display: inline-block;
     width: 60px;
     text-align: center;
     border-right-style: solid;
@@ -181,7 +172,6 @@ body {
 #chatRoomPadding {
     float: right;
     height: 18px;
-    width: 172px;
     border-bottom-style: solid;
     background-color: rgba(150, 150, 170);
     border-width: 2px;
@@ -192,6 +182,7 @@ body {
     overflow-wrap: break-word;
     overflow-y: scroll;
     margin-left: 10px;
+    margin-right: 10px;
 }
 
 #chatInput {

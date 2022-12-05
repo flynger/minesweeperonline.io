@@ -14,6 +14,17 @@ module.exports = (server) => {
             } else {
                 io.to(room).emit("chatMessage", { user: "Guest " + socket.id.substring(0, 4), room: room, msg: message });
             }
+        },
+        joinSocketToRoom(socket, room) {
+            if (socket.rooms.has(room)) {
+                return { error: "You're already in that room." };
+            } else if (room.length > 6) {
+                return { error: `Your room name is longer than 6 characters. (${room.length} characters)` };
+            } else {
+                socket.join(room);
+                // socket.emit("chatMessage", { user: "Server", room: room, msg: ("Joined chat: " + inputtedRoom) });
+                return { success: true };
+            }
         }
     }
 

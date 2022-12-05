@@ -50,8 +50,8 @@ var loginHandler = require("./src/loginHandler")(server);
 io.on("connection", (socket) => {
     // connect event
     console.log(color.green, socket.id);
-    socket.join("Global");
-    socket.join("Room");
+    // chatHandler.joinSocketToRoom(socket, "global");
+    // chatHandler.joinSocketToRoom(socket, "room");
 
     // add events
     socket.on("ping", (callback) => {
@@ -74,14 +74,11 @@ io.on("connection", (socket) => {
     });
 
     socket.on("joinRoom", data => {
-        let room = data.room.toLowerCase();
-        if (socket.rooms.has(room)) {
-            socket.emit("chatMessage", { user: "Server", msg: "You're already in that room." });
-        } else if (room.length > 15) {
-            socket.emit("chatMessage", { user: "Server", msg: `Your room name is longer than 15 characters. (${room.length} characters)` });
-        } else {
-            socket.join(room);
-            socket.emit("chatMessage", { user: "Server", msg: ("Successfully joined room: " + data.room) });
+        let result = chatHandler.joinSocketToRoom(socket, data.requestedRoom);
+        if (result.error) {
+            socket.emit("roomJoinFailure", { room: data.requestedRoom, error: result.error });
+        } else if (result.success) {
+            socket.emit("roomJoinSuccess", { room: data.requestedRoom });
         }
     });
 
