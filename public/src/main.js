@@ -64,7 +64,7 @@ class Minesweeper {
             this.EXPERT = { height: 16, width: 30, mines: 99 },
             this.CUSTOM = { height: 20, width: 30, mines: 145 },
             this.MIN = { height: 1, width: 8, mines: 1 },
-            this.MAX = { height: 36, width: 36 },
+            this.MAX = { height: 50, width: 45 },
             this.GRID = []
     }
     startGame() {
@@ -89,7 +89,7 @@ class Minesweeper {
         $("#game").height(this.SETTINGS.height * this.TILE_SIZE + this.BORDER * 2);
 
         let grid = "";
-        // game gui 
+        // game gui
         grid += this.createImg("bordertl");
         grid += this.createImg("border-h").repeat(this.SETTINGS.width);
         grid += this.createImg("bordertr");
@@ -207,9 +207,13 @@ class Minesweeper {
                         if (cell.hasClass("selected")) {
                             // if game doesn't exist, create one
                             if (this.GRID.length == 0) {
-                                this.GRID = this.createBoard(x, y, this.SETTINGS.width, this.SETTINGS.height, this.SETTINGS.mines);
+                                // this.GRID = this.createBoard(x, y, this.SETTINGS.width, this.SETTINGS.height, this.SETTINGS.mines);
+                                socket.emit("createBoard", { startX: x, startY: y, width: this.SETTINGS.width, height: this.SETTINGS.height, mines: this.SETTINGS.mines });
+                                this.GRID = new Array(this.SETTINGS.height).fill("").map(x => new Array(this.SETTINGS.width).fill("?"));
                             }
-                            this.clearCell(x, y);
+                            // this.clearCell(x, y);
+                            console.log("clearing cell...");
+                            socket.emit("clearCell", { x: x, y: y });
                         } else if (this.satisfyFlags(x, y)) {
                             this.clearCells(x, y, false);
                         }
@@ -290,7 +294,7 @@ class Minesweeper {
         this.do3x3Operation(x, y, (thisX, thisY, thisCell) => {
             if (thisCell.hasClass("bombflagged")) flags++;
         });
-        return this.cellIsClear(this.getCanvasCell(x, y)) && flags === this.GRID[y][x];
+        return this.cellIsClear(this.getCanvasCell(x, y)) && this.getCanvasCell(x, y).hasClass("open" + flags);
     }
     clearCell(x, y) {
         let cell = this.GRID[y][x];
@@ -423,6 +427,15 @@ class Minesweeper {
         $("#mines_ones").attr("class", "time" + flagString[2]);
         $("#mines_tens").attr("class", "time" + flagString[1]);
         $("#mines_hundreds").attr("class", "time" + flagString[0]);
+    }
+    updateTimer(time) {
+        let timeString = "" + limitNumber(time, 0, 999);
+        while (timeString.length < 3) {
+            timeString = "0" + timeString;
+        }
+        $("#seconds_ones").attr("class", "time" + timeString[2]);
+        $("#seconds_tens").attr("class", "time" + timeString[1]);
+        $("#seconds_hundreds").attr("class", "time" + timeString[0]);
     }
 }
 

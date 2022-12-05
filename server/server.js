@@ -44,6 +44,10 @@ var io = socket(expressServer, {
 var server = {
     io: io
 }
+const Board = require("./src/gameHandler");
+var socketToBoard = {
+    /* socket: Board() */
+}
 var chatHandler = require("./src/chatHandler")(server);
 var loginHandler = require("./src/loginHandler")(server);
 
@@ -63,16 +67,48 @@ io.on("connection", (socket) => {
 
     });
 
-    socket.on("register", data => {
+    socket.on("register", (data) => {
         console.log(`received signup: ${JSON.stringify(data)}`);
         loginHandler.registerAccount(socket, data);
     });
 
-    // input events
-    socket.on("playerInput", (id) => {
-        //socket.emit();
+    // game events
+    socket.on("createBoard", (settings) => {
+        let board = socketToBoard[socket.id];
+        if (!board) {
+            board = new Board(settings);
+            board.timer = () => {
+                board.TIME++;
+                socket.emit("boardTime", { time: board.TIME });
+            };
+            console.log("Board created!");
+            socket.emit("boardData", { board: board.CLEARED });
+            if (board.GAMEOVER) {
+                delete socketToBoard[socket.id];
+            }
+            else setInterval(board.timer, 1000);
+            // send to client
+        } else {
+            // send "You already have a board!" error
+        }
     });
 
+    socket.on("clearCell", (data) => {
+        console.log(socketToBoard);
+        let board = socketToBoard[socket.id];
+        if (board && board.checkCell(data.x, data.y, ["?"])) {
+            board.clearCell(data.x, data.y);
+            socket.emit("boardData", { board: board.CLEARED });
+            if (board.GAMEOVER) {
+                clearInterval(board.timer);
+                delete socketToBoard[socket.id];
+            }
+        } else {
+            // send "You don't have a game to clear in!" error
+        }
+    });
+
+    // chat and room events
     socket.on("joinRoom", data => {
         let result = chatHandler.joinSocketToRoom(socket, data.requestedRoom);
         if (result.error) {
@@ -83,11 +119,6 @@ io.on("connection", (socket) => {
     });
 
     socket.on("chatMessage", data => chatHandler.processChat(socket, data));
-
-    //test
-    socket.on('test', (number, string, obj) => {
-        console.log(number, string, obj);
-    })
 
     // add disconnect event
     socket.on("disconnect", () => console.log(color.red, socket.id));

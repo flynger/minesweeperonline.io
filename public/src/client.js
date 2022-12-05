@@ -49,7 +49,47 @@ socket.on("roomJoinFailure", (data) => {
     }
 });
 
+socket.on("boardData", (data) => {
+    console.log(data.board);
+    for (let row in minesweeper.GRID) {
+        for (let col in minesweeper.GRID[row]) {
+            if (minesweeper.GRID[row][col] != data.board[row][col]) {
+                let classToAdd = "";
+                switch (data.board[row][col]) {
+                    case "?":
+                        // uncleared
+                        classToAdd = -1;
+                        break
+                    case "F":
+                        // flag
+                        classToAdd = "bombflagged";
+                        break
+                    case "X":
+                        // bomb (gameover)
+                        classToAdd = "bombrevealed";
+                        break
+                    case "FX":
+                        classToAdd = "bombmisflagged";
+                        break
+                    case "RX":
+                        classToAdd = "bombdeath";
+                        $("#game").off();
+                        break
+                    default:
+                        classToAdd = "open" + data.board[row][col];
+                }
+                if (classToAdd != -1) {
+                    $(`#${row}_${col}`).attr("class", "cell " + classToAdd);
+                }
+            }
+        }
+        //minesweeper.GRID = data.board;
+    }
+});
+
+socket.on("boardTime", (data) => {
+    minesweeper.updateTimer(data.time);
+});
 // socket.on("joinROom", (data) => {
 //     addChatMessage(data.user + " successfully joined " + data.room)
 // })
-

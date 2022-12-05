@@ -22,21 +22,4 @@ module.exports = (server) => {
     }
 
     return server.loginHandler = loginHandler;
-
-    // let profiles = JSON.parse(profilesStr);
-    // console.log(profiles);
-
-
-    // checking if username already exists
-
-    // for (let i = 0; i < profiles.length; i++) {
-    //     if (data.username == profiles[i].user) {
-    //         socket.emit("usernameExists");
-    //         break;
-    //     }
-    // }
-
-    // console.log("registered : \n" + data.username + "\n" + data.password);
-    // let profile = {name: [data.username], password: [data.password]}
-    // fs.appendFile("profiles.json", profile + ",\n\t");
 }
