@@ -34,13 +34,11 @@ socket.on("roomJoinSuccess", (data) => {
         addServerMessage("Joined chat: " + requestedRoom.displayName, requestedRoom.id);
         requestedRoom = false;
     } else {
-        alert(data.requestedRoom);
         addServerMessage("Something went wrong with joining that room.", currentChat.id);
     }
 });
 
 socket.on("roomJoinFailure", (data) => {
-    alert(data);
     if (data.room === requestedRoom.id) {
         addServerMessage(data.error, currentChat.id);
         requestedRoom = false;

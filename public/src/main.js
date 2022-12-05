@@ -64,7 +64,7 @@ class Minesweeper {
             this.EXPERT = { height: 16, width: 30, mines: 99 },
             this.CUSTOM = { height: 20, width: 30, mines: 145 },
             this.MIN = { height: 1, width: 8, mines: 1 },
-            this.MAX = { height: 200, width: 60 },
+            this.MAX = { height: 100, width: 50 },
             this.GRID = []
     }
     startGame() {
