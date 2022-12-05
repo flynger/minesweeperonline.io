@@ -1,6 +1,4 @@
 var latency = -1;
-var link = window.location.href;
-var socket = io.connect(link);
 
 setInterval(() => {
     const start = Date.now();
@@ -50,46 +48,64 @@ socket.on("roomJoinFailure", (data) => {
 });
 
 socket.on("boardData", (data) => {
-    console.log(data.board);
+    let win = true;
+    let death = false;
     for (let row in minesweeper.GRID) {
         for (let col in minesweeper.GRID[row]) {
-            if (minesweeper.GRID[row][col] != data.board[row][col]) {
+           if (minesweeper.GRID[row][col] != data.board[row][col]) {
                 let classToAdd = "";
-                switch (data.board[row][col]) {
+                let value =  data.board[row][col];
+                if (minesweeper.GRID[row][col] === "F") {
+                    if (data.gameOver) {
+                        value = value === "X" ? "?" : "FX";
+                    } else {
+                        if (value !== "?") {
+                            minesweeper.FLAGS++;
+                        } else value = "?";
+                    }
+                }
+                switch (value) {
                     case "?":
                         // uncleared
-                        classToAdd = -1;
                         break
                     case "F":
                         // flag
+                        minesweeper.GRID[row][col] = "F";
+                        minesweeper.FLAGS--;
                         classToAdd = "bombflagged";
                         break
                     case "X":
                         // bomb (gameover)
                         classToAdd = "bombrevealed";
+                        if (!death) death = true;
                         break
                     case "FX":
                         classToAdd = "bombmisflagged";
+                        if (!death) death = true;
                         break
                     case "RX":
                         classToAdd = "bombdeath";
-                        $("#game").off();
+                        if (!death) death = true;
                         break
                     default:
-                        classToAdd = "open" + data.board[row][col];
+                        minesweeper.GRID[row][col] = value;
+                        classToAdd = "open" + value;
                 }
-                if (classToAdd != -1) {
-                    $(`#${row}_${col}`).attr("class", "cell " + classToAdd);
-                }
+                if (classToAdd) $(`#${row}_${col}`).attr("class", "cell " + classToAdd);
             }
         }
-        //minesweeper.GRID = data.board;
+    }
+    // scuffed win/loss code
+    minesweeper.updateFlagCounter();
+    if (death) {
+        $("#game").off();
+        minesweeper.setFace("facedead");
+    } else if (data.board.every((row) => row.every(val => val != "?" && val != "X" && val != "X" && val != "X"))) {
+        $("#game").off();
+        minesweeper.setFace("facewin");
     }
 });
 
 socket.on("boardTime", (data) => {
     minesweeper.updateTimer(data.time);
 });
-// socket.on("joinROom", (data) => {
-//     addChatMessage(data.user + " successfully joined " + data.room)
-// })

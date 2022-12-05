@@ -44,10 +44,7 @@ var io = socket(expressServer, {
 var server = {
     io: io
 }
-const Board = require("./src/gameHandler");
-var socketToBoard = {
-    /* socket: Board() */
-}
+var Minesweeper = require("./src/gameHandler")(server);
 var chatHandler = require("./src/chatHandler")(server);
 var loginHandler = require("./src/loginHandler")(server);
 
@@ -74,42 +71,40 @@ io.on("connection", (socket) => {
 
     // game events
     socket.on("createBoard", (settings) => {
-        let board = socketToBoard[socket.id];
-        if (!board) {
-            board = new Board(settings);
-            board.timer = () => {
-                board.TIME++;
-                socket.emit("boardTime", { time: board.TIME });
-            };
-            console.log("Board created!");
-            socket.emit("boardData", { board: board.CLEARED });
-            if (board.GAMEOVER) {
-                delete socketToBoard[socket.id];
-            }
-            else setInterval(board.timer, 1000);
-            // send to client
-        } else {
-            // send "You already have a board!" error
+        // if board exists, delete it
+        if (Minesweeper.hasBoard(socket)) {
+            Minesweeper.resetBoard(socket);
+        }
+        let board = Minesweeper.createBoard(socket, settings);
+        socket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER });
+        if (board.GAMEOVER) {
+            Minesweeper.resetBoard(socket);
+        }
+        else board.timer = setInterval(() => {
+            board.TIME++;
+            socket.emit("boardTime", { time: board.TIME });
+        }, 1000);
+    });
+
+    socket.on("resetBoard", () => {
+        if (Minesweeper.hasBoard(socket)) {
+            Minesweeper.resetBoard(socket);
         }
     });
 
     socket.on("clearCell", (data) => {
-        console.log(socketToBoard);
-        let board = socketToBoard[socket.id];
-        if (board && board.checkCell(data.x, data.y, ["?"])) {
+        if (Minesweeper.hasBoard(socket) && Minesweeper.getBoard(socket).checkCell(data.x, data.y, ["?"])) {
+            let board = Minesweeper.getBoard(socket);
             board.clearCell(data.x, data.y);
-            socket.emit("boardData", { board: board.CLEARED });
+            socket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER });
             if (board.GAMEOVER) {
-                clearInterval(board.timer);
-                delete socketToBoard[socket.id];
+                Minesweeper.resetBoard(socket);
             }
-        } else {
-            // send "You don't have a game to clear in!" error
         }
     });
 
     // chat and room events
-    socket.on("joinRoom", data => {
+    socket.on("joinRoom", (data) => {
         let result = chatHandler.joinSocketToRoom(socket, data.requestedRoom);
         if (result.error) {
             socket.emit("roomJoinFailure", { room: data.requestedRoom, error: result.error });
@@ -118,10 +113,17 @@ io.on("connection", (socket) => {
         }
     });
 
-    socket.on("chatMessage", data => chatHandler.processChat(socket, data));
+    socket.on("chatMessage", (data) => chatHandler.processChat(socket, data));
 
     // add disconnect event
-    socket.on("disconnect", () => console.log(color.red, socket.id));
+    socket.on("disconnect", () => {
+        console.log(color.red, socket.id);
+        // if board exists, delete it
+        if (Minesweeper.hasBoard(socket)) {
+            Minesweeper.resetBoard(socket);
+            console.log(color.red, "Deleted board for disconnected player");
+        }
+    });
 });
 
 /* to broadcast event to all users: io.sockets.emit(key, data);
