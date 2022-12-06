@@ -6,6 +6,10 @@ const KEYCODE = {
     RIGHT_CLICK: 3, // RMB
     ENTER: 13, // ENTER
     SPACE: 32, // SPACE
+    c: 99,
+    t: 116,
+    C: 67,
+    T: 84,
     BACKTICK: 96 // `
 };
 
@@ -190,8 +194,10 @@ class Minesweeper {
                         case KEYCODE.LEFT_CLICK:
                             if (cell.hasClass("blank")) {
                                 this.selectCell(x, y);
+                                $("#face").attr("class", "faceooh");
                             } else if (this.cellIsClear(cell)) {
                                 this.selectCells(x, y);
+                                $("#face").attr("class", "faceooh");
                             }
                             break;
                         case KEYCODE.RIGHT_CLICK:
@@ -223,6 +229,7 @@ class Minesweeper {
                                 this.clearCells(x, y, false);
                             }
                             else this.deselectCells(x, y);
+                            $("#face").attr("class", "facesmile");
                             break;
                         default:
                         // do nothing
@@ -237,11 +244,13 @@ class Minesweeper {
                     [this.hoverX, this.hoverY] = this.getCellFromID(this.hoverCell.attr("id"));
                     e.preventDefault();
                     switch (e.buttons) {
-                        case 1:
+                        case KEYCODE.LEFT_CLICK:
                             if (cell.hasClass("blank")) {
                                 this.selectCell(this.hoverX, this.hoverY);
+                                $("#face").attr("class", "faceooh");
                             } else if (this.cellIsClear(cell)) {
                                 this.selectCells(this.hoverX, this.hoverY);
+                                $("#face").attr("class", "faceooh");
                             }
                             break;
                         case 3:
@@ -263,6 +272,7 @@ class Minesweeper {
                 if (cell.hasClass("cell")) {
                     let [x, y] = this.getCellFromID(cell.attr("id"));
                     this.deselectCells(x, y);
+                    $("#face").attr("class", "facesmile");
                 }
             });
 
@@ -295,6 +305,15 @@ class Minesweeper {
                 // check BACKTICK
                 e.preventDefault();
                 this.startGame();
+            } else if ((e.which === KEYCODE.T || e.which === KEYCODE.t) && e.target == document.body) {
+                // check BACKTICK
+                e.preventDefault();
+                $("#chatBody").show();
+                $("#chatInput").focus();
+            }  else if ((e.which === KEYCODE.C || e.which === KEYCODE.c) && e.target == document.body) {
+                // check BACKTICK
+                e.preventDefault();
+                $("#chatBody").toggle();
             }
         });
     }
@@ -454,7 +473,8 @@ class Minesweeper {
         $("#face")
             .attr("class", type)
             .off("mouseout mouseup")
-            .on("mouseout mouseup", f);
+            .on("mouseout mouseup", f)
+            .on("mouseup", () => this.startGame());
 
     }
 }
