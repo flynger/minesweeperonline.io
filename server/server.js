@@ -80,7 +80,9 @@ io.on("connection", (socket) => {
         board.START_TIME = Date.now();
         socket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER });
         if (board.GAMEOVER) {
-            console.log(Date.now() - board.START_TIME);
+            let timeElapsed = Date.now() - board.START_TIME;
+            console.log(timeElapsed);
+            
             Minesweeper.resetBoard(socket);
         }
         else board.timer = setInterval(() => {
