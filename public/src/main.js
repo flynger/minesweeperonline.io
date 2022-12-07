@@ -6,11 +6,11 @@ const KEYCODE = {
     RIGHT_CLICK: 3, // RMB
     ENTER: 13, // ENTER
     SPACE: 32, // SPACE
-    c: 99,
-    t: 116,
-    C: 67,
-    T: 84,
-    BACKTICK: 96 // `
+    C: 67, // C
+    T: 84, // T
+    BACKTICK: 96, // `
+    c: 99, // c
+    t: 116 // t
 };
 
 // code run on startup
@@ -486,7 +486,7 @@ function randomNumber(min, max) {
 function limitNumber(val, min, max) {
     if (val < min) return min;
     else if (val > max) return max;
-    else return val;
+    else return Math.round(val);
 }
 
 function limitInput(input, min, max) {

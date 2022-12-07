@@ -14,5 +14,5 @@ $(document).ready(function () {
         if (usernameInput && passwordInput) {
             socket.emit("register", { username: usernameInput, password: passwordInput });
         }
-    })
+    });
 });
