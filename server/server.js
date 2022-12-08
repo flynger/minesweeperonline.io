@@ -61,7 +61,8 @@ io.on("connection", (socket) => {
 
     // login events
     socket.on("login", (data) => {
-
+        console.log(`received login: ${JSON.stringify(data)}`);
+        loginHandler.loginAccount(socket, data);
     });
 
     socket.on("register", (data) => {

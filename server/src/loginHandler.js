@@ -14,7 +14,11 @@ module.exports = (server) => {
             }
         },
         loginAccount: (socket, data) => {
-
+            if (accounts[data.username.toLowerCase()] && accounts[data.username.toLowerCase()].password === data.password) {
+                socket.emit("loginSuccess");
+            } else {
+                socket.emit("loginFail");
+            }
         },
         saveAccountData: () => {
             return jsonfile.writeFileSync("./data/accounts.json", accounts);
