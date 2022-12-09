@@ -12,7 +12,7 @@ module.exports = (server) => {
             if (message.length > 50) {
                 socket.emit("chatMessage", { user: "Server", room: room, msg: `Your message is longer than 50 characters. (${message.length} characters)` });
             } else {
-                io.to(room).emit("chatMessage", { user: "Guest " + socket.id.substring(0, 4), room: room, msg: message });
+                io.to(room).emit("chatMessage", { user: server.gameHandler.socketToPlayer[socket.id] !== undefined ? server.gameHandler.socketToPlayer[socket.id] : "Guest " + socket.id.substring(0, 4), room: room, msg: message });
             }
         },
         joinSocketToRoom(socket, room) {

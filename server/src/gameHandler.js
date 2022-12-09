@@ -1,6 +1,7 @@
 module.exports = (server) => {
     var socketToBoard = {};
     var gameHandler = {
+        socketToPlayer: {},
         Board: class {
             // creates a board
             constructor({ startX, startY, width, height, mines }) {

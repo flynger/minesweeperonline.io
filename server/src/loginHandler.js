@@ -14,7 +14,9 @@ module.exports = (server) => {
             }
         },
         loginAccount: (socket, data) => {
-            if (accounts[data.username.toLowerCase()] && accounts[data.username.toLowerCase()].password === data.password) {
+            let username = data.username.toLowerCase();
+            if (accounts[username] === data.password) {
+                server.gameHandler.socketToPlayer[socket.id] = username;
                 socket.emit("loginSuccess");
             } else {
                 socket.emit("loginFail");

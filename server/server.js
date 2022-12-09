@@ -125,6 +125,10 @@ io.on("connection", (socket) => {
     // add disconnect event
     socket.on("disconnect", () => {
         console.log(color.red, socket.id);
+        // reference to player exists, delete it
+        if (Minesweeper.socketToPlayer[socket.id] !== undefined) {
+            delete gameHandler.socketToPlayer[socket.id];
+        }
         // if board exists, delete it
         if (Minesweeper.hasBoard(socket)) {
             Minesweeper.resetBoard(socket);
