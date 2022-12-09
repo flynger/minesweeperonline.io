@@ -79,7 +79,6 @@ socket.on("boardData", (data) => {
                         break
                     case "FX":
                         classToAdd = "bombmisflagged";
-                        if (!death) death = true;
                         break
                     case "RX":
                         classToAdd = "bombdeath";

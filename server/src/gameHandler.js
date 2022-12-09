@@ -49,46 +49,49 @@ module.exports = (server) => {
             }
             // clears a cell
             clearCell(x, y) {
-                if (this.CLEARED[y][x] === "?") {
-                    if (this.GRID[y][x] === "X") {
-                        for (let row in this.GRID) {
-                            for (let col in this.GRID[row]) {
-                                let isFlagged = this.GRID[row][col] === "F";
-                                if (this.GRID[row][col] === "X") {
-                                    if (!isFlagged && this.CLEARED[row][col] != "RX") {
-                                        this.CLEARED[row][col] = "X";
-                                    }
-                                }
-                                else if (isFlagged) {
-                                    this.CLEARED[row][col] = "FX";
+                // if (this.CLEARED[y][x] === "?" || this.CLEARED[y][x] === "Q") {
+                if (this.GRID[y][x] === "X") {
+                    for (let row in this.GRID) {
+                        for (let col in this.GRID[row]) {
+                            let isFlagged = this.GRID[row][col] === "F";
+                            if (this.GRID[row][col] === "X") {
+                                if (!isFlagged && this.CLEARED[row][col] != "RX") {
+                                    this.CLEARED[row][col] = "X";
                                 }
                             }
-                        }
-                        this.CLEARED[y][x] = "RX";
-                        this.GAMEOVER = true; // game over
-                    } else {
-                        this.CLEARED[y][x] = this.GRID[y][x];
-                        this.CLEAREDCELLS++;
-                        if (this.GRID[y][x] === 0) {
-                            for (let v = -1; v <= 1; v++) {
-                                for (let h = -1; h <= 1; h++) {
-                                    if (this.GRID[y + v] && this.GRID[y + v][x + h] != undefined && this.GRID[y + v][x + h] !== "X") this.CLEARQUEUE.push([x + h, y + v]);
-                                }
+                            else if (isFlagged) {
+                                this.CLEARED[row][col] = "FX";
                             }
-                        }
-                        if (this.CLEAREDCELLS === this.TOTALCELLS) {
-                            this.FLAGS = 0;
-                            for (let row in this.GRID) {
-                                for (let col in this.GRID[row]) {
-                                    if (this.GRID[row][col] === "X") {
-                                        this.CLEARED[row][col] = "F";
-                                    }
-                                }
-                            }
-                            this.GAMEOVER = true;
                         }
                     }
+                    this.CLEARED[y][x] = "RX";
+                    this.GAMEOVER = true; // game over
+                } else {
+                    this.CLEARED[y][x] = this.GRID[y][x];
+                    this.CLEAREDCELLS++;
+                    if (this.GRID[y][x] === 0) {
+                        for (let v = -1; v <= 1; v++) {
+                            for (let h = -1; h <= 1; h++) {
+                                if (!(v === 0 && h === 0) && this.GRID[y + v] && this.GRID[y + v][x + h] !== undefined && this.GRID[y + v][x + h] !== "X" && this.CLEARED[y + v][x + h] === "?") {
+                                    this.CLEARQUEUE.push([x + h, y + v]);
+                                    this.CLEARED[y + v][x + h] = "Q";
+                                }
+                            }
+                        }
+                    }
+                    if (this.CLEAREDCELLS === this.TOTALCELLS) {
+                        this.FLAGS = 0;
+                        for (let row in this.GRID) {
+                            for (let col in this.GRID[row]) {
+                                if (this.GRID[row][col] === "X") {
+                                    this.CLEARED[row][col] = "F";
+                                }
+                            }
+                        }
+                        this.GAMEOVER = true;
+                    }
                 }
+                //}
             }
             // clearCell(x, y) {
             //     let value = this.GRID[y][x];
