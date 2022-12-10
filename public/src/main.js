@@ -308,12 +308,12 @@ class Minesweeper {
             } else if ((e.which === KEYCODE.T || e.which === KEYCODE.t) && e.target == document.body) {
                 // check BACKTICK
                 e.preventDefault();
-                $("#chatBody").show();
+                if (!$("#chat-body").is(":visible")) toggleChat();
                 $("#chatInput").focus();
             }  else if ((e.which === KEYCODE.C || e.which === KEYCODE.c) && e.target == document.body) {
                 // check BACKTICK
                 e.preventDefault();
-                $("#chatBody").toggle();
+                toggleChat();
             }
         });
     }

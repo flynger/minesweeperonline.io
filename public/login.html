@@ -3,81 +3,58 @@
 
 <head>
   <title>Login</title>
-
+  <!-- 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.0/socket.io.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
 
   <script src="libraries/jquery-3.6.0.js"></script>
   <script src="libraries/jquery-ui.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.5.0/p5.min.js"></script>
   <link href="libraries/jquery-ui.css" rel="stylesheet" />
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.5.0/p5.min.js"></script> -->
 
-  <link href="style.css" rel="stylesheet" />
-  <link href="minesweeper.min.css" rel="stylesheet" />
-  <script src="src/socket.js"></script>
-  <script src="src/login.js"></script>
-  <script> 
-    $(function(){
-      $("#header").load("header.html"); 
-      $("#footer").load("footer.html"); 
+
+  <link href="css/style.css" rel="stylesheet" />
+  <link href="css/login.css" rel="stylesheet" />
+  <!-- <script src="src/socket.js"></script>
+  <script src="src/login.js"></script> -->
+  <script>
+    document.onreadystatechange = function () {
+      if (document.readyState !== "complete") {
+        document.querySelector("#site").style.display = "none";
+        document.querySelector("#loader").style.visibility = "visible";
+      } else {
+        document.querySelector("#loader").style.visibility = "hidden";
+        document.querySelector("#site").style.display = "block";
+      }
+    };
+    $(function () {
+      $("#header").load("header.html");
+      $("#footer").load("footer.html");
     });
-    </script>
-    <style>
-      .login-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        /* justify-content: normal; */
-        height: 100vh;
-        top: 100px;
-      }
-    
-      .login-form {
-        width: 300px;
-        padding: 20px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-      }
-    
-      .login-form input[type="text"],
-      .login-form input[type="password"] {
-        width: 100%;
-        padding: 12px 20px;
-        margin: 8px 0;
-        box-sizing: border-box;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-      }
-    
-      .login-form input[type="submit"] {
-        width: 100%;
-        background-color: #4CAF50;
-        color: white;
-        padding: 14px 20px;
-        margin: 8px 0;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-      }
-    
-      .login-form input[type="submit"]:hover {
-        background-color: #45a049;
-      }
-    </style> 
+  </script>
 </head>
 
-<div id="header"></div>
-
-<body oncontextmenu="return false;">
- 
-  <div class="login-container">
-    <h1>Login</h1>
-    <div class="login-form">
-      <label for="username">Username:</label><br>
-      <input type="text" id="usernameInput" name="username"><br>
-      <label for="password">Password:</label><br>
-      <input type="password" id="passwordInput" name="password"><br>
-      <input id="loginButton" type="submit" value="Login">
+<body>
+  <header id="header"></header>
+  <div id="loader" class="center"></div>
+  <div id="site">
+    <div class="bg-image"></div>
+    <div class="login-container">
+      <h1>Welcome Back, Sweeper.</h1>
+      <form class="login-form" action="/login" method="post">
+        <div>Log in to your account below.</div><br>
+        <!-- <label for="username">Username</label><br> -->
+        <input type="text" name="username" placeholder="Username" required><br>
+        <!-- <label for="password">Password</label><br> -->
+        <input type="password" name="password" placeholder="Password" required><br>
+        <input type="submit" value="Login">
+      </form>
+      <br>
+      <div class="no-account-text">
+        <span>New around here?</span>
+        <a href="/register">Make an account</a>
+      </div>
+      <!-- Don't have an account? <a href="/register">Sign up!</a> -->
     </div>
   </div>
 </body>

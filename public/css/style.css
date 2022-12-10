@@ -19,6 +19,7 @@ body {
     margin-top: 0%;
 } */
 
+/* classes */
 .button {
     display: flex;
     flex-direction: column;
@@ -39,18 +40,6 @@ body {
 
 .button:focus {
     box-shadow: inset 0px 0.8px 0px -0.25px rgba(255, 255, 255, 0.2), 0px 0.5px 1px rgba(0, 0, 0, 0.1), 0px 0px 0px 3.5px rgba(58, 108, 217, 0.5);
-}
-
-/* classes */
-.options-close {
-    cursor: pointer;
-}
-
-.options-title {
-    background-color: rgb(53, 53, 243);
-    color: white;
-    font-weight: bold;
-    font-style: italic;
 }
 
 .difficulty-select {
@@ -74,6 +63,17 @@ body {
     width: 32px;
     height: 40px;
     display: block;
+}
+
+.options-close {
+    cursor: pointer;
+}
+
+.options-title {
+    background-color: rgb(53, 53, 243);
+    color: white;
+    font-weight: bold;
+    font-style: italic;
 }
 
 .top-nav {
@@ -131,7 +131,7 @@ body {
     background-color: rgba(128, 128, 255, 0.25);
 }
 
-#chatBar {
+#chat-bar {
     height: 25px;
     text-indent: 5px;
     border: black;
@@ -140,10 +140,9 @@ body {
     border-bottom-style: none;
     font-size: 20px;
     user-select: none;
-    transition-duration: 1s;
 }
 
-#chatBody {
+#chat-body {
     display: block;
     border: black;
     border-style: solid;
@@ -151,11 +150,11 @@ body {
 }
 
 #chatRooms {
-    display: inline-block;
+    /* display: inline-block;
     border-width: 2px;
     width: 100%;
     height: 20px;
-    font-size: 16px;
+    font-size: 16px; */
     user-select: none;
 }
 
@@ -167,6 +166,7 @@ body {
     border-bottom-style: solid;
     background-color: rgba(150, 150, 170);
     border-width: 2px;
+    user-select: none;
 }
 
 #chatRoomPadding {
@@ -178,7 +178,10 @@ body {
 }
 
 #chatText {
+    width: 280px;
     height: 400px;
+    font-size: small;
+    /* word-break: break-all; */
     overflow-wrap: break-word;
     overflow-y: scroll;
     margin-left: 10px;
@@ -204,4 +207,28 @@ body {
 #site {
     margin-left: 10px;
     margin-right: 10px;
+}
+
+#loader {
+    border: 12px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 12px solid #444444;
+    width: 70px;
+    height: 70px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.center {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
 }

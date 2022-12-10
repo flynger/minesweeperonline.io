@@ -1,9 +1,10 @@
 // libraries
-const express = require("./node_modules/express/index");
-const socket = require("./node_modules/socket.io/dist/index");
+const bodyParser = require("./node_modules/body-parser");
 const cors = require("./node_modules/cors");
 const color = require("./libs/color");
+const express = require("./node_modules/express/index");
 const jsonfile = require("./node_modules/jsonfile");
+const socket = require("./node_modules/socket.io/dist/index");
 
 // server setup
 var app = express();
@@ -11,6 +12,7 @@ var port = 3000;
 var name = "Minesweeper Online";
 
 app.use(express.static("../public"));
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(
     cors({
         origin: "*",
@@ -18,8 +20,14 @@ app.use(
 );
 
 // url masks
+app.get("/", (req, res) => {
+    res.redirect("/play");
+});
 app.get("/home", (req, res) => {
-    res.sendFile('index.html', { root: '../public' });
+    res.redirect("/play");
+});
+app.get("/play", (req, res) => {
+    res.sendFile('play.html', { root: '../public' });
 });
 app.get("/profile", (req, res) => {
     res.sendFile('profile.html', { root: '../public' });
@@ -30,8 +38,18 @@ app.get("/settings", (req, res) => {
 app.get("/login", (req, res) => {
     res.sendFile('login.html', { root: '../public' });
 });
+app.post("/login", (req, res) => {
+    let username = req.body.username;
+    let password = req.body.password;
+    res.send(`login, Username: ${username} Password: ${password}`);
+});
 app.get("/register", (req, res) => {
     res.sendFile('register.html', { root: '../public' });
+});
+app.post("/register", (req, res) => {
+    let username = req.body.username;
+    let password = req.body.password;
+    res.send(`signed up, Username: ${username} Password: ${password}`);
 });
 
 var expressServer = app.listen(port, () => console.log(color.blue, `Starting Server: ${name} on port ${port}`));
@@ -82,7 +100,7 @@ io.on("connection", (socket) => {
         if (board.GAMEOVER) {
             let timeElapsed = Date.now() - board.START_TIME;
             console.log(timeElapsed);
-            
+
             Minesweeper.resetBoard(socket);
         }
         else board.timer = setInterval(() => {

@@ -10,6 +10,15 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
 
     <script>
+        document.onreadystatechange = function () {
+            if (document.readyState !== "complete") {
+                document.querySelector("#site").style.display = "none";
+                document.querySelector("#loader").style.visibility = "visible";
+            } else {
+                document.querySelector("#loader").style.visibility = "hidden";
+                document.querySelector("#site").style.display = "block";
+            }
+        };
         $(function () {
             $("#header").load("header.html");
             $("#footer").load("footer.html");
@@ -20,8 +29,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.0/socket.io.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.5.0/p5.min.js"></script>
 
-    <link href="style.css" rel="stylesheet" />
-    <link href="minesweeper.min.css" rel="stylesheet" />
+    <link href="css/style.css" rel="stylesheet" />
+    <link href="css/minesweeper.min.css" rel="stylesheet" />
     <script src="src/socket.js"></script>
     <script src="src/client.js"></script>
     <script src="src/main.js"></script>
@@ -30,8 +39,8 @@
 
 <body>
     <header id="header"></header>
+    <div id="loader" class="center"></div>
     <div id="site">
-        <div id="header"></div>
         <!-- <div id="settingsButton">
             <button onclick="location.href='settings.html'" class="button"><i class="fa fa-cog"></i></button>
         </div> -->
@@ -95,27 +104,29 @@
             <div id="game">
             </div>
         </div>
-    </div>
-    <div id="chat">
-        <div id="chatBar">Chat</div>
-        <div id="chatBody">
-            <div id="chatRooms">
-                <!-- <div id="selectGlobal" name="room">Global</div>
-                <div id="selectRoom" name="room">Room</div>
-                <div id="chatRoomPadding"></div> -->
-            </div>
-            <p id="chatText"></p>
-            <br>
-            <input id="chatInput" type="text" placeholder="Type message here...">
-            <br>
-            <br>
-            <div id="roomSelector">
-                Room:
-                <input id="roomInput" type="text">
-                <button id="roomButton" type="button">Join</button>
+        <div id="chat">
+            <div id="chat-bar">Chat</div>
+            <div id="chat-body">
+                <div id="chat-rooms">
+                    <!-- <div id="selectGlobal" name="room">Global</div>
+                    <div id="selectRoom" name="room">Room</div>
+                    <div id="chatRoomPadding"></div> -->
+                </div>
+                <br>
+                <p id="chatText"></p>
+                <br>
+                <input id="chatInput" type="text" placeholder="Type message here..." maxlength="50">
+                <br>
+                <br>
+                <div id="roomSelector">
+                    Room:
+                    <input id="roomInput" type="text">
+                    <button id="roomButton" type="button">Join</button>
+                </div>
             </div>
         </div>
     </div>
+    
 </body>
 
 </html>

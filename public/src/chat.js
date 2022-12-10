@@ -22,11 +22,11 @@ joinRoom("Global");
 var currentChat = requestedRoom;
 
 function setupChat() {
-    $("#chatBar").on("click", e => {
+    $("#chat-bar").on("click", e => {
         e.preventDefault();
         switch (e.which) {
             case KEYCODE.LEFT_CLICK:
-                $("#chatBody").toggle();
+                toggleChat();
                 break;
         }
     });
@@ -60,6 +60,10 @@ function setupChat() {
             $("#chatInput").val("");
         }
     });
+}
+
+function toggleChat() {
+    $("#chat-body").stop().slideToggle(200);
 }
 
 function addChatMessage(user, msg, room) {
@@ -99,7 +103,7 @@ function updateChatRooms() {
         let displayName = chatRooms[room].displayName;
         roomsHTML += `<div id="select${displayName}" class="selectRoom" name="room" onclick="selectChat(chatRooms['${room}'])">${displayName}</div>`;
     }
-    $("#chatRooms").html(roomsHTML + "<div id='chatRoomPadding' style='width:" + (296 - 62 * countRooms()) + "px'></div>");
+    $("#chat-rooms").html(roomsHTML + "<div id='chatRoomPadding' style='width:" + (296 - 62 * countRooms()) + "px'></div>");
 }
 
 function updateCurrentChat() {

@@ -1,5 +1,5 @@
 /* .night-mode .z100 #game div {
-    background-image: url('res/sprites-night.png')
+    background-image: url('../res/sprites-night.png')
 } */
 
 /* #options {
@@ -20,6 +20,7 @@
 
 #game {
     background-color: silver;
+    image-rendering: pixelated;
     user-select: none;
 }
 
@@ -28,9 +29,9 @@
     line-height: 0;
     font-size: 0
 }
-
+/* 
 .z100 #game div {
-    background-image: url('res/sprites.png');
+    background-image: url('../res/sprites.png');
 }
 
 .z100 .time0 {
@@ -320,11 +321,11 @@
 }
 
 .z150 #game div {
-    /* background-image: url('sprite150.gif') */
+     background-image: url('sprite150.gif') 
 }
 
 .night-mode .z150 #game div {
-    /* background-image: url('sprite150-night.gif') */
+     background-image: url('sprite150-night.gif') 
 }
 
 .z150 .time0 {
@@ -611,15 +612,15 @@
 .z150 .options {
     left: 24px;
     top: 102px
-}
+} */
 
 .z200 #game div {
-    background-image: url('res/sprites.png');
+    background-image: url('../res/sprites.png');
     /*filter: invert(100%) hue-rotate(80deg);*/
 }
 
 .night-mode .z200 #game div {
-    background-image: url('res/darksprites.png');
+    background-image: url('../res/darksprites.png');
 }
 
 .z200 .time0 {
