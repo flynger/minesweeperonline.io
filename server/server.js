@@ -2,8 +2,10 @@
 const bodyParser = require("./node_modules/body-parser");
 const cors = require("./node_modules/cors");
 const color = require("./libs/color");
+const cookieParser = require("./node_modules/cookie-parser");
 const express = require("./node_modules/express/index");
 const jsonfile = require("./node_modules/jsonfile");
+const sessions = require("./node_modules/express-session");
 const socket = require("./node_modules/socket.io/dist/index");
 
 // server setup
@@ -18,6 +20,12 @@ app.use(
         origin: "*",
     })
 );
+app.use(sessions({
+    secret: "e'eF?infFwa%%ofFia*Gesj8\\g4pdO!ih",
+    saveUninitialized: true,
+    cookie: { maxAge: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000) },
+    resave: false
+}))
 
 // url masks
 app.get("/", (req, res) => {
@@ -39,6 +47,7 @@ app.get("/login", (req, res) => {
     res.sendFile('login.html', { root: '../public' });
 });
 app.post("/login", (req, res) => {
+    console.log(req.session);
     let username = req.body.username;
     let password = req.body.password;
     res.send(`login, Username: ${username} Password: ${password}`);
