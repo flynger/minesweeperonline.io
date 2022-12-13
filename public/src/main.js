@@ -104,12 +104,15 @@ class Minesweeper {
         grid += "<br>";
 
         grid += this.createImg("border-vlong");
+        // grid += this.createImg("flagsicon flagsicon", "flagsicon")
         grid += this.createImg("time0", "mines_hundreds");
         grid += this.createImg("time0", "mines_tens");
         grid += this.createImg("time0", "mines_ones");
 
+        // - 48.5 when adding flag and time icon
         let margin = 364 - (this.TILE_SIZE / 2) * (30 - this.SETTINGS.width);
         grid += this.createImg("facesmile", "face", "margin-left:" + margin + "px; margin-right: " + margin + "px;", "onclick='minesweeper.startGame()'");
+        // grid += this.createImg("timeicon timeicon", "timeicon");
         grid += this.createImg("time0", "seconds_hundreds");
         grid += this.createImg("time0", "seconds_tens");
         grid += this.createImg("time0", "seconds_ones");
@@ -310,7 +313,7 @@ class Minesweeper {
                 e.preventDefault();
                 if (!$("#chat-body").is(":visible")) toggleChat();
                 $("#chatInput").focus();
-            }  else if ((e.which === KEYCODE.C || e.which === KEYCODE.c) && e.target == document.body) {
+            } else if ((e.which === KEYCODE.C || e.which === KEYCODE.c) && e.target == document.body) {
                 // check BACKTICK
                 e.preventDefault();
                 toggleChat();

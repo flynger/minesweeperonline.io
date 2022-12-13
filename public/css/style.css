@@ -147,6 +147,7 @@ body {
     border: black;
     border-style: solid;
     border-width: 2px;
+    display: none;
 }
 
 #chatRooms {

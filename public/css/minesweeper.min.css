@@ -19,7 +19,7 @@
 } */
 
 #game {
-    background-color: silver;
+    background-color: rgb(192, 192, 192);
     image-rendering: pixelated;
     user-select: none;
 }
@@ -29,6 +29,7 @@
     line-height: 0;
     font-size: 0
 }
+
 /* 
 .z100 #game div {
     background-image: url('../res/sprites.png');
@@ -907,4 +908,27 @@
 .z200 .options {
     left: 30px;
     top: 130px
+}
+
+.z200 .flagsicon {
+    background-position: -286px 0;
+    width: 52px;
+    height: 46px;
+}
+
+.z200 #flagsicon {
+    margin-top: 6px;
+    margin-bottom: 6px;
+}
+
+.z200 .timeicon {
+    background-position: -338px 0;
+    width: 52px;
+    height: 46px;
+}
+
+.z200 #timeicon {
+    margin-top: 6px;
+    margin-bottom: 6px;
+    margin-right: 5px
 }
