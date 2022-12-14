@@ -13,13 +13,14 @@ module.exports = (server) => {
                 socket.emit("accountCreated");
             }
         },
-        loginAccount: (socket, data) => {
-            let username = data.username.toLowerCase();
-            if (accounts[username] === data.password) {
-                server.gameHandler.socketToPlayer[socket.id] = username;
-                socket.emit("loginSuccess");
+        loginAccount: (request) => {
+            let username = request.body.username.toLowerCase();
+            if (accounts[username] === request.body.password) {
+                request.session.username = username;
+                // server.gameHandler.socketToPlayer[socket.id] = username;
+                // socket.emit("loginSuccess");
             } else {
-                socket.emit("loginFail");
+                // socket.emit("loginFail");
             }
         },
         saveAccountData: () => {

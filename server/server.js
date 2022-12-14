@@ -25,7 +25,7 @@ app.use(sessions({
     saveUninitialized: true,
     cookie: { maxAge: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000) },
     resave: false
-}))
+}));
 
 // url masks
 app.get("/", (req, res) => {
@@ -47,6 +47,7 @@ app.get("/login", (req, res) => {
     res.sendFile('login.html', { root: '../public' });
 });
 app.post("/login", (req, res) => {
+    loginHandler.loginAccount(req);
     console.log(req.session);
     let username = req.body.username;
     let password = req.body.password;
