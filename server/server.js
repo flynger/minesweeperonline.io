@@ -12,6 +12,12 @@ const socket = require("./node_modules/socket.io/dist/index");
 var app = express();
 var port = 3000;
 var name = "Minesweeper Online";
+var sessionMiddleware = sessions({
+    secret: "e'eF?infFwa%%ofFia*Gesj8\\g4pdO!ih",
+    saveUninitialized: true,
+    cookie: { maxAge: 365 * 24 * 60 * 60 * 1000 },
+    resave: false
+});
 
 app.use(express.static("../public"));
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -20,12 +26,7 @@ app.use(
         origin: "*",
     })
 );
-app.use(sessions({
-    secret: "e'eF?infFwa%%ofFia*Gesj8\\g4pdO!ih",
-    saveUninitialized: true,
-    cookie: { maxAge: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000) },
-    resave: false
-}));
+app.use(sessionMiddleware);
 
 // url masks
 app.get("/", (req, res) => {
@@ -36,6 +37,7 @@ app.get("/home", (req, res) => {
 });
 app.get("/play", (req, res) => {
     res.sendFile('play.html', { root: '../public' });
+    console.log(req.sessionID);
 });
 app.get("/profile", (req, res) => {
     res.sendFile('profile.html', { root: '../public' });
@@ -47,11 +49,14 @@ app.get("/login", (req, res) => {
     res.sendFile('login.html', { root: '../public' });
 });
 app.post("/login", (req, res) => {
-    loginHandler.loginAccount(req);
+    if (loginHandler.loginAccount(req)) {
+        res.redirect("/play");
+    } else {
+        let username = req.body.username;
+        let password = req.body.password;
+        res.json({ login: false });
+    }
     console.log(req.session);
-    let username = req.body.username;
-    let password = req.body.password;
-    res.send(`login, Username: ${username} Password: ${password}`);
 });
 app.get("/register", (req, res) => {
     res.sendFile('register.html', { root: '../public' });
@@ -67,6 +72,7 @@ var io = socket(expressServer, {
     pingInterval: 900,
     pingTimeout: 5000
 });
+io.use((socket, next) => sessionMiddleware(socket.request, {}, next)); // gives request 
 
 // our source files
 var server = {
@@ -77,6 +83,7 @@ var chatHandler = require("./src/chatHandler")(server);
 var loginHandler = require("./src/loginHandler")(server);
 
 io.on("connection", (socket) => {
+    console.log(socket.request.sessionID);
     // connect event
     console.log(color.green, socket.id);
     // chatHandler.joinSocketToRoom(socket, "global");
