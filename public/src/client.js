@@ -30,8 +30,9 @@ socket.on("roomJoinSuccess", (data) => {
         chatRooms[requestedRoom.id] = requestedRoom;
         updateChatRooms();
         selectChat(requestedRoom);
-        addServerMessage(`You connected as user: Guest ${socket.id.substring(0, 4)}`, currentChat.id);
-        addServerMessage("Joined chat: " + requestedRoom.displayName, requestedRoom.id);
+        for (let message in data.messages) {
+            addServerMessage(data.messages[message], currentChat.id);
+        }
         requestedRoom = false;
     } else {
         addServerMessage("Something went wrong with joining that room.", currentChat.id);

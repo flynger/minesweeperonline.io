@@ -7,6 +7,7 @@ const express = require("./node_modules/express/index");
 const jsonfile = require("./node_modules/jsonfile");
 const sessions = require("./node_modules/express-session");
 const socket = require("./node_modules/socket.io/dist/index");
+const { uniqueNamesGenerator, adjectives, colors, animals } = require("./node_modules/unique-names-generator");
 
 // server setup
 var app = express();
@@ -36,6 +37,14 @@ app.get("/home", (req, res) => {
     res.redirect("/play");
 });
 app.get("/play", (req, res) => {
+    if (!req.session.username) {
+        req.session.username = "Guest " + uniqueNamesGenerator({ 
+            dictionaries: [adjectives, animals],
+            separator: " ",
+            style: "capital"
+        }); // big_red_donkey
+        req.session.isGuest = true;
+    }
     res.sendFile('play.html', { root: '../public' });
     console.log(req.sessionID);
 });
@@ -151,7 +160,8 @@ io.on("connection", (socket) => {
         if (result.error) {
             socket.emit("roomJoinFailure", { room: data.requestedRoom, error: result.error });
         } else if (result.success) {
-            socket.emit("roomJoinSuccess", { room: data.requestedRoom });
+            let session = socket.request.session;
+            socket.emit("roomJoinSuccess", { room: data.requestedRoom, messages: [`You connected as user: ${session.username}`, "Joined chat: " + data.requestedRoom] });
         }
     });
 
@@ -161,9 +171,9 @@ io.on("connection", (socket) => {
     socket.on("disconnect", () => {
         console.log(color.red, socket.id);
         // reference to player exists, delete it
-        if (Minesweeper.socketToPlayer[socket.id] !== undefined) {
-            delete gameHandler.socketToPlayer[socket.id];
-        }
+        // if (Minesweeper.socketToPlayer[socket.id] !== undefined) {
+        //     delete Minesweeper.socketToPlayer[socket.id];
+        // }
         // if board exists, delete it
         if (Minesweeper.hasBoard(socket)) {
             Minesweeper.resetBoard(socket);

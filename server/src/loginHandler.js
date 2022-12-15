@@ -17,6 +17,7 @@ module.exports = (server) => {
             let username = req.body.username.toLowerCase();
             if (accounts[username] === req.body.password) {
                 req.session.username = username;
+                req.session.isGuest = false;
                 return true;
                 // server.gameHandler.socketToPlayer[socket.id] = username;
                 // socket.emit("loginSuccess");
