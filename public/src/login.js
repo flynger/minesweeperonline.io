@@ -19,3 +19,12 @@
 //         }
 //     });
 // });
+
+$("#login-form").on("submit", (e) => {
+    console.log("hi")
+    e.preventDefault();
+    let data = $(this).serialize();
+    $.post("/login", (data) => {
+        console.log(data)
+    });
+});

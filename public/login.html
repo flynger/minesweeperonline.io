@@ -41,13 +41,14 @@
     <div class="bg-image"></div>
     <div class="login-container">
       <h1>Welcome Back, Sweeper.</h1>
-      <form class="login-form" action="/login" method="post">
+      <form id="login-form" class="login-form">
         <div>Log in to your account below.</div><br>
         <!-- <label for="username">Username</label><br> -->
         <input type="text" name="username" placeholder="Username" required><br>
         <!-- <label for="password">Password</label><br> -->
         <input type="password" name="password" placeholder="Password" required><br>
-        <input type="submit" value="Login">
+        <button onclick="$('#login-form').submit()" value="Login">
+        <div id="login-fail">Incorrect Username and/or Password</div>
       </form>
       <br>
       <div class="no-account-text">

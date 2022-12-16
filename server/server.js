@@ -58,12 +58,13 @@ app.get("/login", (req, res) => {
     res.sendFile('login.html', { root: '../public' });
 });
 app.post("/login", (req, res) => {
+    console.log(req.body)
     if (loginHandler.loginAccount(req)) {
         res.redirect("/play");
     } else {
         let username = req.body.username;
         let password = req.body.password;
-        res.json({ login: false });
+        res.send("login failed");
     }
     console.log(req.session);
 });

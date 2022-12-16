@@ -60,3 +60,8 @@
 #header {
     filter: brightness(83%); 
 }
+
+#login-fail {
+  color: red;
+  display: none;
+}
