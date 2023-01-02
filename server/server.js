@@ -48,6 +48,19 @@ app.get("/play", (req, res) => {
     res.sendFile('play.html', { root: '../public' });
     console.log(req.sessionID);
 });
+app.get("/play/:username", (req, res) => {
+    requestedUsername = req.params.username;
+    // check if the requested user is currently playing
+    //to be implemented: hasPlayer and getPlayer
+    if (Minesweeper.hasPlayer(requestedUsername)) {
+        currentGame = Minesweeper.getPlayer(requestedUsername);
+        // send the current board data to the client
+        socket.emit("boardData", { board: currentGame.board.CLEARED, gameOver: currentGame.board.GAMEOVER });
+        socket.emit("boardTime", { time: currentGame.board.TIME });
+        // update the view of the game
+        updateView();
+    }
+});
 app.get("/profile", (req, res) => {
     res.sendFile('profile.html', { root: '../public' });
 });
@@ -67,6 +80,7 @@ app.post("/login", (req, res) => {
         res.send("login failed");
     }
     console.log(req.session);
+    console.log(req.session.username);
 });
 app.get("/register", (req, res) => {
     res.sendFile('register.html', { root: '../public' });
@@ -117,6 +131,9 @@ io.on("connection", (socket) => {
 
     // game events
     socket.on("createBoard", (settings) => {
+        // if (req.session.username !== req.params.username) {
+        //     return;
+        // }
         // if board exists, delete it
         if (Minesweeper.hasBoard(socket)) {
             Minesweeper.resetBoard(socket);
@@ -137,12 +154,18 @@ io.on("connection", (socket) => {
     });
 
     socket.on("resetBoard", () => {
+        // if (req.session.username !== req.params.username) {
+        //     return;
+        // }
         if (Minesweeper.hasBoard(socket)) {
             Minesweeper.resetBoard(socket);
         }
     });
 
     socket.on("clearCell", (data) => {
+        // if (req.session.username !== req.params.username) {
+        //     return;
+        // }
         if (Minesweeper.hasBoard(socket) && Minesweeper.getBoard(socket).checkCell(data.x, data.y, ["?"])) {
             let board = Minesweeper.getBoard(socket);
             board.clearCell(data.x, data.y);
