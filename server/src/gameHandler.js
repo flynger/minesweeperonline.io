@@ -1,5 +1,4 @@
 module.exports = (server) => {
-    var socketToBoard = {};
     var gameHandler = {
         Board: class {
             // creates a board
@@ -167,6 +166,13 @@ module.exports = (server) => {
                     this.clearCell(cell[0], cell[1]);
                 }
             }
+            resetTimer() {
+                // if board exists, delete it
+                let timeElapsed = Date.now() - this.START_TIME;
+                console.log("resetting board");
+                console.log(timeElapsed);
+                if (this.timer) clearInterval(this.timer);
+            }
         },
         // clearBoard(board) {
         //     while (board.CLEARQUEUE.length > 0) {
@@ -183,14 +189,6 @@ module.exports = (server) => {
         },
         hasBoard(socket) {
             return socket.id in socketToBoard;
-        },
-        resetBoard(socket) {
-            // if board exists, delete it
-            if (socketToBoard[socket.id]) {
-                console.log("resetting board");
-                if (socketToBoard[socket.id].timer) clearInterval(socketToBoard[socket.id].timer);
-                delete socketToBoard[socket.id];
-            }
         }
     }
 

@@ -37,14 +37,6 @@ app.get("/home", (req, res) => {
     res.redirect("/play");
 });
 app.get("/play", (req, res) => {
-    if (!req.session.username) {
-        req.session.username = "Guest " + uniqueNamesGenerator({ 
-            dictionaries: [adjectives, animals],
-            separator: " ",
-            style: "capital"
-        }); // big_red_donkey
-        req.session.isGuest = true;
-    }
     res.sendFile('play.html', { root: '../public' });
     console.log(req.sessionID);
 });
@@ -71,6 +63,7 @@ app.get("/login", (req, res) => {
     res.sendFile('login.html', { root: '../public' });
 });
 app.post("/login", (req, res) => {
+    if (play)
     console.log(req.body)
     if (loginHandler.loginAccount(req)) {
         res.redirect("/play");
@@ -100,14 +93,27 @@ io.use((socket, next) => sessionMiddleware(socket.request, {}, next)); // gives 
 
 // our source files
 var server = {
-    io: io
+    io: io,
+    players: {}
 }
 var Minesweeper = require("./src/gameHandler")(server);
 var chatHandler = require("./src/chatHandler")(server);
 var loginHandler = require("./src/loginHandler")(server);
 
 io.on("connection", (socket) => {
-    console.log(socket.request.sessionID);
+    let session = socket.request.session;
+    let username = session.username ? session.username : "Guest " + uniqueNamesGenerator({ 
+        dictionaries: [adjectives, animals],
+        separator: " ",
+        style: "capital"
+    }); // big_red_donkey;
+    let board = null;
+    req.session.username = "Guest " + uniqueNamesGenerator({ 
+            dictionaries: [adjectives, animals],
+            separator: " ",
+            style: "capital"
+        }); // big_red_donkey
+
     // connect event
     console.log(color.green, socket.id);
     // chatHandler.joinSocketToRoom(socket, "global");
@@ -135,17 +141,16 @@ io.on("connection", (socket) => {
         //     return;
         // }
         // if board exists, delete it
-        if (Minesweeper.hasBoard(socket)) {
-            Minesweeper.resetBoard(socket);
+        if (board) {
+            board.resetTimer();
+            board = null;
         }
-        let board = Minesweeper.createBoard(socket, settings);
+        board = Minesweeper.createBoard(socket, settings);
         board.clearQueue();
         socket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER });
         if (board.GAMEOVER) {
-            let timeElapsed = Date.now() - board.START_TIME;
-            console.log(timeElapsed);
-
-            Minesweeper.resetBoard(socket);
+            board.resetTimer();
+            board = null;
         }
         else board.timer = setInterval(() => {
             board.TIME++;
