@@ -94,7 +94,7 @@ class Minesweeper {
     resetBoard() {
         $("#game").html("");
         $("#game").width(this.SETTINGS.width * this.TILE_SIZE + this.BORDER * 2);
-        $("#game").height(this.SETTINGS.height * this.TILE_SIZE + this.BORDER * 2);
+        $("#game").height(this.SETTINGS.height * this.TILE_SIZE + this.BORDER * 3);
 
         let grid = "";
         // game gui
