@@ -18,7 +18,8 @@ module.exports = (server) => {
             if (accounts[username] === req.body.password) {
                 req.session.username = username;
                 req.session.isGuest = false;
-                if (!server.players[username]) server.players[username] = { board: null };
+                let board = null;
+                if (!server.players[username]) server.players[username] = { board };
                 return true;
                 // server.gameHandler.socketToPlayer[socket.id] = username;
                 // socket.emit("loginSuccess");
