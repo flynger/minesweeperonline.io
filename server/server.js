@@ -109,7 +109,7 @@ io.on("connection", (socket) => {
         style: "capital"
     }); // big_red_donkey;
     let board = null;
-    req.session.username = "Guest " + uniqueNamesGenerator({ 
+    session.username = "Guest " + uniqueNamesGenerator({ 
             dictionaries: [adjectives, animals],
             separator: " ",
             style: "capital"
@@ -169,7 +169,7 @@ io.on("connection", (socket) => {
                 board.clearCell(data.x, data.y);
                 board.clearQueue();
                 if (board.GAMEOVER) {
-                    socket.board.reset(true);
+                    board.reset(true);
                 }
                 socket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER, win: board.WIN });
             }
@@ -196,7 +196,7 @@ io.on("connection", (socket) => {
         console.log(color.red, socket.id);
         // if board exists, delete it
         if ("board" in socket) {
-            socket.board.reset();
+            board.reset();
             console.log(color.red, "Deleted board for disconnected player");
         }
     });
