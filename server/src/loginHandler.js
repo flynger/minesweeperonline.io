@@ -1,16 +1,23 @@
 module.exports = (server) => {
     const jsonfile = require("../node_modules/jsonfile");
     const accounts = jsonfile.readFileSync("./data/accounts.json");
-    var { io } = server; // tells you what properties of server are imported
+    var { io, players } = server; // tells you what properties of server are imported
     console.log(`accounts: ${JSON.stringify(accounts)}`);
 
     var loginHandler = {
-        registerAccount: (socket, data) => {
-            if (accounts[data.username.toLowerCase()]) {
-                socket.emit("usernameExists");
+        registerAccount: (req) => {
+            let displayName = req.body.username;
+            let username = displayName.toLowerCase();
+            let password = req.body.password;
+            if (accounts[username]) {
+                return { success: false, reason: "An account with the provided username already exists." };
+                //socket.emit("usernameExists");
             } else {
-                accounts[data.username.toLowerCase()] = data.password;
-                socket.emit("accountCreated");
+                accounts[username] = password;
+                players[username] = { username, displayName, wins: 0, losses: 0, gamesCreated: 0 };
+                console.log(`signed up, Username: ${username} Password: ${password}`);
+                console.log(players);
+                return { success: true };
             }
         },
         loginAccount: (req) => {
@@ -18,12 +25,9 @@ module.exports = (server) => {
             if (accounts[username] === req.body.password) {
                 req.session.username = username;
                 req.session.isGuest = false;
-                return true;
-                // server.gameHandler.socketToPlayer[socket.id] = username;
-                // socket.emit("loginSuccess");
+                return { success: true };
             } else {
-                return false;
-                // socket.emit("loginFail");
+                return { success: false, reason: "The username or password is incorrect." };
             }
         },
         saveAccountData: () => {

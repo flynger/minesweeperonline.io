@@ -7,7 +7,7 @@ const express = require("./node_modules/express/index");
 const jsonfile = require("./node_modules/jsonfile");
 const sessions = require("./node_modules/express-session");
 const socket = require("./node_modules/socket.io/dist/index");
-const { uniqueNamesGenerator, adjectives, colors, animals } = require("./node_modules/unique-names-generator");
+const { uniqueNamesGenerator, adjectives, /*colors,*/ animals } = require("./node_modules/unique-names-generator");
 
 // server setup
 var app = express();
@@ -38,15 +38,15 @@ app.get("/home", (req, res) => {
 });
 app.get("/play", (req, res) => {
     if (!req.session.username) {
-        req.session.username = "Guest " + uniqueNamesGenerator({ 
+        req.session.username = "Guest " + uniqueNamesGenerator({
             dictionaries: [adjectives, animals],
             separator: " ",
             style: "capital"
-        }); // big_red_donkey
+        }); // Guest Big Donkey
         req.session.isGuest = true;
     }
     res.sendFile('play.html', { root: '../public' });
-    console.log(req.sessionID);
+    // console.log(req.sessionID);
 });
 app.get("/profile", (req, res) => {
     res.sendFile('profile.html', { root: '../public' });
@@ -55,26 +55,28 @@ app.get("/settings", (req, res) => {
     res.sendFile('settings.html', { root: '../public' });
 });
 app.get("/login", (req, res) => {
-    res.sendFile('login.html', { root: '../public' });
+    if (!req.session.username) {
+        res.sendFile('login.html', { root: '../public' });
+    }
+    else res.redirect("/play");
 });
 app.post("/login", (req, res) => {
-    console.log(req.body)
-    if (loginHandler.loginAccount(req)) {
-        res.redirect("/play");
-    } else {
-        let username = req.body.username;
-        let password = req.body.password;
-        res.send("login failed");
-    }
-    console.log(req.session);
+    // console.log(req.body);
+    // console.log(req.session);
+    // let username = req.body.username;
+    // let password = req.body.password;
+    res.send(loginHandler.loginAccount(req));
 });
 app.get("/register", (req, res) => {
-    res.sendFile('register.html', { root: '../public' });
+    if (!req.session.username) {
+        res.sendFile('register.html', { root: '../public' });
+    }
+    else res.redirect("/play");
 });
 app.post("/register", (req, res) => {
-    let username = req.body.username;
-    let password = req.body.password;
-    res.send(`signed up, Username: ${username} Password: ${password}`);
+    // let username = req.body.username;
+    // let password = req.body.password;
+    res.send(loginHandler.registerAccount(req));
 });
 
 var expressServer = app.listen(port, () => console.log(color.blue, `Starting Server: ${name} on port ${port}`));
@@ -86,14 +88,20 @@ io.use((socket, next) => sessionMiddleware(socket.request, {}, next)); // gives 
 
 // our source files
 var server = {
-    io: io
+    io: io,
 }
 var Minesweeper = require("./src/gameHandler")(server);
 var chatHandler = require("./src/chatHandler")(server);
 var loginHandler = require("./src/loginHandler")(server);
+// var playerHandler = require("./src/playerHandler")(server);
 
 io.on("connection", (socket) => {
-    console.log(socket.request.sessionID);
+    let session = socket.request.session;
+    let sessionID = socket.request.sessionID;
+    session.socket = socket;
+    // players[]
+    //playerHandler[session.username] = socket; // add check to see if player logged in later
+
     // connect event
     console.log(color.green, socket.id);
     // chatHandler.joinSocketToRoom(socket, "global");
@@ -105,52 +113,47 @@ io.on("connection", (socket) => {
     });
 
     // login events
-    socket.on("login", (data) => {
-        console.log(`received login: ${JSON.stringify(data)}`);
-        loginHandler.loginAccount(socket, data);
-    });
+    // socket.on("login", (data) => {
+    //     console.log(`received login: ${JSON.stringify(data)}`);
+    //     loginHandler.loginAccount(socket, data);
+    // });
 
-    socket.on("register", (data) => {
-        console.log(`received signup: ${JSON.stringify(data)}`);
-        loginHandler.registerAccount(socket, data);
-    });
+    // socket.on("register", (data) => {
+    //     console.log(`received signup: ${JSON.stringify(data)}`);
+    //     loginHandler.registerAccount(socket, data);
+    // });
 
     // game events
     socket.on("createBoard", (settings) => {
         // if board exists, delete it
-        if (Minesweeper.hasBoard(socket)) {
-            Minesweeper.resetBoard(socket);
+        if ("board" in socket) {
+            socket.board.reset();
         }
-        let board = Minesweeper.createBoard(socket, settings);
+        let board = socket.board = new Minesweeper.Board(settings, [session]);
         board.clearQueue();
-        socket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER });
+        socket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER, win: board.WIN });
+        board.startTimer();
         if (board.GAMEOVER) {
-            let timeElapsed = Date.now() - board.START_TIME;
-            console.log(timeElapsed);
-
-            Minesweeper.resetBoard(socket);
+            socket.board.reset(true);
         }
-        else board.timer = setInterval(() => {
-            board.TIME++;
-            socket.emit("boardTime", { time: board.TIME });
-        }, 1000);
     });
 
     socket.on("resetBoard", () => {
-        if (Minesweeper.hasBoard(socket)) {
-            Minesweeper.resetBoard(socket);
+        if ("board" in socket) {
+            socket.board.reset();
         }
     });
 
     socket.on("clearCell", (data) => {
-        if (Minesweeper.hasBoard(socket) && Minesweeper.getBoard(socket).checkCell(data.x, data.y, ["?"])) {
-            let board = Minesweeper.getBoard(socket);
-            board.clearCell(data.x, data.y);
-            board.clearQueue();
-            socket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER });
-            if (board.GAMEOVER) {
-                console.log(Date.now() - board.START_TIME);
-                Minesweeper.resetBoard(socket);
+        if ("board" in socket) {
+            let { board } = socket;
+            if(board.checkCell(data.x, data.y, ["?"])) {
+                board.clearCell(data.x, data.y);
+                board.clearQueue();
+                if (board.GAMEOVER) {
+                    socket.board.reset(true);
+                }
+                socket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER, win: board.WIN });
             }
         }
     });
@@ -161,23 +164,21 @@ io.on("connection", (socket) => {
         if (result.error) {
             socket.emit("roomJoinFailure", { room: data.requestedRoom, error: result.error });
         } else if (result.success) {
-            let session = socket.request.session;
             socket.emit("roomJoinSuccess", { room: data.requestedRoom, messages: [`You connected as user: ${session.username}`, "Joined chat: " + data.requestedRoom] });
         }
     });
 
-    socket.on("chatMessage", (data) => chatHandler.processChat(socket, data));
+    socket.on("chatMessage", (data) => {
+        // console.log(color.yellow, socket.id);
+        chatHandler.processChat(socket, data)
+    });
 
     // add disconnect event
     socket.on("disconnect", () => {
         console.log(color.red, socket.id);
-        // reference to player exists, delete it
-        // if (Minesweeper.socketToPlayer[socket.id] !== undefined) {
-        //     delete Minesweeper.socketToPlayer[socket.id];
-        // }
         // if board exists, delete it
-        if (Minesweeper.hasBoard(socket)) {
-            Minesweeper.resetBoard(socket);
+        if ("board" in socket) {
+            socket.board.reset();
             console.log(color.red, "Deleted board for disconnected player");
         }
     });

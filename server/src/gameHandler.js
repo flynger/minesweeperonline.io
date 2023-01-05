@@ -1,15 +1,18 @@
 module.exports = (server) => {
-    var socketToBoard = {};
+    // var socketToBoard = {};
     var gameHandler = {
         Board: class {
             // creates a board
-            constructor({ startX, startY, width, height, mines }) {
+            constructor({ startX, startY, width, height, mines }, players) {
+                console.log("Board created!");
                 this.GRID = new Array(height).fill("").map(x => new Array(width).fill("0"));
                 this.CLEARED = new Array(height).fill("").map(x => new Array(width).fill("?"));
                 this.MINES = this.FLAGS = mines;
-                this.CLEAREDCELLS = 0, this.TIME = 0;
+                this.CLEAREDCELLS = this.TIME = 0;
+                this.GAMEOVER = this.WIN = false;
                 this.TOTALCELLS = width * height - mines;
                 this.CLEARQUEUE = [];
+                this.sessions = players;
 
                 for (let v = -1; v <= 1; v++) {
                     for (let h = -1; h <= 1; h++) {
@@ -25,6 +28,7 @@ module.exports = (server) => {
                         this.MINES--;
                     }
                 }
+                this.MINES = mines; // reset variable back to mine count
 
                 for (let row in this.GRID) {
                     for (let col in this.GRID[row]) {
@@ -33,7 +37,6 @@ module.exports = (server) => {
                         }
                     }
                 }
-                this.START_TIME = Date.now();
                 this.clearCell(startX, startY);
             }
             // count mines while generating
@@ -88,6 +91,7 @@ module.exports = (server) => {
                             }
                         }
                         this.GAMEOVER = true;
+                        this.WIN = true;
                     }
                 }
                 //}
@@ -167,31 +171,61 @@ module.exports = (server) => {
                     this.clearCell(cell[0], cell[1]);
                 }
             }
-        },
+            startTimer() {
+                this.timer = setInterval(() => {
+                    this.TIME++;
+                    console.log("counting time: ", this.TIME);
+                    for (let player of this.sockets) {
+                        player.emit("boardTime", { time: this.TIME });
+                    }
+                }, 1000);
+                this.START_TIME = Date.now();
+            }
+            stopTimer() {
+                this.GAMEDURATION = (Date.now() - this.START_TIME) / 1000; // store game duration in seconds
+                console.log("Game lasted " + this.GAMEDURATION + "s");
+                if (this.timer) clearInterval(this.timer);
+            }
+            reset(sendStats) {
+                // stops timer and deletes reference to board, letting it be deleted by garbage collector
+                this.stopTimer();
+                socket.username
+                for (let player of this.sockets) {
+                    if (sendStats) {
+                        player.emit("gameStats", { timeTaken: this.GAMEDURATION, players: this.sockets });
+                    }
+                    delete player.board;
+                }
+            }
+        }
         // clearBoard(board) {
         //     while (board.CLEARQUEUE.length > 0) {
         //         let cell = board.CLEARQUEUE.shift().split(",");
         //         board.clearCell(+cell[0], +cell[1]);
         //     }
         // },
-        createBoard(socket, settings) {
-            console.log("Board created!");
-            return socketToBoard[socket.id] = new this.Board(settings);
-        },
-        getBoard(socket) {
-            return socketToBoard[socket.id];
-        },
-        hasBoard(socket) {
-            return socket.id in socketToBoard;
-        },
-        resetBoard(socket) {
-            // if board exists, delete it
-            if (socketToBoard[socket.id]) {
-                console.log("resetting board");
-                if (socketToBoard[socket.id].timer) clearInterval(socketToBoard[socket.id].timer);
-                delete socketToBoard[socket.id];
-            }
-        }
+        // createBoard(settings) {
+        //     console.log("Board created!");
+        //     return new this.Board(settings);
+        //     // return socketToBoard[socket.id] = new this.Board(settings);
+        // }
+        // getBoard(socket) {
+        //     return socketToBoard[socket.id];
+        // },
+        // hasBoard(socket) {
+        //     return socket.id in socketToBoard;
+        // },
+        // resetBoard(socket) {
+        //     if board exists, delete it
+        //     if ("board" in socket) {
+        //         socket.board.reset();
+        //     }
+        //     if (socketToBoard[socket.id]) {
+        //         console.log("resetting board");
+        //         if (socketToBoard[socket.id].timer) clearInterval(socketToBoard[socket.id].timer);
+        //         delete socketToBoard[socket.id];
+        //     }
+        // }
     }
 
     return server.gameHandler = gameHandler;

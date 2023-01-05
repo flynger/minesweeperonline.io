@@ -19,12 +19,38 @@
 //         }
 //     });
 // });
-
-$("#login-form").on("submit", (e) => {
-    console.log("hi")
-    e.preventDefault();
-    let data = $(this).serialize();
-    $.post("/login", (data) => {
-        console.log(data)
+// $("#login-button").click(e => {
+//     alert("hi1");
+//     $("#login-form")[0].submit();
+// });
+$(function () {
+    $('#login-form').on('submit', function (e) {
+        e.preventDefault();
+        let data = $("#login-form").serialize();
+        $.post("/login", data, (response) => {
+            if (response.success) {
+                window.location.href = "/home";
+            } else {
+                alert("login fail");
+            }
+        });
+        // $.ajax({
+        //     type: "POST",
+        //     url: "/login",
+        //     data: data,
+        //     success: function () {
+        //         alert("successful logins ent");
+        //         // $("#contact_form").html("<div id='message'></div>");
+        //         // $("#message")
+        //         //     .html("<h2>Contact Form Submitted!</h2>")
+        //         //     .append("<p>We will be in touch soon.</p>")
+        //         //     .hide()
+        //         //     .fadeIn(1500, function () {
+        //         //         $("#message").append(
+        //         //             "<img id='checkmark' src='images/check.png' />"
+        //         //         );
+        //         //     });
+        //     }
+        // });
     });
 });

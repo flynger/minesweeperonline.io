@@ -15,8 +15,8 @@
 
   <link href="css/style.css" rel="stylesheet" />
   <link href="css/login.css" rel="stylesheet" />
-  <!-- <script src="src/socket.js"></script>
-  <script src="src/login.js"></script> -->
+  <!-- <script src="src/socket.js"></script> -->
+  <script src="src/login.js"></script> 
   <script>
     document.onreadystatechange = function () {
       if (document.readyState !== "complete") {
@@ -47,7 +47,7 @@
         <input type="text" name="username" placeholder="Username" required><br>
         <!-- <label for="password">Password</label><br> -->
         <input type="password" name="password" placeholder="Password" required><br>
-        <button onclick="$('#login-form').submit()" value="Login">
+        <input id="login-button" type="submit" value="Login"/>
         <div id="login-fail">Incorrect Username and/or Password</div>
       </form>
       <br>

@@ -65,7 +65,7 @@ socket.on("boardData", (data) => {
                 }
                 switch (value) {
                     case "?":
-                        // uncleared
+                        // uncleared or dont do anything
                         break
                     case "F":
                         // flag
@@ -76,14 +76,12 @@ socket.on("boardData", (data) => {
                     case "X":
                         // bomb (gameover)
                         classToAdd = "bombrevealed";
-                        if (!death) death = true;
                         break
                     case "FX":
                         classToAdd = "bombmisflagged";
                         break
                     case "RX":
                         classToAdd = "bombdeath";
-                        if (!death) death = true;
                         break
                     default:
                         minesweeper.GRID[row][col] = value;
@@ -95,12 +93,9 @@ socket.on("boardData", (data) => {
     }
     // scuffed win/loss code
     minesweeper.updateFlagCounter();
-    if (death) {
+    if (data.gameOver) {
         $("#game").off();
-        minesweeper.setFace("facedead");
-    } else if (data.board.every((row) => row.every(val => val != "?" && val != "X" && val != "X" && val != "X"))) {
-        $("#game").off();
-        minesweeper.setFace("facewin");
+        minesweeper.setFace("face" + (data.win ? "win" : "dead"));
     }
 });
 
