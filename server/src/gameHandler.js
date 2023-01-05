@@ -1,5 +1,4 @@
 module.exports = (server) => {
-    // var socketToBoard = {};
     var gameHandler = {
         Board: class {
             // creates a board

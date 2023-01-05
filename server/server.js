@@ -37,16 +37,21 @@ app.get("/home", (req, res) => {
     res.redirect("/play");
 });
 app.get("/play", (req, res) => {
-    if (!req.session.username) {
-        req.session.username = "Guest " + uniqueNamesGenerator({
-            dictionaries: [adjectives, animals],
-            separator: " ",
-            style: "capital"
-        }); // Guest Big Donkey
-        req.session.isGuest = true;
-    }
     res.sendFile('play.html', { root: '../public' });
     // console.log(req.sessionID);
+});
+app.get("/play/:username", (req, res) => {
+    requestedUsername = req.params.username;
+    // check if the requested user is currently playing
+    //to be implemented: hasPlayer and getPlayer
+    if (Minesweeper.hasPlayer(requestedUsername)) {
+        currentGame = Minesweeper.getPlayer(requestedUsername);
+        // send the current board data to the client
+        socket.emit("boardData", { board: currentGame.board.CLEARED, gameOver: currentGame.board.GAMEOVER });
+        socket.emit("boardTime", { time: currentGame.board.TIME });
+        // update the view of the game
+        updateView();
+    }
 });
 app.get("/profile", (req, res) => {
     res.sendFile('profile.html', { root: '../public' });
@@ -89,6 +94,7 @@ io.use((socket, next) => sessionMiddleware(socket.request, {}, next)); // gives 
 // our source files
 var server = {
     io: io,
+    players: {}
 }
 var Minesweeper = require("./src/gameHandler")(server);
 var chatHandler = require("./src/chatHandler")(server);
@@ -97,10 +103,17 @@ var loginHandler = require("./src/loginHandler")(server);
 
 io.on("connection", (socket) => {
     let session = socket.request.session;
-    let sessionID = socket.request.sessionID;
-    session.socket = socket;
-    // players[]
-    //playerHandler[session.username] = socket; // add check to see if player logged in later
+    let username = session.username ? session.username : "Guest " + uniqueNamesGenerator({ 
+        dictionaries: [adjectives, animals],
+        separator: " ",
+        style: "capital"
+    }); // big_red_donkey;
+    let board = null;
+    req.session.username = "Guest " + uniqueNamesGenerator({ 
+            dictionaries: [adjectives, animals],
+            separator: " ",
+            style: "capital"
+        }); // big_red_donkey
 
     // connect event
     console.log(color.green, socket.id);
@@ -125,28 +138,33 @@ io.on("connection", (socket) => {
 
     // game events
     socket.on("createBoard", (settings) => {
+        // if (req.session.username !== req.params.username) {
+        //     return;
+        // }
         // if board exists, delete it
-        if ("board" in socket) {
-            socket.board.reset();
+        if (board != null) {
+            board.reset();
+            board = null;
         }
-        let board = socket.board = new Minesweeper.Board(settings, [session]);
+        board = new Minesweeper.Board(settings, [session]);
         board.clearQueue();
         socket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER, win: board.WIN });
         board.startTimer();
         if (board.GAMEOVER) {
-            socket.board.reset(true);
+            board.reset(true);
+            board = null;
         }
     });
 
     socket.on("resetBoard", () => {
-        if ("board" in socket) {
-            socket.board.reset();
+        if (board != null) {
+            board.reset();
+            board = null;
         }
     });
 
     socket.on("clearCell", (data) => {
-        if ("board" in socket) {
-            let { board } = socket;
+        if (board != null) {
             if(board.checkCell(data.x, data.y, ["?"])) {
                 board.clearCell(data.x, data.y);
                 board.clearQueue();
