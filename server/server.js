@@ -103,17 +103,17 @@ var loginHandler = require("./src/loginHandler")(server);
 
 io.on("connection", (socket) => {
     let session = socket.request.session;
-    let username = session.username ? session.username : "Guest " + uniqueNamesGenerator({ 
-        dictionaries: [adjectives, animals],
-        separator: " ",
-        style: "capital"
-    }); // big_red_donkey;
-    let board = null;
-    session.username = "Guest " + uniqueNamesGenerator({ 
+    session.socket = socket;
+    if (!session.username) {
+        session.isGuest = true;
+        session.username = "Guest " + uniqueNamesGenerator({
             dictionaries: [adjectives, animals],
             separator: " ",
             style: "capital"
         }); // big_red_donkey
+    }
+    let username = session.username;
+    let board = null;
 
     // connect event
     console.log(color.green, socket.id);
@@ -146,14 +146,14 @@ io.on("connection", (socket) => {
             board.reset();
             board = null;
         }
-        board = new Minesweeper.Board(settings, [session]);
+        board = new Minesweeper.Board(settings, [socket]);
         board.clearQueue();
-        socket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER, win: board.WIN });
         board.startTimer();
         if (board.GAMEOVER) {
             board.reset(true);
             board = null;
         }
+        socket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER, win: board.WIN });
     });
 
     socket.on("resetBoard", () => {
@@ -165,11 +165,12 @@ io.on("connection", (socket) => {
 
     socket.on("clearCell", (data) => {
         if (board != null) {
-            if(board.checkCell(data.x, data.y, ["?"])) {
+            if (board.checkCell(data.x, data.y, ["?"])) {
                 board.clearCell(data.x, data.y);
                 board.clearQueue();
                 if (board.GAMEOVER) {
                     board.reset(true);
+                    board = null;
                 }
                 socket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER, win: board.WIN });
             }
@@ -195,10 +196,12 @@ io.on("connection", (socket) => {
     socket.on("disconnect", () => {
         console.log(color.red, socket.id);
         // if board exists, delete it
-        if ("board" in socket) {
+        if (board != null) {
             board.reset();
+            board = null;
             console.log(color.red, "Deleted board for disconnected player");
         }
+        delete session.socket;
     });
 });
 

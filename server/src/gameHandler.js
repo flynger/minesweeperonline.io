@@ -2,7 +2,7 @@ module.exports = (server) => {
     var gameHandler = {
         Board: class {
             // creates a board
-            constructor({ startX, startY, width, height, mines }, players) {
+            constructor({ startX, startY, width, height, mines }, sessions) {
                 console.log("Board created!");
                 this.GRID = new Array(height).fill("").map(x => new Array(width).fill("0"));
                 this.CLEARED = new Array(height).fill("").map(x => new Array(width).fill("?"));
@@ -11,7 +11,7 @@ module.exports = (server) => {
                 this.GAMEOVER = this.WIN = false;
                 this.TOTALCELLS = width * height - mines;
                 this.CLEARQUEUE = [];
-                this.sessions = players;
+                this.connectedSessions = sessions;
 
                 for (let v = -1; v <= 1; v++) {
                     for (let h = -1; h <= 1; h++) {
@@ -188,10 +188,11 @@ module.exports = (server) => {
             reset(sendStats) {
                 // stops timer and deletes reference to board, letting it be deleted by garbage collector
                 this.stopTimer();
-                socket.username
-                for (let player of this.sockets) {
+                let players = []
+                // socket.username
+                for (let player of this.connectedSessions) {
                     if (sendStats) {
-                        player.emit("gameStats", { timeTaken: this.GAMEDURATION, players: this.sockets });
+                        player.emit("gameStats", { timeTaken: this.GAMEDURATION, players: ["unknown"] });
                     }
                     delete player.board;
                 }
