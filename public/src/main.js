@@ -56,6 +56,19 @@ function setup() {
         e.target.blur();
         minesweeper.startGame();
     });
+
+    $(document).unbind("keypress").on("keypress", e => {
+        if ((e.which === KEYCODE.T || e.which === KEYCODE.t) && e.target == document.body) {
+            // check BACKTICK
+            e.preventDefault();
+            if (!$("#chat-body").is(":visible")) toggleChat();
+            $("#chatInput").focus();
+        } else if ((e.which === KEYCODE.C || e.which === KEYCODE.c) && e.target == document.body) {
+            // check BACKTICK
+            e.preventDefault();
+            toggleChat();
+        }
+    });
 }
 
 // minesweeper class
@@ -71,9 +84,9 @@ class Minesweeper {
             this.MAX = { height: 100, width: 50 },
             this.GRID = []
     }
-    startGame() {
+    startGame(isSpectating = false) {
         // tell server to stop game
-        socket.emit("resetBoard", {});
+        if (!isSpectating) socket.emit("resetBoard", {});
 
         // update custom settings before creating board
         this.updateCustomSettings();
@@ -88,8 +101,11 @@ class Minesweeper {
         this.boardExists = false;
         this.resetBoard();
         this.updateFlagCounter();
-        this.createMouseEvents();
-        this.createKeyboardEvents();
+
+        if (!isSpectating) {
+            this.createMouseEvents();
+            this.createKeyboardEvents();
+        }
     }
     resetBoard() {
         $("#game").html("");
@@ -308,15 +324,6 @@ class Minesweeper {
                 // check BACKTICK
                 e.preventDefault();
                 this.startGame();
-            } else if ((e.which === KEYCODE.T || e.which === KEYCODE.t) && e.target == document.body) {
-                // check BACKTICK
-                e.preventDefault();
-                if (!$("#chat-body").is(":visible")) toggleChat();
-                $("#chatInput").focus();
-            } else if ((e.which === KEYCODE.C || e.which === KEYCODE.c) && e.target == document.body) {
-                // check BACKTICK
-                e.preventDefault();
-                toggleChat();
             }
         });
     }

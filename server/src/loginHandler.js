@@ -1,7 +1,9 @@
 module.exports = (server) => {
     const jsonfile = require("../node_modules/jsonfile");
     const accounts = jsonfile.readFileSync("./data/accounts.json");
-    var { io, players } = server; // tells you what properties of server are imported
+    const playerData = jsonfile.readFileSync("./data/players.json");
+    var { io } = server; // tells you what properties of server are imported
+    let players = server.players = playerData;
     console.log(`accounts: ${JSON.stringify(accounts)}`);
 
     var loginHandler = {
@@ -25,7 +27,10 @@ module.exports = (server) => {
             if (accounts[username] === req.body.password) {
                 req.session.username = username;
                 req.session.isGuest = false;
-                if (!server.players[username]) server.players[username] = { board: null };
+                if (!server.players[username]) {
+                    
+                }
+                server.players[username].board = null;
                 return { success: true };
                 // server.gameHandler.socketToPlayer[socket.id] = username;
                 // socket.emit("loginSuccess");
@@ -33,10 +38,10 @@ module.exports = (server) => {
                 return { success: false, reason: "The username or password is incorrect." };
             }
         },
-        saveAccountData: () => {
-            return jsonfile.writeFileSync("./data/accounts.json", accounts);
+        saveData: () => {
+            jsonfile.writeFileSync("./data/players.json", players);
+            jsonfile.writeFileSync("./data/accounts.json", accounts);
         }
     }
-
     return server.loginHandler = loginHandler;
 }

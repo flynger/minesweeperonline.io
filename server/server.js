@@ -44,13 +44,11 @@ app.get("/play/:username", (req, res) => {
     requestedUsername = req.params.username;
     // check if the requested user is currently playing
     //to be implemented: hasPlayer and getPlayer
-    if (Minesweeper.hasPlayer(requestedUsername)) {
-        currentGame = Minesweeper.getPlayer(requestedUsername);
-        // send the current board data to the client
-        socket.emit("boardData", { board: currentGame.board.CLEARED, gameOver: currentGame.board.GAMEOVER });
-        socket.emit("boardTime", { time: currentGame.board.TIME });
-        // update the view of the game
-        updateView();
+    if (server.players.hasOwnProperty(requestedUsername)) {
+        console.log(requestedUsername);
+        // let currentGame = Minesweeper.getPlayerGame(requestedUsername);
+        // // send the current board data to the client
+        // socket.emit("boardData", { board: currentGame.board.CLEARED, gameOver: currentGame.board.GAMEOVER, startSpectating: true, time:currentGame.board.TIME });
     }
 });
 app.get("/profile", (req, res) => {
@@ -93,8 +91,7 @@ io.use((socket, next) => sessionMiddleware(socket.request, {}, next)); // gives 
 
 // our source files
 var server = {
-    io: io,
-    players: {}
+    io: io
 }
 var Minesweeper = require("./src/gameHandler")(server);
 var chatHandler = require("./src/chatHandler")(server);
@@ -214,7 +211,7 @@ process.on("SIGINT", () => process.exit(0));
 
 process.on("exit", (code) => {
     console.log(`Process exited with code: ${code}`);
-    loginHandler.saveAccountData()
+    loginHandler.saveData();
     console.log("Account data saved successfully");
 });
 

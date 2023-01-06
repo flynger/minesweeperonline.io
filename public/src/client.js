@@ -47,6 +47,10 @@ socket.on("roomJoinFailure", (data) => {
 });
 
 socket.on("boardData", (data) => {
+    if (data.startSpectating) {
+        minesweeper.startGame(true);
+        minesweeper.updateTimer(data.time);
+    }
     let win = true;
     let death = false;
     for (let row in minesweeper.GRID) {
@@ -103,8 +107,3 @@ socket.on("boardTime", (data) => {
     minesweeper.updateTimer(data.time);
 });
 
-function updateView() {
-    if (currentGame && currentGame.username !== requestedUsername) {
-        $('.game-container input, .game-container button').attr('pointer-events', 'none');
-    }
-}
