@@ -214,8 +214,7 @@ module.exports = (server) => {
                 this.timer = setInterval(() => {
                     this.TIME++;
                     // console.log("counting time: ", this.TIME);
-                    for (let id in this.sockets) {
-                        let player = this.sockets[id];
+                    for (let player of this.connectedSessions   ) {
                         player.emit("boardTime", { time: this.TIME });
                     }
                 }, 1000);
