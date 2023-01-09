@@ -16,6 +16,10 @@ module.exports = (server) => {
             if (accounts[username]) {
                 return { success: false, reason: "An account with the provided username already exists." };
                 //socket.emit("usernameExists");
+            } else if (!/(?=(.*[0-9]))((?=.*[A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z]))^.{8,}$/.test(password)) {
+                return { success: false, reason: "Invalid password. A password must include 1 lowercase letter, 1 uppercase letter, 1 number, and be at least 8 characters long." };
+            } else if (!/^[A-Za-z0-9_]{3,16}$/.test(username)) {
+                return { success: false, reason: "Invalid username. A username may only include alphanumeric characters, underscores, and be a length of 3 to 16 characters." };
             } else {
                 accounts[username] = password;
                 players[username] = { username, displayName, wins: 0, losses: 0, gamesCreated: 0, currentGame: null, currentGameOver: null, currentWin: null, currentTime: null };

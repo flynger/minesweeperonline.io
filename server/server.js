@@ -93,7 +93,8 @@ io.use((socket, next) => sessionMiddleware(socket.request, {}, next)); // gives 
 
 // our source files
 var server = {
-    io: io
+    io: io,
+    onlinePlayers: []
 }
 var Minesweeper = require("./src/gameHandler")(server);
 var chatHandler = require("./src/chatHandler")(server);
@@ -113,6 +114,7 @@ io.on("connection", (socket) => {
     }
     let username = session.username;
     socket.username = username;
+    server.onlinePlayers.push(username);
     let board = null;
 
     // connect event
