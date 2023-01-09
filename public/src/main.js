@@ -14,7 +14,7 @@ const KEYCODE = {
 };
 
 // code run on startup
-function setup() {
+$(document).ready(() => {
     minesweeper = new Minesweeper();
     minesweeper.startGame();
     setupChat();
@@ -69,7 +69,7 @@ function setup() {
             toggleChat();
         }
     });
-}
+});
 
 // minesweeper class
 class Minesweeper {
@@ -109,7 +109,7 @@ class Minesweeper {
     resetBoard() {
         $("#game").html("");
         $("#game").width(this.SETTINGS.width * this.TILE_SIZE + this.BORDER * 2);
-        $("#game").height(this.SETTINGS.height * this.TILE_SIZE + this.BORDER * 3);
+        $("#game").height(this.SETTINGS.height * this.TILE_SIZE + this.BORDER * 4 + 46);
 
         let grid = "";
         // game gui
