@@ -1,4 +1,5 @@
 var minesweeper;
+console.log("bruh");
 
 // custom names for keycodes
 const KEYCODE = {
@@ -15,9 +16,12 @@ const KEYCODE = {
 
 // code run on startup
 function setup() {
+    console.log("setup");
     minesweeper = new Minesweeper();
     minesweeper.startGame();
     setupChat();
+    //change to actual username
+    let username = "8";
 
     // set difficulty setting mins and maxes
     $("#custom_height").attr({
@@ -28,7 +32,12 @@ function setup() {
         "min": minesweeper.MIN.width,
         "max": minesweeper.MAX.width
     });
-    // setup events
+
+    socket.emit("spectate");
+    console.log("Spectating");
+
+
+    // setup events might comment out
     $("input[name='difficulty']").on("click", e => {
         e.target.blur();
     });
@@ -71,7 +80,7 @@ class Minesweeper {
             this.MAX = { height: 100, width: 50 },
             this.GRID = []
     }
-    startGame(isSpectating = false) {
+    startGame() {
         // tell server to stop game
         socket.emit("resetBoard", {});
 
@@ -88,10 +97,6 @@ class Minesweeper {
         this.boardExists = false;
         this.resetBoard();
         this.updateFlagCounter();
-        if (!isSpectating) {
-            this.createMouseEvents();
-            this.createKeyboardEvents();
-        }
 
         //chat events setup
         if ((e.which === KEYCODE.T || e.which === KEYCODE.t) && e.target == document.body) {

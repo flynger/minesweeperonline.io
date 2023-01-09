@@ -2,7 +2,7 @@ module.exports = (server) => {
     var gameHandler = {
         Board: class {
             // creates a board
-            constructor({ startX, startY, width, height, mines }, sessions) {
+            constructor({ startX, startY, width, height, mines }, sessions, username) {
                 console.log("Board created!");
                 this.GRID = new Array(height).fill("").map(x => new Array(width).fill("0"));
                 this.CLEARED = new Array(height).fill("").map(x => new Array(width).fill("?"));
@@ -12,6 +12,13 @@ module.exports = (server) => {
                 this.TOTALCELLS = width * height - mines;
                 this.CLEARQUEUE = [];
                 this.connectedSessions = sessions;
+
+                //console.log(server.players[username]);
+                if (server.players.hasOwnProperty(username)) {
+                    server.players[username].currentGame = this.CLEARED;
+                    server.players[username].currentGameOver = this.GAMEOVER;
+                    server.players[username].currentWin = this.WIN;
+                }
 
                 for (let v = -1; v <= 1; v++) {
                     for (let h = -1; h <= 1; h++) {
@@ -36,7 +43,7 @@ module.exports = (server) => {
                         }
                     }
                 }
-                this.clearCell(startX, startY);
+                this.clearCell(startX, startY, username);
             }
             // count mines while generating
             countMines(x, y) {
@@ -49,7 +56,7 @@ module.exports = (server) => {
                 return mines;
             }
             // clears a cell
-            clearCell(x, y) {
+            clearCell(x, y, username) {
                 // if (this.CLEARED[y][x] === "?" || this.CLEARED[y][x] === "Q") {
                 if (this.GRID[y][x] === "X") {
                     for (let row in this.GRID) {
@@ -58,17 +65,32 @@ module.exports = (server) => {
                             if (this.GRID[row][col] === "X") {
                                 if (!isFlagged && this.CLEARED[row][col] != "RX") {
                                     this.CLEARED[row][col] = "X";
+                                    if (server.players.hasOwnProperty(username)) {
+                                        server.players[username].currentGame[row][col] = "X";
+                                    }
                                 }
                             }
                             else if (isFlagged) {
                                 this.CLEARED[row][col] = "FX";
+                                if (server.players.hasOwnProperty(username)) {
+                                    server.players[username].currentGame[row][col] = "FX";
+                                }
                             }
                         }
                     }
                     this.CLEARED[y][x] = "RX";
+                    if (server.players.hasOwnProperty(username)) {
+                        server.players[username].currentGame[y][x] = "RX";
+                    }
                     this.GAMEOVER = true; // game over
+                    if (server.players.hasOwnProperty(username)) {
+                        server.players[username].currentGameOver = true;
+                    }
                 } else {
                     this.CLEARED[y][x] = this.GRID[y][x];
+                    if (server.players.hasOwnProperty(username)) {
+                        server.players[username].currentGame[y][x] = this.GRID[y][x];
+                    }
                     this.CLEAREDCELLS++;
                     if (this.GRID[y][x] === 0) {
                         for (let v = -1; v <= 1; v++) {
@@ -86,14 +108,29 @@ module.exports = (server) => {
                             for (let col in this.GRID[row]) {
                                 if (this.GRID[row][col] === "X") {
                                     this.CLEARED[row][col] = "F";
+                                    if (server.players.hasOwnProperty(username)) {
+                                        server.players[username].currentGame[row][col] = "F";
+                                    }
                                 }
                             }
                         }
                         this.GAMEOVER = true;
+                        if (server.players.hasOwnProperty(username)) {
+                            server.players[username].currentGameOver = true;
+                        }
                         this.WIN = true;
+                        if (server.players.hasOwnProperty(username)) {
+                            server.players[username].currentWin = true;
+                        }
                     }
                 }
-                //}
+                //updates currentGame for others to spectate
+                // console.log("before this ", this);
+                // console.log("before currentgame", server.players.currentGame);
+                // server.players.currentGame = this.CLEARED;
+                // server.players.currentGameStatus = this.GAMEOVER;
+                // // console.log("after this ", this);
+                // console.log("after currentgame", server.players.currentGame);
             }
             // clearCell(x, y) {
             //     let value = this.GRID[y][x];
@@ -151,9 +188,12 @@ module.exports = (server) => {
             //     }
             // }
             // flags a cell
-            flagCell(x, y) {
+            flagCell(x, y, username) {
                 if (this.checkCell(x, y, ["?"])) {
                     this.CLEARED[y][x] = "F";
+                    if (server.players.hasOwnProperty(username)) {
+                        server.players[username].currentGame[y][x] = "F";
+                    }
                 }
             }
             // check the 'visible' value of a cell
@@ -173,8 +213,9 @@ module.exports = (server) => {
             startTimer() {
                 this.timer = setInterval(() => {
                     this.TIME++;
-                    console.log("counting time: ", this.TIME);
-                    for (let player of this.sockets) {
+                    // console.log("counting time: ", this.TIME);
+                    for (let id in this.sockets) {
+                        let player = this.sockets[id];
                         player.emit("boardTime", { time: this.TIME });
                     }
                 }, 1000);

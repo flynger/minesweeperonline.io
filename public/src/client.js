@@ -103,8 +103,3 @@ socket.on("boardTime", (data) => {
     minesweeper.updateTimer(data.time);
 });
 
-function updateView() {
-    if (currentGame && currentGame.username !== requestedUsername) {
-        $('.game-container input, .game-container button').attr('pointer-events', 'none');
-    }
-}
