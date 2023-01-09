@@ -312,14 +312,14 @@ class Minesweeper {
         this.setFace("facesmile");
     }
     createKeyboardEvents() {
-        $(document).unbind("keypress").on("keypress", e => {
-            if (e.which === KEYCODE.SPACE && e.target == document.body) {
+        $(document.body).unbind("keypress").on("keypress", e => {
+            if (e.which === KEYCODE.SPACE) {
                 // check SPACE
                 e.preventDefault();
                 if (this.hoverCell && this.hoverCell.hasClass("cell")) {
                     this.flagAndClear(this.hoverX, this.hoverY, true);
                 }
-            } else if (e.which === KEYCODE.BACKTICK && e.target == document.body) {
+            } else if (e.which === KEYCODE.BACKTICK) {
                 // check BACKTICK
                 e.preventDefault();
                 this.startGame();
