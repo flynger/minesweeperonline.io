@@ -1,3 +1,5 @@
+const { json } = require("express");
+
 module.exports = (server) => {
     const jsonfile = require("../node_modules/jsonfile");
     const accounts = jsonfile.readFileSync("./data/accounts.json");
@@ -16,7 +18,7 @@ module.exports = (server) => {
                 //socket.emit("usernameExists");
             } else {
                 accounts[username] = password;
-                players[username] = { username, displayName, wins: 0, losses: 0, gamesCreated: 0 };
+                players[username] = { username, displayName, wins: 0, losses: 0, gamesCreated: 0, currentGame: null, currentGameOver: null, currentWin: null, currentTime: null };
                 console.log(`signed up, Username: ${username} Password: ${password}`);
                 console.log(players);
                 return { success: true };

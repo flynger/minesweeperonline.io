@@ -10,5 +10,8 @@
     "nodemon": "^2.0.20",
     "socket.io": "^4.5.2",
     "unique-names-generator": "^4.7.1"
+  },
+  "devDependencies": {
+    "locus": "^2.0.4"
   }
 }

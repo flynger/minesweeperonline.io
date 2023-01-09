@@ -8,6 +8,7 @@ const jsonfile = require("./node_modules/jsonfile");
 const sessions = require("./node_modules/express-session");
 const socket = require("./node_modules/socket.io/dist/index");
 const { uniqueNamesGenerator, adjectives, /*colors,*/ animals } = require("./node_modules/unique-names-generator");
+require('locus');
 
 // server setup
 var app = express();
@@ -110,6 +111,7 @@ io.on("connection", (socket) => {
         }); // big_red_donkey
     }
     let username = session.username;
+    socket.username = username;
     let board = null;
 
     // connect event
@@ -142,13 +144,21 @@ io.on("connection", (socket) => {
         if (board != null) {
             board.reset();
             board = null;
+            if (server.players.hasOwnProperty(socket.username)) {
+                server.players[socket.username].currentGame = null;
+                server.players[socket.username].currentGameOver = null;
+            }
         }
-        board = new Minesweeper.Board(settings, [socket]);
+        board = new Minesweeper.Board(settings, [socket], socket.username);
         board.clearQueue();
         board.startTimer();
         if (board.GAMEOVER) {
             board.reset(true);
             board = null;
+            if (server.players.hasOwnProperty(socket.username)) {
+                server.players[socket.username].currentGame = null;
+                server.players[socket.username].currentGameOver = null;
+            }
         }
         socket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER, win: board.WIN });
     });
@@ -157,20 +167,36 @@ io.on("connection", (socket) => {
         if (board != null) {
             board.reset();
             board = null;
+            if (server.players.hasOwnProperty(socket.username)) {
+                server.players[socket.username].currentGame = null;
+                server.players[socket.username].currentGameOver = null;
+            }
         }
     });
 
     socket.on("clearCell", (data) => {
         if (board != null) {
             if (board.checkCell(data.x, data.y, ["?"])) {
-                board.clearCell(data.x, data.y);
+                board.clearCell(data.x, data.y, socket.username);
                 board.clearQueue();
+                socket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER, win: board.WIN });
+
                 if (board.GAMEOVER) {
                     board.reset(true);
                     board = null;
+                    if (server.players.hasOwnProperty(socket.username)) {
+                        server.players[socket.username].currentGame = null;
+                        server.players[socket.username].currentGameOver = null;
+                    }
                 }
-                socket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER, win: board.WIN });
             }
+        }
+    });
+
+    socket.on("spectate", () => {
+        if (socket.spectate) {
+            console.log("Emitting spectate data");
+            socket.emit("boardData", { board: server.players[socket.spectate].currentGame, gameOver: server.players[socket.spectate].currentGameOver, win: server.players[socket.spectate].currentWin });
         }
     });
 
@@ -196,6 +222,10 @@ io.on("connection", (socket) => {
         if (board != null) {
             board.reset();
             board = null;
+            if (server.players.hasOwnProperty(socket.username)) {
+                server.players[socket.username].currentGame = null;
+                server.players[socket.username].currentGameOver = null;
+            }
             console.log(color.red, "Deleted board for disconnected player");
         }
         delete session.socket;
