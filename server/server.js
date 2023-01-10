@@ -12,7 +12,7 @@ require('locus');
 
 // server setup
 var app = express();
-var port = 3000;
+var port = 80;
 var name = "Minesweeper Online";
 var sessionMiddleware = sessions({
     secret: "e'eF?infFwa%%ofFia*Gesj8\\g4pdO!ih",
