@@ -12,6 +12,8 @@ module.exports = (server) => {
                 this.TOTALCELLS = width * height - mines;
                 this.CLEARQUEUE = [];
                 this.connectedPlayers = [];
+                // remove when ^ is functional
+                this.connectedSessions = sessions;
 
                 //console.log(server.players[username]);
                 if (server.players.hasOwnProperty(username)) {
@@ -159,7 +161,7 @@ module.exports = (server) => {
                 this.timer = setInterval(() => {
                     this.TIME++;
                     // console.log("counting time: ", this.TIME);
-                    for (let player of this.connectedSessions   ) {
+                    for (let player of this.connectedSessions) {
                         player.emit("boardTime", { time: this.TIME });
                     }
                 }, 1000);
