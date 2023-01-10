@@ -42,7 +42,7 @@ app.get("/play", (req, res) => {
     // console.log(req.sessionID);
 });
 app.get("/spectate", (req, res) => {
-    requestedUsername = req.query.name;
+    let requestedUsername = req.query.name;
     // check if the requested user is currently playing
     //to be implemented: hasPlayer and getPlayer
     if (server.players.hasOwnProperty(requestedUsername)) {
