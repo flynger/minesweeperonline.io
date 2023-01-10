@@ -6,19 +6,20 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.0/socket.io.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
   <script src="libraries/jquery-3.6.0.js"></script>
   <script src="libraries/jquery-ui.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.5.0/p5.min.js"></script>
   <link href="libraries/jquery-ui.css" rel="stylesheet" />
 
   <link href="css/style.css" rel="stylesheet" />
-  <link href="css/minesweeper.min.css" rel="stylesheet" />
+  <link href="css/settings.css" rel="stylesheet" />
   <!-- <script src="src/socket.js"></script> -->
   <script>
     $(function () {
       $("#header").load("header.html");
       $("#footer").load("footer.html");
+      $("#settings-tabs").tabs().addClass("ui-tabs-vertical ui-helper-clearfix");
+      $("#settings-tabs li").removeClass("ui-corner-top").addClass("ui-corner-left");
     });
   </script>
 </head>
@@ -26,23 +27,46 @@
 <div id="header"></div>
 
 <body oncontextmenu="return false;">
-  <div id="site">
-    <h1>Settings</h1>
-    <div id="Themes">
-      <label><strong>Themes</strong></label>
-      <br>
-      <div id="lightTheme">
-        <label>Light Theme</label>
-        <br>
-        <img src="">
+  <div id="site">  
+    <br>
+    <div id="settings-tabs">
+      <ul>
+        <li><a href="#general">General</a></li>
+        <li><a href="#appearance">Appearance</a></li>
+        <li><a href="#controls">Controls</a></li>
+        <li><a href="#account">Account</a></li>
+        <li><a href="#privacy">Privacy</a></li>
+      </ul>
+      <div id="general">
+        <h2>General</h2>
       </div>
-      <div id="darkTheme">
-        <label>Dark Theme</label>
-        <br>
-        <img src="">
+      <div id="appearance">
+        <h2>Appearance</h2>
+        <div id="themes">
+          <label><strong>Themes</strong></label>
+          <div id="light-theme">
+            <label>Light Theme</label>
+            <br>
+            <img src="">
+          </div>
+          <div id="dark-txheme">
+            <label>Dark Theme</label>
+            <br>
+            <img src="">
+          </div>
+      </div>
+      <div id="controls">
+        <h2>Controls</h2>
+      </div>
+      <div id="account">
+        <h2>Account</h2>
+      </div>
+      <div id="privacy">
+        <h2>Privacy</h2>
       </div>
     </div>
-  </div>
+  
+    </div>
 </body>
 
 </html>
