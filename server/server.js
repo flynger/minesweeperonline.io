@@ -41,17 +41,17 @@ app.get("/play", (req, res) => {
     res.sendFile('play.html', { root: '../public' });
     // console.log(req.sessionID);
 });
-app.get("/spectate/:username", (req, res) => {
-    requestedUsername = req.params.username;
+app.get("/spectate", (req, res) => {
+    requestedUsername = req.query.name;
     // check if the requested user is currently playing
     //to be implemented: hasPlayer and getPlayer
     if (server.players.hasOwnProperty(requestedUsername)) {
-        console.log("requestedUsername",requestedUsername);
+        console.log({ requestedUsername });
         res.sendFile('play.html', { root: '../public' });
         // let currentGame = Minesweeper.getPlayerGame(requestedUsername);
         // // send the current board data to the client
         // socket.emit("boardData", { board: currentGame.board.CLEARED, gameOver: currentGame.board.GAMEOVER, startSpectating: true, time:currentGame.board.TIME });
-    }
+    } else res.redirect("/play");
 });
 app.get("/profile", (req, res) => {
     res.sendFile('profile.html', { root: '../public' });
