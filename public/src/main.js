@@ -23,10 +23,8 @@ $(document).ready(() => {
     //checking spectate
     let paths = str.split(window.location.pathname);
     console.log(paths);
-    if (paths[1] === 'spectate') {
-        if (paths.hasOwnProperty(2)) {
-            socket.emit('spectate', paths[2]);
-        }
+    if (paths.length > 2 && paths[1] === 'spectate') {
+        socket.emit('spectate', paths[2]);
     }
 
     // set difficulty setting mins and maxes

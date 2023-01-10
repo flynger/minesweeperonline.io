@@ -11,7 +11,7 @@ module.exports = (server) => {
                 this.GAMEOVER = this.WIN = false;
                 this.TOTALCELLS = width * height - mines;
                 this.CLEARQUEUE = [];
-                this.connectedSessions = sessions;
+                this.connectedPlayers = [];
 
                 //console.log(server.players[username]);
                 if (server.players.hasOwnProperty(username)) {
@@ -131,62 +131,7 @@ module.exports = (server) => {
                 // server.players.currentGameStatus = this.GAMEOVER;
                 // // console.log("after this ", this);
                 // console.log("after currentgame", server.players.currentGame);
-            }
-            // clearCell(x, y) {
-            //     let value = this.GRID[y][x];
-            //     // death check
-            //     if (value === "X") {
-            //         for (let row in this.GRID) {
-            //             for (let col in this.GRID[row]) {
-            //                 let isFlagged = this.GRID[row][col] === "F";
-            //                 if (this.GRID[row][col] === "X") {
-            //                     if (!isFlagged && this.CLEARED[row][col] != "RX") {
-            //                         this.CLEARED[row][col] = "X";
-            //                     }
-            //                 }
-            //                 else if (isFlagged) {
-            //                     this.CLEARED[row][col] = "FX";
-            //                 }
-            //             }
-            //         }
-            //         this.CLEARED[y][x] = "RX";
-            //         this.GAMEOVER = true; // game over
-            //     } else {
-            //         // if there was a flag update counter
-            //         if (this.CLEARED[y][x] === "F") {
-            //             this.FLAGS++;
-            //         }
-
-            //         // open the cell
-            //         this.CLEARED[y][x] = value;
-            //         this.CLEAREDCELLS++;
-
-            //         // if a 0, open nearby cells
-            //         if (value === 0) {
-            //             // clearCells (without the function)
-            //             for (let v = -1; v <= 1; v++) {
-            //                 for (let h = -1; h <= 1; h++) {
-            //                     if (!(v == 0 && h == 0) && this.checkCell(x + h, y + v, ["?", "F"]) && !this.CLEARQUEUE.includes((x + h) + "," + (y + v))) {
-            //                         this.CLEARQUEUE.push((x + h) + "," + (y + v));
-            //                     }
-            //                 }
-            //             }
-            //         }
-
-            //         // checks if all possible cleared cells are cleared (win code)
-            //         if (this.CLEAREDCELLS === this.TOTALCELLS) {
-            //             this.FLAGS = 0;
-            //             for (let row in this.GRID) {
-            //                 for (let col in this.GRID[row]) {
-            //                     if (this.GRID[row][col] === "X") {
-            //                         this.CLEARED[row][col] = "F";
-            //                     }
-            //                 }
-            //             }
-            //             this.GAMEOVER = true;
-            //         }
-            //     }
-            // }
+            }   
             // flags a cell
             flagCell(x, y, username) {
                 if (this.checkCell(x, y, ["?"])) {
@@ -237,35 +182,18 @@ module.exports = (server) => {
                     delete player.board;
                 }
             }
+        },
+        Game: class {
+            constructor(numOfBoards, settings, teams, mode) {
+                this.boards = [];
+                this.mode = mode;
+                this.settings = settings;
+                this.teams = teams;
+                for (let i = 0; i < numOfBoards; i++) {
+                    this.boards.push(new Board(settings, teams[i]));
+                }
+            }
         }
-        // clearBoard(board) {
-        //     while (board.CLEARQUEUE.length > 0) {
-        //         let cell = board.CLEARQUEUE.shift().split(",");
-        //         board.clearCell(+cell[0], +cell[1]);
-        //     }
-        // },
-        // createBoard(settings) {
-        //     console.log("Board created!");
-        //     return new this.Board(settings);
-        //     // return socketToBoard[socket.id] = new this.Board(settings);
-        // }
-        // getBoard(socket) {
-        //     return socketToBoard[socket.id];
-        // },
-        // hasBoard(socket) {
-        //     return socket.id in socketToBoard;
-        // },
-        // resetBoard(socket) {
-        //     if board exists, delete it
-        //     if ("board" in socket) {
-        //         socket.board.reset();
-        //     }
-        //     if (socketToBoard[socket.id]) {
-        //         console.log("resetting board");
-        //         if (socketToBoard[socket.id].timer) clearInterval(socketToBoard[socket.id].timer);
-        //         delete socketToBoard[socket.id];
-        //     }
-        // }
     }
 
     return server.gameHandler = gameHandler;
