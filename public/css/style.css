@@ -11,7 +11,11 @@
 } */
 
 body {
-    font-family: 'Franklin Gothic', 'Arial Narrow', Arial, sans-serif; /* other options: Garamond */
+    font-family: 'Franklin Gothic', 'Arial Narrow', Arial, sans-serif;
+    /* other options: Garamond */
+    min-width: min-content;
+    border: 0;
+    padding: 0;
     margin: 0;
 }
 
@@ -77,6 +81,7 @@ body {
 }
 
 .top-nav {
+    min-width: 1140px;
     background-color: #BDBDBD;
     overflow: hidden;
     margin-top: 0%;

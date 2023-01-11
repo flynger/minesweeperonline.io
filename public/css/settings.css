@@ -5,7 +5,7 @@
 .ui-tabs-vertical .ui-tabs-nav {
     padding: .2em .1em .2em .2em;
     float: left;
-    width: 12em;
+    width: max-content;
 }
 
 .ui-tabs-vertical .ui-tabs-nav li {
@@ -26,14 +26,16 @@
     padding-right: .1em;
     border-right-width: 1px;
     background: rgba(150, 150, 170);
+    border: 2px solid rgb(130, 130, 130);
 }
 
 .ui-tabs-vertical .ui-tabs-panel {
     padding: 1em;
-    float: right;
-    width: 40em;
+    float: left;
+    width: inherit;
 }
 
 #settings-tabs {
-    margin: auto;
+    width: inherit;
+    display: inline-flex;
 }
