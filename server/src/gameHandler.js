@@ -65,20 +65,20 @@ module.exports = (server) => {
                 if (this.GRID[y][x] === "X") {
                     for (let row in this.GRID) {
                         for (let col in this.GRID[row]) {
-                            let isFlagged = this.GRID[row][col] === "F";
+                            let isFlagged = this.CLEARED[row][col] === "F";
                             if (this.GRID[row][col] === "X") {
                                 if (!isFlagged && this.CLEARED[row][col] != "RX") {
                                     this.CLEARED[row][col] = "X";
-                                    if (server.players.hasOwnProperty(username)) {
-                                        server.players[username].currentGame[row][col] = "X";
-                                    }
+                                    // if (server.players.hasOwnProperty(username)) {
+                                    //     server.players[username].currentGame[row][col] = "X";
+                                    // }
                                 }
                             }
                             else if (isFlagged) {
                                 this.CLEARED[row][col] = "FX";
-                                if (server.players.hasOwnProperty(username)) {
-                                    server.players[username].currentGame[row][col] = "FX";
-                                }
+                                // if (server.players.hasOwnProperty(username)) {
+                                //     server.players[username].currentGame[row][col] = "FX";
+                                // }
                             }
                         }
                     }
