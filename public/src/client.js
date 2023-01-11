@@ -107,3 +107,8 @@ socket.on("boardTime", (data) => {
     minesweeper.updateTimer(data.time);
 });
 
+socket.on("gameStats", (data) => {
+    $("#player-name").html(data.players.join(", "));
+    $("#time").html(data.time);
+    $("#result-block")[0].style.display = "inline-block";
+});

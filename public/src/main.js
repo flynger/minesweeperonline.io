@@ -118,6 +118,7 @@ class Minesweeper {
         $("#game").html("");
         $("#game").width(this.SETTINGS.width * this.TILE_SIZE + this.BORDER * 2);
         $("#game").height(this.SETTINGS.height * this.TILE_SIZE + this.BORDER * 4 + 46);
+        $("#result-block")[0].style.display = "none";
 
         let grid = "";
         // game gui
