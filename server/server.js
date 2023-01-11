@@ -230,12 +230,16 @@ io.on("connection", (socket) => {
     socket.on("addFlag", (data) => {
         if (board != null) {
             board.flagCell(data.x, data.y);
+            board.TIMESTAMPS.push({ time: Date.now() - board.START_TIME, x, y, board: JSON.stringify(board.CLEARED) });
+            socket.emit("boardData", { board: board.CLEARED });
         }
     });
 
     socket.on("removeFlag", (data) => {
         if (board != null) {
             board.unflagCell(data.x, data.y);
+            board.TIMESTAMPS.push({ time: Date.now() - board.START_TIME, x, y, board: JSON.stringify(board.CLEARED) });
+            socket.emit("boardData", { board: board.CLEARED });
         }
     });
 
