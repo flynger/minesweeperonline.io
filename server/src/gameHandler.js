@@ -179,7 +179,7 @@ module.exports = (server) => {
                 // socket.username
                 for (let player of this.connectedSessions) {
                     if (sendStats) {
-                        player.emit("gameStats", { timeTaken: this.GAMEDURATION, players: ["unknown"] });
+                        player.emit("gameStats", { time: this.GAMEDURATION, players: [player.username] });
                     }
                     delete player.board;
                 }
