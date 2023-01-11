@@ -196,6 +196,18 @@ io.on("connection", (socket) => {
         }
     });
 
+    socket.on("addFlag", (data) => {
+        if (board != null) {
+            board.flagCell(data.x, data.y);
+        }
+    });
+
+    socket.on("removeFlag", (data) => {
+        if (board != null) {
+            board.unflagCell(data.x, data.y);
+        }
+    });
+
     socket.on("spectate", (username) => {
         console.log("Emitting spectate data");
         socket.emit("boardData", { board: server.players[username].currentGame, gameOver: server.players[username].currentGameOver, win: server.players[username].currentWin });

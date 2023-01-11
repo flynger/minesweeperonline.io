@@ -138,9 +138,17 @@ module.exports = (server) => {
             flagCell(x, y, username) {
                 if (this.checkCell(x, y, ["?"])) {
                     this.CLEARED[y][x] = "F";
-                    if (server.players.hasOwnProperty(username)) {
-                        server.players[username].currentGame[y][x] = "F";
-                    }
+                    // if (server.players.hasOwnProperty(username)) {
+                    //     server.players[username].currentGame[y][x] = "F";
+                    // }
+                }
+            }
+            unflagCell(x, y, username) {
+                if (this.checkCell(x, y, ["F"])) {
+                    this.CLEARED[y][x] = "?";
+                    // if (server.players.hasOwnProperty(username)) {
+                    //     server.players[username].currentGame[y][x] = "F";
+                    // }
                 }
             }
             // check the 'visible' value of a cell
