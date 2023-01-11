@@ -1,14 +1,9 @@
 /* tags */
-/* body {
-    background-image: url("../res/minesweeper-bg.png");
-    backdrop-filter: blur(3px);
-    -webkit-backdrop-filter: blur(3px); 
+body {
+    background-image: url("../res/gameplay.gif");
     background-position: center;
-    background-size: cover;
-    image-rendering: pixelated;
-    filter: brightness(120%); 
-    filter: blur(10px);
-} */
+    background-size: 100%;
+}
 
 /* classes */
 .login-container {
