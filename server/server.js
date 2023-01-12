@@ -155,6 +155,7 @@ io.on("connection", (socket) => {
         board = new Minesweeper.Board(settings, [socket], socket.username);
         board.clearQueue();
         board.startTimer();
+        socket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER, win: board.WIN });
         if (board.GAMEOVER) {
             board.reset(true);
             board = null;
@@ -163,7 +164,6 @@ io.on("connection", (socket) => {
                 server.players[socket.username].currentGameOver = null;
             }
         }
-        socket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER, win: board.WIN });
     });
 
     socket.on("resetBoard", () => {
@@ -205,9 +205,9 @@ io.on("connection", (socket) => {
                 console.log("clearing cells around cell:", data);
                 for (let v = -1; v <= 1; v++) {
                     for (let h = -1; h <= 1; h++) {
-                        if (this.CLEARED[y + v][x + h] === "?" && x + h < board.WIDTH && y + v < board.HEIGHT) {
-                            this.CLEARQUEUE.push([x + h, y + v]);
-                            this.CLEARED[y + v][x + h] = "Q";
+                        if (board.CLEARED[y + v][x + h] === "?" && x + h < board.WIDTH && y + v < board.HEIGHT) {
+                            board.CLEARQUEUE.push([x + h, y + v]);
+                            board.CLEARED[y + v][x + h] = "Q";
                         }
                     }
                 }

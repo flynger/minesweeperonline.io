@@ -396,9 +396,10 @@ class Minesweeper {
     //     }
     // }
     clearCells(x, y) { /* removed overrideFlags */
-        this.do3x3Operation(x, y, (thisX, thisY, thisCell) => {
-            if (!this.cellIsClear(thisCell) && (thisCell.hasClass("blank") || thisCell.hasClass("selected"))) socket.emit("clearCell", { x: thisX, y: thisY });
-        });
+        // this.do3x3Operation(x, y, (thisX, thisY, thisCell) => {
+        //     if (!this.cellIsClear(thisCell) && (thisCell.hasClass("blank") || thisCell.hasClass("selected"))) socket.emit("clearCell", { x: thisX, y: thisY });
+        // });
+        socket.emit("clearCells", { x, y });
     }
     cellIsClear(cell) {
         return cell.attr("class").includes("open");
