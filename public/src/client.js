@@ -64,10 +64,10 @@ socket.on("boardData", (data) => {
                 switch (value) {
                     case "?":
                         // uncleared or dont do anything
+                        classToAdd = "blank";
                         break
                     case "F":
                         // flag
-                        minesweeper.GRID[row][col] = "F";
                         minesweeper.FLAGS--;
                         classToAdd = "bombflagged";
                         break
@@ -82,9 +82,9 @@ socket.on("boardData", (data) => {
                         classToAdd = "bombdeath";
                         break
                     default:
-                        minesweeper.GRID[row][col] = value;
                         classToAdd = "open" + value;
                 }
+                minesweeper.GRID[row][col] = value;
                 if (classToAdd) $(`#${row}_${col}`).attr("class", "cell " + classToAdd);
             }
         }

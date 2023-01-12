@@ -99,7 +99,7 @@ module.exports = (server) => {
                     if (this.GRID[y][x] === 0) {
                         for (let v = -1; v <= 1; v++) {
                             for (let h = -1; h <= 1; h++) {
-                                if (!(v === 0 && h === 0) && this.GRID[y + v] && this.GRID[y + v][x + h] !== undefined && this.CLEARED[y + v][x + h] === "?") {
+                                if (!(v === 0 && h === 0) && this.GRID[y + v] && this.GRID[y + v][x + h] !== undefined && (this.CLEARED[y + v][x + h] === "?" || this.CLEARED[y + v][x + h] === "F")) {
                                     this.CLEARQUEUE.push([x + h, y + v]);
                                     this.CLEARED[y + v][x + h] = "Q";
                                 }
@@ -143,7 +143,9 @@ module.exports = (server) => {
                     // if (server.players.hasOwnProperty(username)) {
                     //     server.players[username].currentGame[y][x] = "F";
                     // }
+                    return true;
                 }
+                return false;
             }
             unflagCell(x, y, username) {
                 if (this.checkCell(x, y, ["F"])) {
@@ -151,7 +153,9 @@ module.exports = (server) => {
                     // if (server.players.hasOwnProperty(username)) {
                     //     server.players[username].currentGame[y][x] = "F";
                     // }
+                    return true;
                 }
+                return false;
             }
             // check if a cell satisfies its flag count for chording
             satisfyFlags(x, y) {

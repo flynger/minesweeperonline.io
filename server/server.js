@@ -205,7 +205,7 @@ io.on("connection", (socket) => {
                 console.log("clearing cells around cell:", data);
                 for (let v = -1; v <= 1; v++) {
                     for (let h = -1; h <= 1; h++) {
-                        if (board.CLEARED[y + v][x + h] === "?" && x + h < board.WIDTH && y + v < board.HEIGHT) {
+                        if (board.CLEARED[y + v][x + h] === "?" && x + h < board.WIDTH && y + v < board.HEIGHT) { // space does weird stuff !!! check
                             board.CLEARQUEUE.push([x + h, y + v]);
                             board.CLEARED[y + v][x + h] = "Q";
                         }
@@ -230,18 +230,20 @@ io.on("connection", (socket) => {
     socket.on("addFlag", (data) => {
         if (board != null) {
             let { x, y } = data;
-            board.flagCell(x, y);
-            board.TIMESTAMPS.push({ time: Date.now() - board.START_TIME, x, y, board: JSON.stringify(board.CLEARED) });
-            socket.emit("boardData", { board: board.CLEARED });
+            if (board.flagCell(x, y)) {
+                board.TIMESTAMPS.push({ time: Date.now() - board.START_TIME, x, y, board: JSON.stringify(board.CLEARED) });
+                socket.emit("boardData", { board: board.CLEARED });
+            }
         }
     });
 
     socket.on("removeFlag", (data) => {
         if (board != null) {
             let { x, y } = data;
-            board.unflagCell(x, y);
-            board.TIMESTAMPS.push({ time: Date.now() - board.START_TIME, x, y, board: JSON.stringify(board.CLEARED) });
-            socket.emit("boardData", { board: board.CLEARED });
+            if (board.unflagCell(x, y)) {
+                board.TIMESTAMPS.push({ time: Date.now() - board.START_TIME, x, y, board: JSON.stringify(board.CLEARED) });
+                socket.emit("boardData", { board: board.CLEARED });
+            }
         }
     });
 
