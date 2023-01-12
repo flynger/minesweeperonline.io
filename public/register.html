@@ -36,17 +36,17 @@
 <body>
   <header id="header"></header>
   <div id="loader" class="center"></div>
-  <div id="site">
+  <div id="login-site">
     <div class="bg-image"></div>
     <div class="login-container">
       <h1>Become a Sweeper today!</h1>
-      <form class="login-form" action="/register" method="post">
+      <form id="register-form" class="login-form" action="/register" method="post">
         <div>Create a new account below.</div>
         <br>
         <!-- <label for="username">Create a Unique Username</label><br> -->
         <input type="text" name="username" placeholder="Enter a Unique Username" required>
         <br>
-        <div id="nameTaken" style="display: none; color: red;">This username is already in use.</div>
+        <div id="register-fail" style="display: none; color: red;"></div>
         <!-- <label for="password">Choose a Strong Password</label><br> -->
         <input type="password" name="password" placeholder="Choose a Strong Password" required>
         <br><br>
@@ -57,21 +57,11 @@
       </form>
       <br>
       <div class="yes-account-text">
+        <br>
         <span>Already have an account?</span>
         <a href="/login">Login here</a>
       </div>
     </div>
-    <!-- <h1>Sign up</h1>
-    <div id="register">
-      <label for="name">Username</label>
-      <input name="username" id="usernameInput" type="text">
-
-      <br>
-      <label for="name">Password</label>
-      <input name="password" id="passwordInput" type="text">
-      <br>
-      <button id="registerButton" type="button">Register</button>
-    </div> -->
   </div>
 </body>
 
