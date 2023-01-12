@@ -13,7 +13,7 @@
   <link href="libraries/jquery-ui.css" rel="stylesheet" />
 
   <link href="css/style.css" rel="stylesheet" />
-  <link href="css/minesweeper.min.css" rel="stylesheet" />
+  <link href="css/profile.css" rel="stylesheet" />
   <script src="client.js"></script>
   <script>
     $(function () {
@@ -21,114 +21,118 @@
       $("#footer").load("footer.html");
     });
   </script>
-  <style>
-    /* Add some basic styles to make the page look nice */
-    /* body {
-      font-family: sans-serif;
-      margin: 30px;
-    } */
-
-    /* Style the profile section */
-    .profile {
-      display: flex;
-      align-items: center;
-      margin-bottom: 30px;
-    }
-
-    .profile img {
-      border-radius: 50%;
-      width: 100px;
-      height: 100px;
-      margin-right: 20px;
-    }
-
-    .profile h1 {
-      font-size: 24px;
-      margin: 0;
-    }
-
-    /* Style the statistics table */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    td,
-    th {
-      padding: 10px;
-      border: 1px solid #ccc;
-    }
-
-    th {
-      background-color: #ddd;
-      font-weight: bold;
-    }
-
-    /* Style the leaderboard section */
-    .leaderboard h2 {
-      margin-bottom: 10px;
-    }
-
-    .leaderboard table {
-      margin-bottom: 30px;
-    }
-
-    .leaderboard td:nth-child(1) {
-      text-align: right;
-    }
-
-    .leaderboard td:nth-child(2) {
-      font-weight: bold;
-    }
-  </style>
 </head>
 
 <div id="header"></div>
 
 <body oncontextmenu="return false;">
   <div id="site">
-  <h1>Profile</h1>
-  <div class="profile">
-    <img src="https://via.placeholder.com/100" alt="Profile Picture">
-    <h1>John Doe</h1>
-  </div>
+    <h1>Profile</h1>
+    <div class="profile">
+      <img src="https://via.placeholder.com/100" alt="Profile Picture">
+      <h1>John Doe</h1>
+    </div>
 
-  <h2>Statistics</h2>
-  <table style="width: 25%">
-    <tr>
-      <th>Total Games</th>
-      <td>500</td>
-    </tr>
-    <tr>
-      <th>Wins</th>
-      <td>250</td>
-    </tr>
-    <tr>
-      <th>Losses</th>
-      <td>200</td>
-    </tr>
-    <tr>
-      <th>Win Percentage</th>
-      <td>50%</td>
-    </tr>
-  </table>
-
-  <div class="leaderboard">
-    <h2>Leaderboard</h2>
-    <table>
+    <h2>Friends</h2>
+    <table id="friends-table" class="friends">
       <tr>
-        <th>Rank</th>
-        <th>Name</th>
-        <th>Score</th>
+        <td>
+          <div class="friends">
+            <img src="https://via.placeholder.com/100" alt="Profile Picture">
+          </div>
+        </td>
+
+        <td>
+          <div class="friends">
+            <img src="https://via.placeholder.com/100" alt="Profile Picture">
+          </div>
+        </td>
+
+        <td>
+          <div class="friends">
+            <img src="https://via.placeholder.com/100" alt="Profile Picture">
+          </div>
+        </td>
       </tr>
       <tr>
-        <td>1</td>
-        <td>John Doe</td>
-        <td>1000</td>
+        <td>
+          <div class="friends">
+            <h3>John Doe</h3>
+          </div>
+        </td>
+
+        <td>
+          <div class="friends">
+            <h3>John Doe</h3>
+          </div>
+        </td>
+
+        <td>
+          <div class="friends">
+            <h3>John Doe</h3>
+          </div>
+        </td>
       </tr>
     </table>
+
+    <table id="friends-table" class="friends">
+      <tr>
+        <td>
+          <div class="button">
+            <h3>Add Friend</h3>
+          </div>
+        </td>
+
+        <td>
+          <div class="button">
+            <h3>Send Message</h3>
+          </div>
+        </td>
+
+        <td>
+          <div class="button">
+            <h3>Spectate</h3>
+          </div>
+        </td>
+      </tr>
+    </table>
+
+    <h2>Statistics</h2>
+    <table id="tablelabel" style="width: 25%">
+      <tr>
+        <th>Total Games</th>
+        <td>500</td>
+      </tr>
+      <tr>
+        <th>Wins</th>
+        <td>250</td>
+      </tr>
+      <tr>
+        <th>Losses</th>
+        <td>250</td>
+      </tr>
+      <tr>
+        <th>Win Percentage</th>
+        <td>50%</td>
+      </tr>
+    </table>
+
+    <div class="leaderboard">
+      <h2>Leaderboard</h2>
+      <table>
+        <tr>
+          <th>Rank</th>
+          <th>Name</th>
+          <th>Score</th>
+        </tr>
+        <tr>
+          <td>1</td>
+          <td>John Doe</td>
+          <td>1000</td>
+        </tr>
+      </table>
+    </div>
   </div>
-</div>
 </body>
 
 </html>

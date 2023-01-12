@@ -179,9 +179,11 @@ io.on("connection", (socket) => {
 
     socket.on("clearCell", (data) => {
         if (board != null) {
-            if (board.checkCell(data.x, data.y, ["?"])) {
-                board.clearCell(data.x, data.y, socket.username);
+            let { x, y } = data;
+            if (board.checkCell(x, y, ["?"])) {
+                board.clearCell(x, y, socket.username);
                 board.clearQueue();
+                board.TIMESTAMPS.push({ time: Date.now() - board.START_TIME, x, y, board: JSON.stringify(board.CLEARED) });
                 socket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER, win: board.WIN });
 
                 if (board.GAMEOVER) {
@@ -193,6 +195,53 @@ io.on("connection", (socket) => {
                     }
                 }
             }
+        }
+    });
+
+    socket.on("clearCells", (data) => {
+        if (board != null) {
+            let { x, y } = data;
+            if (x < board.WIDTH && y < board.HEIGHT && board.satisfyFlags(x, y)) {
+                console.log("clearing cells around cell:", data);
+                for (let v = -1; v <= 1; v++) {
+                    for (let h = -1; h <= 1; h++) {
+                        if (this.CLEARED[y + v][x + h] === "?" && x + h < board.WIDTH && y + v < board.HEIGHT) {
+                            this.CLEARQUEUE.push([x + h, y + v]);
+                            this.CLEARED[y + v][x + h] = "Q";
+                        }
+                    }
+                }
+                board.clearQueue();
+                board.TIMESTAMPS.push({ time: Date.now() - board.START_TIME, x, y, board: JSON.stringify(board.CLEARED) });
+                socket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER, win: board.WIN });
+
+                if (board.GAMEOVER) {
+                    board.reset(true);
+                    board = null;
+                    if (server.players.hasOwnProperty(socket.username)) {
+                        server.players[socket.username].currentGame = null;
+                        server.players[socket.username].currentGameOver = null;
+                    }
+                }
+            }
+        }
+    });
+
+    socket.on("addFlag", (data) => {
+        if (board != null) {
+            let { x, y } = data;
+            board.flagCell(x, y);
+            board.TIMESTAMPS.push({ time: Date.now() - board.START_TIME, x, y, board: JSON.stringify(board.CLEARED) });
+            socket.emit("boardData", { board: board.CLEARED });
+        }
+    });
+
+    socket.on("removeFlag", (data) => {
+        if (board != null) {
+            let { x, y } = data;
+            board.unflagCell(x, y);
+            board.TIMESTAMPS.push({ time: Date.now() - board.START_TIME, x, y, board: JSON.stringify(board.CLEARED) });
+            socket.emit("boardData", { board: board.CLEARED });
         }
     });
 

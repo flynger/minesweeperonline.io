@@ -118,6 +118,7 @@ class Minesweeper {
         $("#game").html("");
         $("#game").width(this.SETTINGS.width * this.TILE_SIZE + this.BORDER * 2);
         $("#game").height(this.SETTINGS.height * this.TILE_SIZE + this.BORDER * 4 + 46);
+        $("#result-block")[0].style.display = "none";
 
         let grid = "";
         // game gui
@@ -406,19 +407,22 @@ class Minesweeper {
         let cell = this.getCanvasCell(x, y);
         if (cell.hasClass("blank")) {
             // if cell blank, add flag
-            this.FLAGS--;
-            this.updateFlagCounter();
-            this.GRID[y][x] = "F";
-            cell.attr("class", "cell bombflagged");
+            // this.FLAGS--;
+            // this.updateFlagCounter();
+            // this.GRID[y][x] = "F";
+            // cell.attr("class", "cell bombflagged");
+            socket.emit("addFlag", { x, y });
         } else if (cell.hasClass("bombflagged")) {
             // if flag, revert to blank
-            this.FLAGS++;
-            this.updateFlagCounter();
-            this.GRID[y][x] = "?";
-            cell.attr("class", "cell blank");
+            // this.FLAGS++;
+            // this.updateFlagCounter();
+            // this.GRID[y][x] = "?";
+            // cell.attr("class", "cell blank");
+            socket.emit("removeFlag", { x, y });
         } else if (clearCondition && this.satisfyFlags(x, y)) {
             // if left click is on, clear cells
-            this.clearCells(x, y, false);
+            socket.emit("clearCells", { x, y });
+            this.clearCells(x, y);
         }
     }
     getCanvasCell(x, y) {

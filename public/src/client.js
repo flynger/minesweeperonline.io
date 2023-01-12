@@ -59,13 +59,7 @@ socket.on("boardData", (data) => {
                 let classToAdd = "";
                 let value =  data.board[row][col];
                 if (minesweeper.GRID[row][col] === "F") {
-                    if (data.gameOver) {
-                        value = value === "X" ? "?" : "FX";
-                    } else {
-                        if (value !== "?") {
-                            minesweeper.FLAGS++;
-                        } else value = "?";
-                    }
+                    minesweeper.FLAGS++;
                 }
                 switch (value) {
                     case "?":
@@ -79,7 +73,7 @@ socket.on("boardData", (data) => {
                         break
                     case "X":
                         // bomb (gameover)
-                        classToAdd = "bombrevealed";
+                        classToAdd = "bombrevealed"; 
                         break
                     case "FX":
                         classToAdd = "bombmisflagged";
@@ -107,3 +101,8 @@ socket.on("boardTime", (data) => {
     minesweeper.updateTimer(data.time);
 });
 
+socket.on("gameStats", (data) => {
+    $("#player-name").html(data.players.join(", "));
+    $("#time").html(data.time);
+    $("#result-block")[0].style.display = "inline-block";
+});

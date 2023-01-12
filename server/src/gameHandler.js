@@ -4,13 +4,15 @@ module.exports = (server) => {
             // creates a board
             constructor({ startX, startY, width, height, mines }, sessions, username) {
                 console.log("Board created!");
+                this.WIDTH = width, this.HEIGHT = height;
                 this.GRID = new Array(height).fill("").map(x => new Array(width).fill("0"));
                 this.CLEARED = new Array(height).fill("").map(x => new Array(width).fill("?"));
                 this.MINES = this.FLAGS = mines;
                 this.CLEAREDCELLS = this.TIME = 0;
-                this.GAMEOVER = this.WIN = false;
                 this.TOTALCELLS = width * height - mines;
+                this.GAMEOVER = this.WIN = false;
                 this.CLEARQUEUE = [];
+                this.TIMESTAMPS = [];
                 this.connectedPlayers = [];
                 // remove when ^ is functional
                 this.connectedSessions = sessions;
@@ -63,20 +65,20 @@ module.exports = (server) => {
                 if (this.GRID[y][x] === "X") {
                     for (let row in this.GRID) {
                         for (let col in this.GRID[row]) {
-                            let isFlagged = this.GRID[row][col] === "F";
+                            let isFlagged = this.CLEARED[row][col] === "F";
                             if (this.GRID[row][col] === "X") {
                                 if (!isFlagged && this.CLEARED[row][col] != "RX") {
                                     this.CLEARED[row][col] = "X";
-                                    if (server.players.hasOwnProperty(username)) {
-                                        server.players[username].currentGame[row][col] = "X";
-                                    }
+                                    // if (server.players.hasOwnProperty(username)) {
+                                    //     server.players[username].currentGame[row][col] = "X";
+                                    // }
                                 }
                             }
                             else if (isFlagged) {
                                 this.CLEARED[row][col] = "FX";
-                                if (server.players.hasOwnProperty(username)) {
-                                    server.players[username].currentGame[row][col] = "FX";
-                                }
+                                // if (server.players.hasOwnProperty(username)) {
+                                //     server.players[username].currentGame[row][col] = "FX";
+                                // }
                             }
                         }
                     }
@@ -97,7 +99,7 @@ module.exports = (server) => {
                     if (this.GRID[y][x] === 0) {
                         for (let v = -1; v <= 1; v++) {
                             for (let h = -1; h <= 1; h++) {
-                                if (!(v === 0 && h === 0) && this.GRID[y + v] && this.GRID[y + v][x + h] !== undefined && this.GRID[y + v][x + h] !== "X" && this.CLEARED[y + v][x + h] === "?") {
+                                if (!(v === 0 && h === 0) && this.GRID[y + v] && this.GRID[y + v][x + h] !== undefined && this.CLEARED[y + v][x + h] === "?") {
                                     this.CLEARQUEUE.push([x + h, y + v]);
                                     this.CLEARED[y + v][x + h] = "Q";
                                 }
@@ -138,10 +140,30 @@ module.exports = (server) => {
             flagCell(x, y, username) {
                 if (this.checkCell(x, y, ["?"])) {
                     this.CLEARED[y][x] = "F";
-                    if (server.players.hasOwnProperty(username)) {
-                        server.players[username].currentGame[y][x] = "F";
+                    // if (server.players.hasOwnProperty(username)) {
+                    //     server.players[username].currentGame[y][x] = "F";
+                    // }
+                }
+            }
+            unflagCell(x, y, username) {
+                if (this.checkCell(x, y, ["F"])) {
+                    this.CLEARED[y][x] = "?";
+                    // if (server.players.hasOwnProperty(username)) {
+                    //     server.players[username].currentGame[y][x] = "F";
+                    // }
+                }
+            }
+            // check if a cell satisfies its flag count for chording
+            satisfyFlags(x, y) {
+                let flags = 0;
+                for (let v = -1; v <= 1; v++) {
+                    for (let h = -1; h <= 1; h++) {
+                        if (this.GRID[y + v] && this.GRID[y + v][x + h] !== undefined && this.CLEARED[y + v][x + h] === "F") {
+                            flags++;
+                        }
                     }
                 }
+                return this.GRID[y][x] == flags;
             }
             // check the 'visible' value of a cell
             checkCell(x, y, options) {
@@ -179,7 +201,7 @@ module.exports = (server) => {
                 // socket.username
                 for (let player of this.connectedSessions) {
                     if (sendStats) {
-                        player.emit("gameStats", { timeTaken: this.GAMEDURATION, players: ["unknown"] });
+                        player.emit("gameStats", { time: this.GAMEDURATION, players: [player.username] });
                     }
                     delete player.board;
                 }
@@ -191,6 +213,7 @@ module.exports = (server) => {
                 this.mode = mode;
                 this.settings = settings;
                 this.teams = teams;
+                this.spectators = [];
                 for (let i = 0; i < numOfBoards; i++) {
                     this.boards.push(new Board(settings, teams[i]));
                 }
