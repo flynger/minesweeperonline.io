@@ -35,6 +35,10 @@
     width: inherit;
 }
 
+.settings-sections {
+    
+}
+
 #settings-tabs {
     width: inherit;
     display: flex;

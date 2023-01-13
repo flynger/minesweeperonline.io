@@ -95,23 +95,19 @@ th {
 }
 
 .button {
+  height: 50px;
   background-color: #4CAF50;
-  /* Green */
   border: none;
+  line-height: 15px;
   color: white;
-  padding: 8px 16px;
+  padding: 1px 16px;
   text-align: center;
   text-decoration: none;
   display: inline-block;
-  font-size: 9px;
-}
-
-.button {
-  transition-duration: 0.4s;
+  font-size: 15px;
 }
 
 .button:hover {
   background-color: #ffffff;
-  /* Green */
   color: rgb(0, 0, 0);
 }

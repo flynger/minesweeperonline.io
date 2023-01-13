@@ -2,30 +2,6 @@
 <html lang="en-US">
 
 <head>
-  <table id="friends-table" class="friends">
-      
-    <tr>
-      <td>
-        <div class="button">
-          <h3>Add Friend</h3>
-        </div>
-      </td>
-
-      <td>
-        <div class="button">
-          <h3>Send Message</h3>
-        </div>
-      </td>
-
-      <td>
-        <div class="button">
-          <h3>Spectate</h3>
-        </div>
-      </td>
-    </tr>
-  </table>
-  <title>Profile</title>
-
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.0/socket.io.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
@@ -49,12 +25,31 @@
 
 <body oncontextmenu="return false;">
   <div id="site">
+    <table id="friends-table" class="friends">
+      <tr>
+        <td>
+          <div class="button">
+            <h3>Add Friend</h3>
+          </div>
+        </td>
+          <td>
+          <div class="button">
+            <h3>Send Message</h3>
+          </div>
+        </td>
+          <td>
+          <div class="button">
+            <h3>Spectate</h3>
+          </div>
+        </td>
+      </tr>
+    </table>
+    <title>Profile</title>
     <h1>Profile</h1>
     <div class="profile">
       <img src="https://via.placeholder.com/100" alt="Profile Picture">
       <h1>John Doe</h1>
     </div>
-
     <h2>Friends</h2>
     <table  class="friends">
       <tr>
