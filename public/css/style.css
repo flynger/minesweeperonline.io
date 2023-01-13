@@ -46,40 +46,6 @@ body {
     box-shadow: inset 0px 0.8px 0px -0.25px rgba(255, 255, 255, 0.2), 0px 0.5px 1px rgba(0, 0, 0, 0.1), 0px 0px 0px 3.5px rgba(58, 108, 217, 0.5);
 }
 
-.difficulty-select {
-    font-family: 'Franklin Gothic', 'Arial Narrow', Arial, sans-serif;
-    font-size: 16px;
-    width: 100px;
-    transition-duration: 0.1s;
-}
-
-.difficulty-select:focus {
-    font-family: Arial, Helvetica, sans-serif;
-    font-weight: bold;
-    font-size: 20px;
-    transition-duration: 0.07s;
-}
-
-.flag {
-    background: url('res/flag.png') no-repeat;
-    background-size: 32px;
-    image-rendering: pixelated;
-    width: 32px;
-    height: 40px;
-    display: block;
-}
-
-.options-close {
-    cursor: pointer;
-}
-
-.options-title {
-    background-color: rgb(53, 53, 243);
-    color: white;
-    font-weight: bold;
-    font-style: italic;
-}
-
 .top-nav {
     min-width: 1140px;
     background-color: #BDBDBD;
@@ -122,85 +88,6 @@ body {
 .top-nav-right a:hover {
     background-color: #ddd;
     color: black;
-}
-
-#chat {
-    position: fixed;
-    width: 300px;
-    right: 5px;
-    bottom: 0%;
-    background-color: rgba(217, 220, 229);
-}
-
-#chat ::selection {
-    background-color: rgba(128, 128, 255, 0.25);
-}
-
-#chat-bar {
-    height: 25px;
-    text-indent: 5px;
-    border: black;
-    border-style: solid;
-    border-width: 2px;
-    border-bottom-style: none;
-    font-size: 20px;
-    user-select: none;
-}
-
-#chat-body {
-    display: block;
-    border: black;
-    border-style: solid;
-    border-width: 2px;
-    display: none;
-}
-
-#chatRooms {
-    /* display: inline-block;
-    border-width: 2px;
-    width: 100%;
-    height: 20px;
-    font-size: 16px; */
-    user-select: none;
-}
-
-.selectRoom {
-    float: left;
-    width: 60px;
-    text-align: center;
-    border-right-style: solid;
-    border-bottom-style: solid;
-    background-color: rgba(150, 150, 170);
-    border-width: 2px;
-    user-select: none;
-}
-
-#chatRoomPadding {
-    float: right;
-    height: 18px;
-    border-bottom-style: solid;
-    background-color: rgba(150, 150, 170);
-    border-width: 2px;
-}
-
-#chatText {
-    width: 280px;
-    height: 400px;
-    font-size: small;
-    /* word-break: break-all; */
-    overflow-wrap: break-word;
-    overflow-y: scroll;
-    margin-left: 10px;
-    margin-right: 10px;
-}
-
-#chatInput {
-    width: 270px;
-    margin-left: 10px;
-}
-
-#roomSelector {
-    margin-left: 10px;
 }
 
 /* #settingsButton {
