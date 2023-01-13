@@ -31,7 +31,8 @@ $(function () {
             if (response.success) {
                 window.location.href = "/home";
             } else {
-                alert("login fail");
+                $("#login-fail").html(response.reason);
+                $("#login-fail")[0].style.display = "inherit";
             }
         });
         // $.ajax({

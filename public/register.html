@@ -14,6 +14,7 @@
 
   <link href="css/style.css" rel="stylesheet" />
   <link href="css/login.css" rel="stylesheet" />
+  <script src="src/register.js"></script> 
   <!-- <script src="src/socket.js"></script>
   <script src="src/register.js"></script> -->
   <script>
@@ -40,24 +41,21 @@
     <div class="bg-image"></div>
     <div class="login-container">
       <h1>Become a Sweeper today!</h1>
-      <form id="register-form" class="login-form" action="/register" method="post">
-        <div>Create a new account below.</div>
-        <br>
+
+      <form id="register-form" class="login-form">
+        <div>Create a new account below.</div><br>
         <!-- <label for="username">Create a Unique Username</label><br> -->
-        <input type="text" name="username" placeholder="Enter a Unique Username" required>
-        <br>
-        <div id="register-fail" style="display: none; color: red;"></div>
+        <input type="text" name="username" placeholder="Enter a Unique Username" required><br>
         <!-- <label for="password">Choose a Strong Password</label><br> -->
-        <input type="password" name="password" placeholder="Choose a Strong Password" required>
-        <br><br>
+        <input type="password" name="password" placeholder="Choose a Strong Password" required><br><br>
         <input type="checkbox" id="verify" name="verify" required><label for="verify">I consent to the site's terms and
-          policies.</label>
-        <br><br>
+          policies.</label><br><br>
         <input type="submit" value="Sign up">
+        <div id="register-fail" style="display: none; color: red;"></div>
       </form>
+
       <br>
       <div class="yes-account-text">
-        <br>
         <span>Already have an account?</span>
         <a href="/login">Login here</a>
       </div>

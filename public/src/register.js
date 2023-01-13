@@ -1,18 +1,36 @@
-socket.on("usernameExists", () => {
-    $("#nameTaken").show();
-});
-
-socket.on("accountCreated", () => {
-    alert("Your account has been created! Please sign in.");
-    window.location.href = "/login";
-});
-
-$(document).ready(function () {
-    $("#registerButton").unbind("click").on("click", e => {
-        let usernameInput = $("#usernameInput").val();
-        let passwordInput = $("#passwordInput").val();
-        if (usernameInput && passwordInput) {
-            socket.emit("register", { username: usernameInput, password: passwordInput });
-        }
+$(function () {
+    $('#register-form').on('submit', function (e) {
+        e.preventDefault();
+        let data = $("#register-form").serialize();
+        $.post("/register", data, (response) => {
+            if (response.success) {
+                $.post("/login", data, () => {
+                    window.location.href = "/home";
+                });
+            } else {
+                $("#register-fail").html(response.reason);
+                $("#register-fail")[0].style.display = "inherit";
+            }
+        });
     });
 });
+
+
+// socket.on("usernameExists", () => {
+//     $("#nameTaken").show();
+// });
+
+// socket.on("accountCreated", () => {
+//     alert("Your account has been created! Please sign in.");
+//     window.location.href = "/login";
+// });
+
+// $(document).ready(function () {
+//     $("#registerButton").unbind("click").on("click", e => {
+//         let usernameInput = $("#usernameInput").val();
+//         let passwordInput = $("#passwordInput").val();
+//         if (usernameInput && passwordInput) {
+//             socket.emit("register", { username: usernameInput, password: passwordInput });
+//         }
+//     });
+// });
