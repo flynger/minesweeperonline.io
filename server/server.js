@@ -205,7 +205,7 @@ io.on("connection", (socket) => {
                 console.log("clearing cells around cell:", data);
                 for (let v = -1; v <= 1; v++) {
                     for (let h = -1; h <= 1; h++) {
-                        if (board.CLEARED[y + v][x + h] === "?" && x + h < board.WIDTH && y + v < board.HEIGHT) { // space does weird stuff !!! check
+                        if (board.checkCell(x + h, y + v, ["?"])) { // space does weird stuff !!! check
                             board.CLEARQUEUE.push([x + h, y + v]);
                             board.CLEARED[y + v][x + h] = "Q";
                         }

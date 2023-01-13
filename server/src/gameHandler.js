@@ -171,7 +171,7 @@ module.exports = (server) => {
             }
             // check the 'visible' value of a cell
             checkCell(x, y, options) {
-                return this.GRID[y] && this.GRID[y][x] != undefined && options.includes(this.CLEARED[y][x]);
+                return this.GRID[y] && this.GRID[y][x] != undefined && options && options.includes(this.CLEARED[y][x]);
             }
             // random number between min and max inclusive
             randomNumber(min, max) {
