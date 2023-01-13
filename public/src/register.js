@@ -4,9 +4,7 @@ $(function () {
         let data = $("#register-form").serialize();
         $.post("/register", data, (response) => {
             if (response.success) {
-                $.post("/login", data, () => {
-                    window.location.href = "/home";
-                });
+                window.location.href = "/home";
             } else {
                 $("#register-fail").html(response.reason);
                 $("#register-fail")[0].style.display = "inherit";
