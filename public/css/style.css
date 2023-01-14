@@ -97,9 +97,9 @@ body {
     cursor: pointer;
 } */
 
-#site {
-    margin-left: 10px;
-    margin-right: 10px;
+.site {
+    margin-left: 40px;
+    margin-right: 40px;
 }
 
 #loader {
