@@ -109,4 +109,5 @@ th {
 
 .button:hover {
   background-color: #2C8F30;
+  cursor: pointer;
 }

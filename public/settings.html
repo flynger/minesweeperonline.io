@@ -27,7 +27,7 @@
 <div id="header"></div>
 
 <body oncontextmenu="return false;">
-  <div class="site">
+  <div class="site" style="display: flex; justify-content: center;">
     <br>
     <div id="settings-tabs">
       <ul>
@@ -38,7 +38,7 @@
         <li><a href="#privacy">Privacy</a></li>
       </ul>
       <!-- <div id="general">
-        <h2>General</h2>
+        <h1>General</h1>
         <p> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
           dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex
           ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat
@@ -46,32 +46,45 @@
           anim id est laborum.</p>
       </div> -->
       <div id="appearance">
-        <h2>Appearance</h2>
+        <h1>Appearance</h1>
         <div id="themes">
-          <label><strong>Themes</strong></label>
-          <div id="light-theme" class="settings-sections">
-            <label>Light Theme</label>
-            <br>
-            <img src="res/light_game_example.png">
-          </div>
-          <div id="dark-theme" class="settings-sections">
-            <label>Dark Theme</label>
-            <br>
-            <img src="res/dark_game_example.png">
-          </div>
+          <label><input class="settings-radio" type="radio" name="theme" value="LIGHT"> <strong>Light
+              Theme</strong><label>
+              <br>
+              <div id="light-theme" class="settings-section">
+                <img src="res/light_game_example.png">
+              </div>
+              <br>
+              <label><input class="settings-radio" type="radio" name="theme" value="DARK"> <strong>Dark
+                  Theme</strong><label>
+                  <br>
+                  <div id="dark-theme" class="settings-section">
+                    <img src="res/dark_game_example.png">
+                  </div>
         </div>
       </div>
-        <div id="controls">
-          <h2>Controls</h2>
+      <div id="controls">
+        <h1>Controls</h1>
+        <p><strong>Chording</strong></p>
+        <div class="switch-field">
+          <input type="radio" id="control-one" name="switch" value="LCLICK" checked />
+          <label for="control-one">Left Click</label>
+          <input type="radio" id="control-two" name="switch" value="LRCLICK" />
+          <label for="control-two">Left Click + Right Click</label>
+          <input type="radio" id="control-three" name="switch" value="SPACEBAR" />
+          <label for="control-three">Spacebar</label>
+          <input type="radio" id="control-four" name="switch" value="ALL" />
+          <label for="control-four">All</label>
         </div>
-        <div id="account">
-          <h2>Account</h2>
-        </div>
-        <div id="privacy">
-          <h2>Privacy</h2>
-        </div>
+      </div>
+      <div id="account">
+        <h1>Account</h1>
+      </div>
+      <div id="privacy">
+        <h1>Privacy</h1>
       </div>
     </div>
+  </div>
 </body>
 
 </html>
