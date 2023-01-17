@@ -29,7 +29,7 @@
 <body oncontextmenu="return false;">
   <div class="site" style="display: flex; justify-content: center;">
     <br>
-    <div id="settings-tabs">
+    <div id="settings-tabs" ondragstart="return false;" ondrop="return false;">
       <ul>
         <!-- <li><a href="#general">General</a></li> -->
         <li><a href="#appearance">Appearance</a></li>
@@ -48,7 +48,7 @@
       <div id="appearance">
         <h1>Appearance</h1>
         <div id="themes">
-          <label><input class="settings-radio" type="radio" name="theme" value="LIGHT"> <strong>Light
+          <label><input class="settings-radio" type="radio" name="theme" value="LIGHT" > <strong>Light
               Theme</strong><label>
               <br>
               <div id="light-theme" class="settings-section">
@@ -67,13 +67,13 @@
         <h1>Controls</h1>
         <p><strong>Chording</strong></p>
         <div class="switch-field">
-          <input type="radio" id="control-one" name="switch" value="LCLICK" checked />
+          <input type="radio" id="control-one" name="switch" value="LCLICK"/>
           <label for="control-one">Left Click</label>
           <input type="radio" id="control-two" name="switch" value="LRCLICK" />
           <label for="control-two">Left Click + Right Click</label>
           <input type="radio" id="control-three" name="switch" value="SPACEBAR" />
           <label for="control-three">Spacebar</label>
-          <input type="radio" id="control-four" name="switch" value="ALL" />
+          <input type="radio" id="control-four" name="switch" value="ALL" checked />
           <label for="control-four">All</label>
         </div>
       </div>
