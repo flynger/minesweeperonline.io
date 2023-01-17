@@ -82,4 +82,5 @@
 #settings-tabs {
     width: 52em;
     display: flex;
+    margin-top: 20px;
 }
