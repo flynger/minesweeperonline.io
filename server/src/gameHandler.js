@@ -18,11 +18,6 @@ module.exports = (server) => {
                 this.connectedSessions = sessions;
 
                 //console.log(server.players[username]);
-                if (server.players.hasOwnProperty(username)) {
-                    server.players[username].currentGame = this.CLEARED;
-                    server.players[username].currentGameOver = this.GAMEOVER;
-                    server.players[username].currentWin = this.WIN;
-                }
 
                 for (let v = -1; v <= 1; v++) {
                     for (let h = -1; h <= 1; h++) {
@@ -69,32 +64,17 @@ module.exports = (server) => {
                             if (this.GRID[row][col] === "X") {
                                 if (!isFlagged && this.CLEARED[row][col] != "RX") {
                                     this.CLEARED[row][col] = "X";
-                                    // if (server.players.hasOwnProperty(username)) {
-                                    //     server.players[username].currentGame[row][col] = "X";
-                                    // }
                                 }
                             }
                             else if (isFlagged) {
                                 this.CLEARED[row][col] = "FX";
-                                // if (server.players.hasOwnProperty(username)) {
-                                //     server.players[username].currentGame[row][col] = "FX";
-                                // }
                             }
                         }
                     }
                     this.CLEARED[y][x] = "RX";
-                    if (server.players.hasOwnProperty(username)) {
-                        server.players[username].currentGame[y][x] = "RX";
-                    }
                     this.GAMEOVER = true; // game over
-                    if (server.players.hasOwnProperty(username)) {
-                        server.players[username].currentGameOver = true;
-                    }
                 } else {
                     this.CLEARED[y][x] = this.GRID[y][x];
-                    if (server.players.hasOwnProperty(username)) {
-                        server.players[username].currentGame[y][x] = this.GRID[y][x];
-                    }
                     this.CLEAREDCELLS++;
                     if (this.GRID[y][x] === 0) {
                         for (let v = -1; v <= 1; v++) {
@@ -112,37 +92,18 @@ module.exports = (server) => {
                             for (let col in this.GRID[row]) {
                                 if (this.GRID[row][col] === "X") {
                                     this.CLEARED[row][col] = "F";
-                                    if (server.players.hasOwnProperty(username)) {
-                                        server.players[username].currentGame[row][col] = "F";
-                                    }
                                 }
                             }
                         }
                         this.GAMEOVER = true;
-                        if (server.players.hasOwnProperty(username)) {
-                            server.players[username].currentGameOver = true;
-                        }
                         this.WIN = true;
-                        if (server.players.hasOwnProperty(username)) {
-                            server.players[username].currentWin = true;
-                        }
                     }
                 }
-                //updates currentGame for others to spectate
-                // console.log("before this ", this);
-                // console.log("before currentgame", server.players.currentGame);
-                // server.players.currentGame = this.CLEARED;
-                // server.players.currentGameStatus = this.GAMEOVER;
-                // // console.log("after this ", this);
-                // console.log("after currentgame", server.players.currentGame);
             }   
             // flags a cell
             flagCell(x, y, username) {
                 if (this.checkCell(x, y, ["?"])) {
                     this.CLEARED[y][x] = "F";
-                    // if (server.players.hasOwnProperty(username)) {
-                    //     server.players[username].currentGame[y][x] = "F";
-                    // }
                     return true;
                 }
                 return false;
@@ -150,9 +111,6 @@ module.exports = (server) => {
             unflagCell(x, y, username) {
                 if (this.checkCell(x, y, ["F"])) {
                     this.CLEARED[y][x] = "?";
-                    // if (server.players.hasOwnProperty(username)) {
-                    //     server.players[username].currentGame[y][x] = "F";
-                    // }
                     return true;
                 }
                 return false;

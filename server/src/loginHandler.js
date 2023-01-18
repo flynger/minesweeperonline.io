@@ -22,7 +22,7 @@ module.exports = (server) => {
                 return { success: false, reason: "Invalid username. A username may only include alphanumeric characters, underscores, and be a length of 3 to 16 characters." };
             } else {
                 accounts[username] = password;
-                players[username] = { username, displayName, wins: 0, losses: 0, gamesCreated: 0, currentGame: null, currentGameOver: null, currentWin: null, currentTime: null };
+                players[username] = { username, displayName, wins: 0, losses: 0, gamesCreated: 0 };
                 console.log(`signed up, Username: ${username} Password: ${password}`);
                 console.log(players);
                 loginHandler.loginAccount(req);
@@ -30,14 +30,14 @@ module.exports = (server) => {
             }
         },
         loginAccount: (req) => {
+            let displayName = req.body.username;
             let username = req.body.username.toLowerCase();
             if (accounts[username] === req.body.password) {
                 req.session.username = username;
                 req.session.isGuest = false;
-                if (!server.players[username]) {
-                    
+                if (!players[username]) {
+                    players[username] = { username, displayName, wins: 0, losses: 0, gamesCreated: 0 };
                 }
-                server.players[username].board = null;
                 return { success: true };
                 // server.gameHandler.socketToPlayer[socket.id] = username;
                 // socket.emit("loginSuccess");
@@ -46,6 +46,12 @@ module.exports = (server) => {
             }
         },
         saveData: () => {
+            for (let p in players) {
+                let plyr = players[p];
+                if (plyr.isGuest) {
+                    delete players[p]
+                } else delete plyr.board;
+            }
             jsonfile.writeFileSync("./data/players.json", players);
             jsonfile.writeFileSync("./data/accounts.json", accounts);
         }

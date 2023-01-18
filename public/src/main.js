@@ -24,6 +24,7 @@ $(document).ready(() => {
     let paths = window.location.pathname.split("/");
     console.log(paths);
     if (paths.length > 2 && paths[1] === 'spectate') {
+        alert(2)
         socket.emit('spectate', paths[2]);
     }
 
