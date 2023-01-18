@@ -202,7 +202,7 @@ io.on("connection", (socket) => {
         if (board != null) {
             let { x, y } = data;
             if (x < board.WIDTH && y < board.HEIGHT && board.satisfyFlags(x, y)) {
-                console.log("clearing cells around cell:", data);
+                // console.log("clearing cells around cell:", data);
                 for (let v = -1; v <= 1; v++) {
                     for (let h = -1; h <= 1; h++) {
                         if (board.checkCell(x + h, y + v, ["?"])) { // space does weird stuff !!! check
