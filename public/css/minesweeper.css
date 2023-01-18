@@ -1,4 +1,4 @@
-/* .night-mode .z100 #game div {
+/* .dark-mode .z100 #game div {
     background-image: url('../res/sprites-night.png')
 } */
 
@@ -667,7 +667,7 @@
     /*filter: invert(100%) hue-rotate(80deg);*/
 }
 
-.night-mode .z200 #game div {
+.dark-mode .z200 #game div {
     background-image: url('../res/darksprites.png');
 }
 

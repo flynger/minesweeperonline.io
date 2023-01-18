@@ -19,10 +19,10 @@ $(document).ready(() => {
     minesweeper.startGame();
     setupChat();
 
-    console.log("some setup");
+    // console.log("some setup");
     //checking spectate
     let paths = window.location.pathname.split("/");
-    console.log(paths);
+    // console.log(paths);
     if (paths.length > 2 && paths[1] === 'spectate') {
         socket.emit('spectate', paths[2]);
     }
