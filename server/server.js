@@ -53,6 +53,16 @@ app.get("/spectate", (req, res) => {
         // socket.emit("boardData", { board: currentGame.board.CLEARED, gameOver: currentGame.board.GAMEOVER, startSpectating: true, time:currentGame.board.TIME });
     } else res.redirect("/play");
 });
+app.post("/spectate", (req, res) => {
+    let requestedUsername = req.query.name;
+    // check if the requested user is currently playing
+    //to be implemented: hasPlayer and getPlayer
+    if (server.players.hasOwnProperty(requestedUsername)) {
+        let currentGame = server.players[requestedUsername];
+        // send the current board data to the client
+        socket.emit("boardData", { board: currentGame.board.CLEARED, gameOver: currentGame.board.GAMEOVER, startSpectating: true, time:currentGame.board.TIME });
+    } else res.redirect("/play");
+});
 app.get("/profile", (req, res) => {
     res.sendFile('profile.html', { root: '../public' });
 });
@@ -102,8 +112,9 @@ var loginHandler = require("./src/loginHandler")(server);
 // var playerHandler = require("./src/playerHandler")(server);
 
 io.on("connection", (socket) => {
-    let session = socket.request.session;
+    let { session, sessionID } = socket.request;
     session.socket = socket;
+    let username = socket.username = session.username;
     if (!session.username) {
         session.isGuest = true;
         session.username = "Guest " + uniqueNamesGenerator({
@@ -111,10 +122,11 @@ io.on("connection", (socket) => {
             separator: " ",
             style: "capital"
         }); // big_red_donkey
+        socket.username = username = sessionID;
+        server.players[username] = { username , displayName: session.username, wins: 0, losses: 0, gamesCreated: 0, isGuest: true };
     }
-    let username = session.username;
-    socket.username = username;
-    server.onlinePlayers.push(username);
+    
+    server.onlinePlayers.push(server.players[username].displayName);
     let board = null;
 
     // connect event
@@ -147,22 +159,14 @@ io.on("connection", (socket) => {
         if (board != null) {
             board.reset();
             board = null;
-            if (server.players.hasOwnProperty(socket.username)) {
-                server.players[socket.username].currentGame = null;
-                server.players[socket.username].currentGameOver = null;
-            }
         }
-        board = new Minesweeper.Board(settings, [socket], socket.username);
+        server.players[username].board = board = new Minesweeper.Board(settings, [socket], username);
         board.clearQueue();
         board.startTimer();
         socket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER, win: board.WIN });
         if (board.GAMEOVER) {
             board.reset(true);
             board = null;
-            if (server.players.hasOwnProperty(socket.username)) {
-                server.players[socket.username].currentGame = null;
-                server.players[socket.username].currentGameOver = null;
-            }
         }
     });
 
@@ -170,10 +174,6 @@ io.on("connection", (socket) => {
         if (board != null) {
             board.reset();
             board = null;
-            if (server.players.hasOwnProperty(socket.username)) {
-                server.players[socket.username].currentGame = null;
-                server.players[socket.username].currentGameOver = null;
-            }
         }
     });
 
@@ -189,10 +189,6 @@ io.on("connection", (socket) => {
                 if (board.GAMEOVER) {
                     board.reset(true);
                     board = null;
-                    if (server.players.hasOwnProperty(socket.username)) {
-                        server.players[socket.username].currentGame = null;
-                        server.players[socket.username].currentGameOver = null;
-                    }
                 }
             }
         }
@@ -218,10 +214,6 @@ io.on("connection", (socket) => {
                 if (board.GAMEOVER) {
                     board.reset(true);
                     board = null;
-                    if (server.players.hasOwnProperty(socket.username)) {
-                        server.players[socket.username].currentGame = null;
-                        server.players[socket.username].currentGameOver = null;
-                    }
                 }
             }
         }
@@ -249,7 +241,8 @@ io.on("connection", (socket) => {
 
     socket.on("spectate", (username) => {
         console.log("Emitting spectate data");
-        socket.emit("boardData", { board: server.players[username].currentGame, gameOver: server.players[username].currentGameOver, win: server.players[username].currentWin });
+        let player = server.players[username];
+        socket.emit("boardData", { board: player.board.CLEARED, gameOver: player.board.GAMEOVER, win: player.board.WIN });
     });
 
     // chat and room events
@@ -258,7 +251,7 @@ io.on("connection", (socket) => {
         if (result.error) {
             socket.emit("roomJoinFailure", { room: data.requestedRoom, error: result.error });
         } else if (result.success) {
-            socket.emit("roomJoinSuccess", { room: data.requestedRoom, messages: [`You connected as user: ${session.username}`, "Joined chat: " + data.requestedRoom] });
+            socket.emit("roomJoinSuccess", { room: data.requestedRoom, messages: [`You connected as user: ${server.players[username].displayName}`, "Joined chat: " + data.requestedRoom] });
         }
     });
 
@@ -274,13 +267,12 @@ io.on("connection", (socket) => {
         if (board != null) {
             board.reset();
             board = null;
-            if (server.players.hasOwnProperty(socket.username)) {
-                server.players[socket.username].currentGame = null;
-                server.players[socket.username].currentGameOver = null;
-            }
             console.log(color.red, "Deleted board for disconnected player");
         }
         delete session.socket;
+        if (session.isGuest) {
+            delete server.players[username];
+        }
     });
 });
 
