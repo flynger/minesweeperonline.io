@@ -322,13 +322,13 @@ class Minesweeper {
     }
     createKeyboardEvents() {
         $(document.body).unbind("keypress").on("keypress", e => {
-            if (e.which === KEYCODE.SPACE) {
+            if (e.which === KEYCODE.SPACE && e.target == document.body) {
                 // check SPACE
                 e.preventDefault();
                 if (this.hoverCell && this.hoverCell.hasClass("cell")) {
                     this.flagAndClear(this.hoverX, this.hoverY, true);
                 }
-            } else if (e.which === KEYCODE.BACKTICK) {
+            } else if (e.which === KEYCODE.BACKTICK && e.target == document.body) {
                 // check BACKTICK
                 e.preventDefault();
                 this.startGame();
