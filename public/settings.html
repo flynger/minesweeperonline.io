@@ -48,26 +48,26 @@
       <div id="appearance">
         <h1>Appearance</h1>
         <div id="themes">
-          <label><input class="settings-radio" type="radio" name="theme" value="LIGHT" > <strong>Light
-              Theme</strong><label>
-              <br>
-              <div id="light-theme" class="settings-section">
-                <img src="res/light_game_example.png">
-              </div>
-              <br>
-              <label><input class="settings-radio" type="radio" name="theme" value="DARK"> <strong>Dark
-                  Theme</strong><label>
-                  <br>
-                  <div id="dark-theme" class="settings-section">
-                    <img src="res/dark_game_example.png">
-                  </div>
+          <input class="settings-radio" id="light-theme" type="radio" name="theme" value="LIGHT" />
+          <label for="light-theme"><strong>Light Theme</strong></label>
+          <br>
+          <div class="settings-section">
+            <img src="res/light_game_example.png">
+          </div>
+          <br>
+          <input class="settings-radio" id="dark-theme" type="radio" name="theme" value="DARK">
+          <label for="dark-theme"><strong>Dark Theme</strong></label>
+          <br>
+          <div class="settings-section">
+            <img src="res/dark_game_example.png">
+          </div>
         </div>
       </div>
       <div id="controls">
         <h1>Controls</h1>
         <p><strong>Chording</strong></p>
         <div class="switch-field">
-          <input type="radio" id="control-one" name="switch" value="LCLICK"/>
+          <input type="radio" id="control-one" name="switch" value="LCLICK" />
           <label for="control-one">Left Click</label>
           <input type="radio" id="control-two" name="switch" value="LRCLICK" />
           <label for="control-two">Left Click + Right Click</label>
