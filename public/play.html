@@ -36,6 +36,7 @@
             //window.scrollTo(0, 0); //TODO: doesn't work
             if (localStorage.getItem("theme") === "DARK") {
                 $(".site").addClass("dark-mode");
+                DarkReader.setFetchMethod(window.fetch)
                 DarkReader.enable();
             }
         });

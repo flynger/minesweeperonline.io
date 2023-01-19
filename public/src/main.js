@@ -1,5 +1,9 @@
 var minesweeper;
 
+let { chording="ALL" } = localStorage
+// if (!chording) { localStorage.setItem("chording", "ALL") };
+var CHORDING = { setting: chording, isSPACE: chording === "SPACE", isLRCLICK: chording === "LRCLICK", isLCLICK: chording === "LCLICK" };
+
 // custom names for keycodes
 const KEYCODE = {
     LEFT_CLICK: 1, // LMB
@@ -15,10 +19,6 @@ const KEYCODE = {
 
 // code run on startup
 $(document).ready(() => {
-    let { chording } = localStorage;
-    if(!chording) {
-        localStorage.setItem("chording", "ALL")
-    }
     minesweeper = new Minesweeper();
     minesweeper.startGame();
     setupChat();
@@ -96,8 +96,6 @@ class Minesweeper {
             this.MIN = { height: 1, width: 8, mines: 1 },
             this.MAX = { height: 100, width: 50 },
             this.GRID = []
-            this.CHORDING = localStorage.getItem("chording");
-
     }
     startGame(isSpectating = false) {
         // tell server to stop game
@@ -226,17 +224,16 @@ class Minesweeper {
                     let [x, y] = this.getCellFromID(cell.attr("id"));
                     switch (e.which) {
                         case KEYCODE.LEFT_CLICK:
-                            if (this.boardExists && this.CHORDING === "SPACEBAR"){return};
                             if (cell.hasClass("blank")) {
                                 this.selectCell(x, y);
                                 $("#face").attr("class", "faceooh");
-                            } else if (this.cellIsClear(cell)) {
+                            } else if (!(this.boardExists && CHORDING.isSPACE ) && this.cellIsClear(cell)) {
                                 this.selectCells(x, y);
                                 $("#face").attr("class", "faceooh");
                             }
                             break;
                         case KEYCODE.RIGHT_CLICK:
-                            this.flagAndClear(x, y, e.which == KEYCODE.LEFT_CLICK);
+                            this.flagAndClear(x, y, CHORDING.isLRCLICK && e.which == KEYCODE.LEFT_CLICK);
                             break;
                         default:
                         // do nothing
@@ -260,8 +257,7 @@ class Minesweeper {
                                 }
                                 // this.clearCell(x, y);
                                 socket.emit("clearCell", { x: x, y: y });
-                            } else if (this.satisfyFlags(x, y)) {
-                                if(this.CHORDING === "SPACEBAR"){break};
+                            } else if (!CHORDING.isSPACE && this.satisfyFlags(x, y)) {
                                 this.clearCells(x, y, false);
                             }
                             else this.deselectCells(x, y);
@@ -331,11 +327,11 @@ class Minesweeper {
     }
     createKeyboardEvents() {
         $(document.body).unbind("keypress").on("keypress", e => {
-            if ((this.CHORDING === "ALL" || this.CHORDING === "SPACEBAR") && e.which === KEYCODE.SPACE && e.target == document.body) {
+            if (e.which === KEYCODE.SPACE && e.target == document.body) {
                 // check SPACE
                 e.preventDefault();
                 if (this.hoverCell && this.hoverCell.hasClass("cell")) {
-                    this.flagAndClear(this.hoverX, this.hoverY, true);
+                    this.flagAndClear(this.hoverX, this.hoverY, !(CHORDING.isLCLICK || CHORDING.isLRCLICK));
                 }
             } else if (e.which === KEYCODE.BACKTICK && e.target == document.body) {
                 // check BACKTICK

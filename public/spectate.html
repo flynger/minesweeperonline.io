@@ -25,6 +25,7 @@
             $("#footer").load("footer.html");
             //window.scrollTo(0, 0); //TODO: doesn't work
             if (localStorage.getItem("theme") === "DARK") {
+                DarkReader.setFetchMethod(window.fetch);
                 DarkReader.enable();
             }
         });

@@ -58,7 +58,7 @@
 }
 
 .flag {
-    background: url('res/flag.png') no-repeat;
+    background: url('../res/flag.png') no-repeat;
     background-size: 32px;
     image-rendering: pixelated;
     width: 32px;

@@ -21,7 +21,8 @@
       $("#footer").load("footer.html");
       $("#settings-tabs").tabs().addClass("ui-tabs-vertical ui-helper-clearfix");
       $("#settings-tabs li").removeClass("ui-corner-top").addClass("ui-corner-left");
-      if (localStorage.getItem("theme") === "DARK") {
+      if (localStorage.getItem("theme") === "DARK") { 
+        DarkReader.setFetchMethod(window.fetch);
         DarkReader.enable();
       }
     });
@@ -77,7 +78,7 @@
           <label for="control-one">Left Click</label>
           <input type="radio" id="control-two" name="chording" value="LRCLICK" />
           <label for="control-two">Left Click + Right Click</label>
-          <input type="radio" id="control-three" name="chording" value="SPACEBAR" />
+          <input type="radio" id="control-three" name="chording" value="SPACE" />
           <label for="control-three">Spacebar</label>
           <input type="radio" id="control-four" name="chording" value="ALL" checked />
           <label for="control-four">All</label>
