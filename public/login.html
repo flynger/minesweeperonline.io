@@ -6,7 +6,7 @@
   <!-- 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.0/socket.io.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
-
+  <script src="libraries/darkreader.js"></script>
   <script src="libraries/jquery-3.6.0.js"></script>
   <script src="libraries/jquery-ui.js"></script>
   <link href="libraries/jquery-ui.css" rel="stylesheet" />
@@ -16,7 +16,7 @@
   <link href="css/style.css" rel="stylesheet" />
   <link href="css/login.css" rel="stylesheet" />
   <!-- <script src="src/socket.js"></script> -->
-  <script src="src/login.js"></script> 
+  <script src="src/login.js"></script>
   <script>
     document.onreadystatechange = function () {
       if (document.readyState !== "complete") {
@@ -30,6 +30,9 @@
     $(function () {
       $("#header").load("header.html");
       $("#footer").load("footer.html");
+      if (localStorage.getItem("theme") === "DARK") {
+        DarkReader.enable();
+      }
     });
   </script>
 </head>
@@ -47,7 +50,7 @@
         <input type="text" name="username" placeholder="Username" required><br>
         <!-- <label for="password">Password</label><br> -->
         <input type="password" name="password" placeholder="Password" required><br>
-        <input id="login-button" type="submit" value="Login"/>
+        <input id="login-button" type="submit" value="Login" />
         <br>
         <div id="login-fail" style="display: none; color: red;"></div>
       </form>

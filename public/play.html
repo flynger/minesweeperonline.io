@@ -6,6 +6,7 @@
 
     <script src="libraries/jquery-3.6.0.js"></script>
     <script src="libraries/jquery-ui.js"></script>
+    <script src="libraries/darkreader.js"></script>
     <link href="libraries/jquery-ui.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
 
@@ -34,8 +35,8 @@
             $("#footer").load("footer.html");
             //window.scrollTo(0, 0); //TODO: doesn't work
             if (localStorage.getItem("theme") === "DARK") {
-                $("#game").css({ "background-color": "rgb(60, 65, 67)" });
                 $(".site").addClass("dark-mode");
+                DarkReader.enable();
             }
         });
     </script>
