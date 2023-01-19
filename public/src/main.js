@@ -15,6 +15,10 @@ const KEYCODE = {
 
 // code run on startup
 $(document).ready(() => {
+    let { chording } = localStorage;
+    if(!chording) {
+        localStorage.setItem("chording", "ALL")
+    }
     minesweeper = new Minesweeper();
     minesweeper.startGame();
     setupChat();
@@ -92,6 +96,8 @@ class Minesweeper {
             this.MIN = { height: 1, width: 8, mines: 1 },
             this.MAX = { height: 100, width: 50 },
             this.GRID = []
+            this.CHORDING = localStorage.getItem("chording");
+
     }
     startGame(isSpectating = false) {
         // tell server to stop game
@@ -220,6 +226,7 @@ class Minesweeper {
                     let [x, y] = this.getCellFromID(cell.attr("id"));
                     switch (e.which) {
                         case KEYCODE.LEFT_CLICK:
+                            if (this.boardExists && this.CHORDING === "SPACEBAR"){return};
                             if (cell.hasClass("blank")) {
                                 this.selectCell(x, y);
                                 $("#face").attr("class", "faceooh");
@@ -254,6 +261,7 @@ class Minesweeper {
                                 // this.clearCell(x, y);
                                 socket.emit("clearCell", { x: x, y: y });
                             } else if (this.satisfyFlags(x, y)) {
+                                if(this.CHORDING === "SPACEBAR"){break};
                                 this.clearCells(x, y, false);
                             }
                             else this.deselectCells(x, y);
@@ -323,7 +331,7 @@ class Minesweeper {
     }
     createKeyboardEvents() {
         $(document.body).unbind("keypress").on("keypress", e => {
-            if (e.which === KEYCODE.SPACE && e.target == document.body) {
+            if ((this.CHORDING === "ALL" || this.CHORDING === "SPACEBAR") && e.which === KEYCODE.SPACE && e.target == document.body) {
                 // check SPACE
                 e.preventDefault();
                 if (this.hoverCell && this.hoverCell.hasClass("cell")) {
