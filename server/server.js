@@ -48,19 +48,17 @@ app.get("/spectate", (req, res) => {
     if (server.players.hasOwnProperty(requestedUsername)) {
         console.log({ requestedUsername });
         res.sendFile('play.html', { root: '../public' });
-        // let currentGame = Minesweeper.getPlayerGame(requestedUsername);
-        // // send the current board data to the client
-        // socket.emit("boardData", { board: currentGame.board.CLEARED, gameOver: currentGame.board.GAMEOVER, startSpectating: true, time:currentGame.board.TIME });
     } else res.redirect("/play");
 });
 app.post("/spectate", (req, res) => {
     let requestedUsername = req.query.name;
+    console.log(req.session.username);
     // check if the requested user is currently playing
     //to be implemented: hasPlayer and getPlayer
-    if (server.players.hasOwnProperty(requestedUsername)) {
-        let currentGame = server.players[requestedUsername];
-        // send the current board data to the client
-        socket.emit("boardData", { board: currentGame.board.CLEARED, gameOver: currentGame.board.GAMEOVER, startSpectating: true, time:currentGame.board.TIME });
+    if (req.session.username && server.players.hasOwnProperty(requestedUsername) && server.players[requestedUsername].board) {
+        res.send({ success: true });
+        let currentGame = server.players[requestedUsername].board;
+        server.players[req.session.username].socket.emit("boardData", { board: currentGame.CLEARED, gameOver: currentGame.GAMEOVER, startSpectating: true, time: currentGame.TIME }); // send the current board data to the client
     } else res.redirect("/play");
 });
 app.get("/profile", (req, res) => {
