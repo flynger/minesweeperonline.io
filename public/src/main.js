@@ -1,6 +1,6 @@
 var minesweeper;
 
-let { chording="ALL" } = localStorage
+let { chording = "ALL" } = localStorage
 // if (!chording) { localStorage.setItem("chording", "ALL") };
 var CHORDING = { setting: chording, isSPACE: chording === "SPACE", isLRCLICK: chording === "LRCLICK", isLCLICK: chording === "LCLICK" };
 
@@ -222,18 +222,25 @@ class Minesweeper {
                 let cell = $(e.target);
                 if (cell.hasClass("cell")) {
                     let [x, y] = this.getCellFromID(cell.attr("id"));
+                    if (e.buttons === 3) {
+                        if (this.cellIsClear(cell) && CHORDING.isLRCLICK) {
+                            this.selectCells(x, y);
+                            $("#face").attr("class", "faceooh");
+                        }
+                        return;
+                    }
                     switch (e.which) {
                         case KEYCODE.LEFT_CLICK:
                             if (cell.hasClass("blank")) {
                                 this.selectCell(x, y);
                                 $("#face").attr("class", "faceooh");
-                            } else if (!(this.boardExists && CHORDING.isSPACE ) && this.cellIsClear(cell)) {
+                            } else if (!(this.boardExists && (CHORDING.isSPACE || CHORDING.isLRCLICK)) && this.cellIsClear(cell)) {
                                 this.selectCells(x, y);
                                 $("#face").attr("class", "faceooh");
                             }
                             break;
                         case KEYCODE.RIGHT_CLICK:
-                            this.flagAndClear(x, y, CHORDING.isLRCLICK && e.which == KEYCODE.LEFT_CLICK);
+                            this.flagAndClear(x, y, false);
                             break;
                         default:
                         // do nothing
@@ -246,6 +253,14 @@ class Minesweeper {
                 let cell = $(e.target);
                 if (cell.hasClass("cell")) {
                     let [x, y] = this.getCellFromID(cell.attr("id"));
+                    // doesn't work
+                    if (e.buttons === 3) {
+                        if (CHORDING.isLRCLICK && this.satisfyFlags(x, y)) {
+                            this.flagAndClear(x, y, true);
+                        } else this.deselectCells(x, y);
+                        $("#face").attr("class", "facesmile");
+                        return;
+                    }
                     switch (e.which) {
                         case KEYCODE.LEFT_CLICK:
                             if (cell.hasClass("selected")) {
@@ -257,10 +272,9 @@ class Minesweeper {
                                 }
                                 // this.clearCell(x, y);
                                 socket.emit("clearCell", { x: x, y: y });
-                            } else if (!CHORDING.isSPACE && this.satisfyFlags(x, y)) {
+                            } else if (!CHORDING.isSPACE && !CHORDING.isLRCLICK && this.satisfyFlags(x, y)) {
                                 this.clearCells(x, y, false);
-                            }
-                            else this.deselectCells(x, y);
+                            } else this.deselectCells(x, y);
                             $("#face").attr("class", "facesmile");
                             break;
                         default:
@@ -428,6 +442,7 @@ class Minesweeper {
         } else if (clearCondition && this.satisfyFlags(x, y)) {
             // if left click is on, clear cells
             socket.emit("clearCells", { x, y });
+            console.log("t")
             this.clearCells(x, y);
         }
     }
