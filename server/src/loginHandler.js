@@ -22,7 +22,7 @@ module.exports = (server) => {
                 return { success: false, reason: "Invalid username. A username may only include alphanumeric characters, underscores, and be a length of 3 to 16 characters." };
             } else {
                 accounts[username] = password;
-                players[username] = { username, displayName, wins: 0, losses: 0, gamesCreated: 0 };
+                players[username] = { username, displayName, wins: 0, losses: 0, gamesCreated: 0, connected: false };
                 console.log(`signed up, Username: ${username} Password: ${password}`);
                 console.log(players);
                 loginHandler.loginAccount(req);
@@ -36,7 +36,7 @@ module.exports = (server) => {
                 req.session.username = username;
                 req.session.isGuest = false;
                 if (!players[username]) {
-                    players[username] = { username, displayName, wins: 0, losses: 0, gamesCreated: 0 };
+                    players[username] = { username, displayName, wins: 0, losses: 0, gamesCreated: 0, connected: false };
                 }
                 return { success: true };
                 // server.gameHandler.socketToPlayer[socket.id] = username;
@@ -50,7 +50,11 @@ module.exports = (server) => {
                 let plyr = players[p];
                 if (plyr.isGuest) {
                     delete players[p]
-                } else delete plyr.board;
+                } else {
+                    delete plyr.board;
+                    delete plyr.socket;
+                    plyr.connected = false;
+                }
             }
             jsonfile.writeFileSync("./data/players.json", players);
             jsonfile.writeFileSync("./data/accounts.json", accounts);

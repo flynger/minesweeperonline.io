@@ -123,9 +123,10 @@ io.on("connection", (socket) => {
             style: "capital"
         }); // big_red_donkey
         socket.username = username = sessionID;
-        server.players[username] = { username , displayName: session.username, wins: 0, losses: 0, gamesCreated: 0, isGuest: true };
-    }
-    
+        server.players[username] = { username, displayName: session.username, wins: 0, losses: 0, gamesCreated: 0, isGuest: true };
+    } 
+    server.players[username].connected = true;
+    server.players[username].socket = socket;
     server.onlinePlayers.push(server.players[username].displayName);
     let board = null;
 
@@ -160,7 +161,7 @@ io.on("connection", (socket) => {
             board.reset();
             board = null;
         }
-        server.players[username].board = board = new Minesweeper.Board(settings, [socket], username);
+        server.players[username].board = board = new Minesweeper.Board(settings, [username], username);
         board.clearQueue();
         board.startTimer();
         socket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER, win: board.WIN });

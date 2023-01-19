@@ -2,7 +2,7 @@ module.exports = (server) => {
     var gameHandler = {
         Board: class {
             // creates a board
-            constructor({ startX, startY, width, height, mines }, sessions, username) {
+            constructor({ startX, startY, width, height, mines }, players, username) {
                 console.log("Board created!");
                 this.WIDTH = width, this.HEIGHT = height;
                 this.GRID = new Array(height).fill("").map(x => new Array(width).fill("0"));
@@ -13,9 +13,9 @@ module.exports = (server) => {
                 this.GAMEOVER = this.WIN = false;
                 this.CLEARQUEUE = [];
                 this.TIMESTAMPS = [];
-                this.connectedPlayers = [];
+                this.PLAYERS = players;
                 // remove when ^ is functional
-                this.connectedSessions = sessions;
+                // this.connectedSessions = sessions;
 
                 //console.log(server.players[username]);
 
@@ -99,7 +99,7 @@ module.exports = (server) => {
                         this.WIN = true;
                     }
                 }
-            }   
+            }
             // flags a cell
             flagCell(x, y, username) {
                 if (this.checkCell(x, y, ["?"])) {
@@ -145,8 +145,11 @@ module.exports = (server) => {
                 this.timer = setInterval(() => {
                     this.TIME++;
                     // console.log("counting time: ", this.TIME);
-                    for (let player of this.connectedSessions) {
-                        player.emit("boardTime", { time: this.TIME });
+                    for (let i of this.PLAYERS) {
+                        let player = server.players[i];
+                        if (player && player.connected) {
+                            player.socket.emit("boardTime", { time: this.TIME });
+                        }
                     }
                 }, 1000);
                 this.START_TIME = Date.now();
@@ -159,13 +162,17 @@ module.exports = (server) => {
             reset(sendStats) {
                 // stops timer and deletes reference to board, letting it be deleted by garbage collector
                 this.stopTimer();
-                let players = []
-                // socket.username
-                for (let player of this.connectedSessions) {
-                    if (sendStats) {
-                        player.emit("gameStats", { time: this.GAMEDURATION, players: [player.username] });
+                let playersList = this.PLAYERS.map(x => server.players.hasOwnProperty(x) ? server.players[x].displayName : "A Guest");
+                for (let i of this.PLAYERS) {
+                    if (server.players.hasOwnProperty(i)) {
+                        let player = server.players[i];
+                        if (player.connected) {
+                            if (sendStats) {
+                                player.socket.emit("gameStats", { time: this.GAMEDURATION, players: playersList });
+                            }
+                        }
+                        delete player.board;
                     }
-                    delete player.board;
                 }
             }
         },
