@@ -1,6 +1,6 @@
 var minesweeper;
 
-let { chording="ALL" } = localStorage
+let { chording = "ALL" } = localStorage
 // if (!chording) { localStorage.setItem("chording", "ALL") };
 var CHORDING = { setting: chording, isSPACE: chording === "SPACE", isLRCLICK: chording === "LRCLICK", isLCLICK: chording === "LCLICK" };
 
@@ -18,58 +18,67 @@ const KEYCODE = {
 };
 
 // code run on startup
-$(document).ready(() => {
+$(function () {
     minesweeper = new Minesweeper();
-    minesweeper.startGame();
-    setupChat();
-
-    // console.log("some setup");
     //checking spectate
     let paths = window.location.pathname.split("/");
-    // console.log(paths);
-    if (paths.length > 2 && paths[1] === 'spectate') {
-        alert(2)
-        socket.emit('spectate', paths[2]);
-    }
-
-    // set difficulty setting mins and maxes
-    $("#custom_height").attr({
-        "min": minesweeper.MIN.height,
-        "max": minesweeper.MAX.height
-    });
-    $("#custom_width").attr({
-        "min": minesweeper.MIN.width,
-        "max": minesweeper.MAX.width
-    });
-    // setup events
-    $("input[name='difficulty']").on("click", e => {
-        e.target.blur();
-    });
-    $(".difficulty-select").on("change", () => {
-        // limit height and width
-        limitInput($("#custom_height"), minesweeper.MIN.height, minesweeper.MAX.height)
-        limitInput($("#custom_width"), minesweeper.MIN.width, minesweeper.MAX.width)
-
-        // limit mines
-        let maxMines = +$("#custom_height").val() * +$("#custom_width").val() - 1;
-        limitInput($("#custom_mines"), minesweeper.MIN.mines, maxMines)
-
-        // update mins and maxes of element
-        $("#custom_mines").attr({
-            "min": minesweeper.MIN.mines,
-            "max": maxMines
+    if (paths.length == 2 && paths[1] === 'spectate') {
+        minesweeper.startGame(true);
+        // socket.emit('spectate', paths[2]);
+        $.post(window.location.pathname + window.location.search, "", (response) => {
+            if (response.success) {
+                console.log("received spectate success");
+                
+            } else {
+                alert("player is not in a game");
+                window.location.href = "/play";
+            }
         });
+    } else {
+        minesweeper.startGame(false);
+        let { chording } = localStorage;
+        if (!chording) {
+            localStorage.setItem("chording", "ALL");
+        }
+        // set difficulty setting mins and maxes
+        $("#custom_height").attr({
+            "min": minesweeper.MIN.height,
+            "max": minesweeper.MAX.height
+        });
+        $("#custom_width").attr({
+            "min": minesweeper.MIN.width,
+            "max": minesweeper.MAX.width
+        });
+        // setup events
+        $("input[name='difficulty']").on("click", e => {
+            e.target.blur();
+        });
+        $(".difficulty-select").on("change", () => {
+            // limit height and width
+            limitInput($("#custom_height"), minesweeper.MIN.height, minesweeper.MAX.height)
+            limitInput($("#custom_width"), minesweeper.MIN.width, minesweeper.MAX.width)
 
-        minesweeper.updateCustomSettings();
-    });
-    $(".difficulty-select").on("mousedown", () => {
-        $('#custom').prop('checked', true);
-    });
-    $("#startGame").on("click", e => {
-        e.target.blur();
-        minesweeper.startGame();
-    });
+            // limit mines
+            let maxMines = +$("#custom_height").val() * +$("#custom_width").val() - 1;
+            limitInput($("#custom_mines"), minesweeper.MIN.mines, maxMines)
 
+            // update mins and maxes of element
+            $("#custom_mines").attr({
+                "min": minesweeper.MIN.mines,
+                "max": maxMines
+            });
+
+            minesweeper.updateCustomSettings();
+        });
+        $(".difficulty-select").on("mousedown", () => {
+            $('#custom').prop('checked', true);
+        });
+        $("#startGame").on("click", e => {
+            e.target.blur();
+            minesweeper.startGame();
+        });
+    }
+    setupChat(); // chat setup
     $(document).unbind("keypress").on("keypress", e => {
         if ((e.which === KEYCODE.T || e.which === KEYCODE.t) && e.target == document.body) {
             // check BACKTICK
@@ -95,7 +104,8 @@ class Minesweeper {
             this.CUSTOM = { height: 20, width: 30, mines: 145 },
             this.MIN = { height: 1, width: 8, mines: 1 },
             this.MAX = { height: 100, width: 50 },
-            this.GRID = []
+            this.GRID = [],
+            this.SPECTATING = false
     }
     startGame(isSpectating = false) {
         // tell server to stop game
@@ -108,6 +118,7 @@ class Minesweeper {
         this.OPENCELLS = 0;
         this.FLAGS = this.SETTINGS.mines;
         this.hoverCell, this.hoverX, this.hoverY = null;
+        this.SPECTATING = isSpectating
 
         // reset board and input events
         this.GRID = new Array(this.SETTINGS.height).fill("").map(x => new Array(this.SETTINGS.width).fill("?"));
@@ -140,7 +151,7 @@ class Minesweeper {
 
         // - 48.5 when adding flag and time icon
         let margin = 364 - (this.TILE_SIZE / 2) * (30 - this.SETTINGS.width);
-        grid += this.createImg("facesmile", "face", "margin-left:" + margin + "px; margin-right: " + margin + "px;", "onclick='minesweeper.startGame()'");
+        grid += this.createImg("facesmile", "face", "margin-left:" + margin + "px; margin-right: " + margin + "px;", this.SPECTATING ? "" : "onclick='minesweeper.startGame()'");
         // grid += this.createImg("timeicon timeicon", "timeicon");
         grid += this.createImg("time0", "seconds_hundreds");
         grid += this.createImg("time0", "seconds_tens");
@@ -227,7 +238,7 @@ class Minesweeper {
                             if (cell.hasClass("blank")) {
                                 this.selectCell(x, y);
                                 $("#face").attr("class", "faceooh");
-                            } else if (!(this.boardExists && CHORDING.isSPACE ) && this.cellIsClear(cell)) {
+                            } else if (!(this.boardExists && CHORDING.isSPACE) && this.cellIsClear(cell)) {
                                 this.selectCells(x, y);
                                 $("#face").attr("class", "faceooh");
                             }
