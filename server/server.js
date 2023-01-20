@@ -169,6 +169,7 @@ io.on("connection", (socket) => {
         if (board != null) {
             for (let spectatorSocket of board.SPECTATORS) {
                 delete spectatorSocket.spectateBoard;
+                // spectatorSocket.emit("boardData", { gameOver: false, startSpectating: true, time: 0 });
             }
             board.reset();
             board = null;
