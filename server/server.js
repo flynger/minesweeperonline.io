@@ -142,17 +142,6 @@ io.on("connection", (socket) => {
         callback();
     });
 
-    // login events
-    // socket.on("login", (data) => {
-    //     console.log(`received login: ${JSON.stringify(data)}`);
-    //     loginHandler.loginAccount(socket, data);
-    // });
-
-    // socket.on("register", (data) => {
-    //     console.log(`received signup: ${JSON.stringify(data)}`);
-    //     loginHandler.registerAccount(socket, data);
-    // });
-
     // game events
     socket.on("createBoard", (settings) => {
         // if (req.session.username !== req.params.username) {

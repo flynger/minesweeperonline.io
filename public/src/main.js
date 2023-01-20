@@ -192,37 +192,6 @@ class Minesweeper {
         let otherText = other ? "' " + other : "";
         return "<div class='" + type + idText + styleText + otherText + "'></div>";
     }
-    // createBoard(startX, startY, width, height, mines) {
-    //     let grid = new Array(height).fill("");
-    //     for (let row in grid) {
-    //         grid[row] = new Array(width).fill("0");
-    //     }
-
-    //     for (let v = -1; v <= 1; v++) {
-    //         for (let h = -1; h <= 1; h++) {
-    //             if (grid[startY + v] && grid[startY + v][startX + h] && (width * height - mines >= 9 || (h == 0 && v == 0))) grid[startY + v][startX + h] = "SAFE";
-    //         }
-    //     }
-
-    //     while (mines > 0) {
-    //         let x = randomNumber(0, width - 1);
-    //         let y = randomNumber(0, height - 1);
-    //         if (grid[y][x] !== "X" && grid[y][x] !== "SAFE") {
-    //             grid[y][x] = "X";
-    //             mines--;
-    //         }
-    //     }
-
-    //     for (let row in grid) {
-    //         for (let col in grid[row]) {
-    //             if (grid[row][col] !== "X") {
-    //                 grid[row][col] = this.countMines(grid, +col, +row);
-    //             }
-    //         }
-    //     }
-    //     console.log(grid);
-    //     return grid;
-    // }
     createMouseEvents() {
         $("#game")
             .unbind("mousedown mouseup")
@@ -375,58 +344,6 @@ class Minesweeper {
         });
         return this.cellIsClear(this.getCanvasCell(x, y)) && this.getCanvasCell(x, y).hasClass("open" + flags);
     }
-    // clearCell(x, y) {
-    //     let cell = this.GRID[y][x];
-    //     let classToAdd;
-    //     // death check
-    //     if (cell === "X") {
-    //         for (let row in this.GRID) {
-    //             for (let col in this.GRID[row]) {
-    //                 let isFlagged = this.getCanvasCell(col, row).hasClass("bombflagged");
-    //                 if (this.GRID[row][col] === "X") {
-    //                     if (!isFlagged) {
-    //                         this.getCanvasCell(col, row).attr("class", "bombrevealed");
-    //                     }
-    //                 }
-    //                 else if (isFlagged) {
-    //                     this.getCanvasCell(col, row).attr("class", "bombmisflagged");
-    //                 }
-    //             }
-    //         }
-    //         $("#game").off();
-    //         classToAdd = "bombdeath";
-    //     } else {
-    //         classToAdd = "cell open" + cell;
-    //         this.OPENCELLS++;
-    //     }
-
-    //     // if there was a flag update counter
-    //     if (this.getCanvasCell(x, y).hasClass("bombflagged")) {
-    //         this.FLAGS++;
-    //         this.updateFlagCounter();
-    //     }
-
-    //     // open the cell
-    //     this.getCanvasCell(x, y).attr("class", classToAdd);
-
-    //     // checks if all possible cleared cells are cleared (win code)
-    //     if (this.OPENCELLS === this.TOTALCELLS) {
-    //         this.FLAGS = 0;
-    //         this.updateFlagCounter();
-    //         for (let row in this.GRID) {
-    //             for (let col in this.GRID[row]) {
-    //                 if (this.GRID[row][col] === "X") {
-    //                     this.getCanvasCell(col, row).attr("class", "bombflagged");
-    //                 }
-    //             }
-    //         }
-    //     }
-
-    //     // if a 0, open nearby cells
-    //     if (cell === 0) {
-    //         this.clearCells(x, y, true);
-    //     }
-    // }
     clearCells(x, y) { /* removed overrideFlags */
         // this.do3x3Operation(x, y, (thisX, thisY, thisCell) => {
         //     if (!this.cellIsClear(thisCell) && (thisCell.hasClass("blank") || thisCell.hasClass("selected"))) socket.emit("clearCell", { x: thisX, y: thisY });
@@ -440,17 +357,9 @@ class Minesweeper {
         let cell = this.getCanvasCell(x, y);
         if (cell.hasClass("blank")) {
             // if cell blank, add flag
-            // this.FLAGS--;
-            // this.updateFlagCounter();
-            // this.GRID[y][x] = "F";
-            // cell.attr("class", "cell bombflagged");
             socket.emit("addFlag", { x, y });
         } else if (cell.hasClass("bombflagged")) {
             // if flag, revert to blank
-            // this.FLAGS++;
-            // this.updateFlagCounter();
-            // this.GRID[y][x] = "?";
-            // cell.attr("class", "cell blank");
             socket.emit("removeFlag", { x, y });
         } else if (clearCondition && this.satisfyFlags(x, y)) {
             // if left click is on, clear cells
