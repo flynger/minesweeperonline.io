@@ -56,7 +56,7 @@ function setupChat() {
             if (cmdFormatMessage[0] == "/ping") {
                 addServerMessage("Your ping is " + latency + "ms.", currentChat.id);
             } else if (cmdFormatMessage.length > 1 && cmdFormatMessage[0] == "/spectate") {
-                alert("spectate?name=" + cmdFormatMessage[1]);
+                // alert("spectate?name=" + cmdFormatMessage[1]);
                 window.location.href = "spectate?name=" + cmdFormatMessage[1];
             } else {
                 socket.emit("chatMessage", { room: currentChat.id, msg: typedMessage });

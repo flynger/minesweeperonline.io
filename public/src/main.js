@@ -30,7 +30,7 @@ $(function () {
                 socket.emit("startSpectating", { name: response.username });
                 console.log("spectating " + response.username);
             } else {
-                alert("player is not in a game");
+                alert(response.reason);
                 window.location.href = "/play";
             }
         });
