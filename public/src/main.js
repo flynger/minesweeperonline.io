@@ -261,7 +261,7 @@ class Minesweeper {
                 if (cell.hasClass("cell")) {
                     let [x, y] = this.getCellFromID(cell.attr("id"));
                     // doesn't work
-                    if (this.LRCLICK) {
+                    if (this.LRCLICK && this.satisfyFlags(x, y)) {
                         if (this.satisfyFlags(x, y)) {
                             this.flagAndClear(x, y, true);
                         } else this.deselectCells(x, y);
