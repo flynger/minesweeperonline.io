@@ -51,8 +51,13 @@ function setupChat() {
         if ($("#chatInput:focus") && $("#chatInput").val() && e.which === KEYCODE.ENTER) {
             // send chat to server
             let typedMessage = $("#chatInput").val();
-            if (typedMessage == "/ping") {
+            let cmdFormatMessage = splitByFirstOccurrence(typedMessage, " ");
+            console.log(cmdFormatMessage);
+            if (cmdFormatMessage[0] == "/ping") {
                 addServerMessage("Your ping is " + latency + "ms.", currentChat.id);
+            } else if (cmdFormatMessage.length > 1 && cmdFormatMessage[0] == "/spectate") {
+                alert("spectate?name=" + cmdFormatMessage[1]);
+                window.location.href = "spectate?name=" + cmdFormatMessage[1];
             } else {
                 socket.emit("chatMessage", { room: currentChat.id, msg: typedMessage });
             }
@@ -109,4 +114,14 @@ function updateChatRooms() {
 function updateCurrentChat() {
     $("#chatText").html(currentChat.output);
     $("#chatText")[0].scrollTo(0, $("#chatText")[0].scrollHeight);
+}
+
+// util functions
+function splitByFirstOccurrence(str, sep) { // string, separator
+    if (!str) return [];
+    var i = str.indexOf(sep);
+    if (i > 0) {
+        return [str.substring(0, i), str.substring(i + 1)];
+    }
+    else return [str];
 }
