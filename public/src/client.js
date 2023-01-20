@@ -106,7 +106,9 @@ socket.on("boardTime", (data) => {
 socket.on("gameStats", (data) => {
     minesweeper.updateTimer(Math.floor(data.time));
     $("#player-name").html("Player" + (data.players.length > 1 ? "s" : "" ) + ": " + data.players.join(", "));
-    $("#spectator-name").html("Spectator" + (data.spectators.length !== 1 ? "s" : "" ) + ": " + (data.spectators.length > 0 ? data.spectators.join(", ") : "N/A"));
+    if(data.spectators.length > 0) {
+        $("#spectator-name").html("Spectator" + (data.spectators.length == 1 ? "" : "s") + ": " + data.spectators.join(", "));
+    }
     $("#time").html(data.time);
     $("#result").html(data.result);
     $("#result-block")[0].style.display = "inline-block";
