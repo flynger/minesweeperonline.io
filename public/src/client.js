@@ -48,16 +48,18 @@ socket.on("roomJoinFailure", (data) => {
 
 socket.on("boardData", (data) => {
     if (data.startSpectating) {
+        minesweeper.SETTINGS = data.settings;
         minesweeper.startGame(true);
         minesweeper.updateTimer(data.time);
+        if (!data.board) {
+            return;
+        }
     }
-    let win = true;
-    let death = false;
     for (let row in minesweeper.GRID) {
         for (let col in minesweeper.GRID[row]) {
-           if (minesweeper.GRID[row][col] != data.board[row][col]) {
+            if (minesweeper.GRID[row][col] != data.board[row][col]) {
                 let classToAdd = "";
-                let value =  data.board[row][col];
+                let value = data.board[row][col];
                 if (minesweeper.GRID[row][col] === "F") {
                     minesweeper.FLAGS++;
                 }
@@ -73,7 +75,7 @@ socket.on("boardData", (data) => {
                         break
                     case "X":
                         // bomb (gameover)
-                        classToAdd = "bombrevealed"; 
+                        classToAdd = "bombrevealed";
                         break
                     case "FX":
                         classToAdd = "bombmisflagged";
@@ -104,6 +106,8 @@ socket.on("boardTime", (data) => {
 socket.on("gameStats", (data) => {
     minesweeper.updateTimer(Math.floor(data.time));
     $("#player-name").html(data.players.join(", "));
+    $("#spectator-name").html(data.spectators.length > 0 ? data.spectators.join(", ") : "N/A");
     $("#time").html(data.time);
+    $("#result").html(data.result);
     $("#result-block")[0].style.display = "inline-block";
 });

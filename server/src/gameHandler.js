@@ -2,8 +2,9 @@ module.exports = (server) => {
     var gameHandler = {
         Board: class {
             // creates a board
-            constructor({ startX, startY, width, height, mines }, players, username) {
+            constructor({ startX, startY, width, height, mines }, players) {
                 console.log("Board created!");
+                this.SETTINGS = { width, height, mines };
                 this.WIDTH = width, this.HEIGHT = height;
                 this.GRID = new Array(height).fill("").map(x => new Array(width).fill("0"));
                 this.CLEARED = new Array(height).fill("").map(x => new Array(width).fill("?"));
@@ -14,10 +15,16 @@ module.exports = (server) => {
                 this.CLEARQUEUE = [];
                 this.TIMESTAMPS = [];
                 this.PLAYERS = players;
-                // remove when ^ is functional
-                // this.connectedSessions = sessions;
-
-                //console.log(server.players[username]);
+                this.SPECTATORS = [];
+                for (let p of this.PLAYERS) {
+                    let player = server.players[p];
+                    if (player.spectatorSockets) {
+                        for (let spectatorSocket of player.spectatorSockets) {
+                            spectatorSocket.spectateBoard = this;
+                        }
+                        this.SPECTATORS.push(...player.spectatorSockets);
+                    }
+                }
 
                 for (let v = -1; v <= 1; v++) {
                     for (let h = -1; h <= 1; h++) {
@@ -42,7 +49,7 @@ module.exports = (server) => {
                         }
                     }
                 }
-                this.clearCell(startX, startY, username);
+                this.clearCell(startX, startY);
             }
             // count mines while generating
             countMines(x, y) {
@@ -55,7 +62,7 @@ module.exports = (server) => {
                 return mines;
             }
             // clears a cell
-            clearCell(x, y, username) {
+            clearCell(x, y) {
                 // if (this.CLEARED[y][x] === "?" || this.CLEARED[y][x] === "Q") {
                 if (this.GRID[y][x] === "X") {
                     for (let row in this.GRID) {
@@ -101,14 +108,14 @@ module.exports = (server) => {
                 }
             }
             // flags a cell
-            flagCell(x, y, username) {
+            flagCell(x, y) {
                 if (this.checkCell(x, y, ["?"])) {
                     this.CLEARED[y][x] = "F";
                     return true;
                 }
                 return false;
             }
-            unflagCell(x, y, username) {
+            unflagCell(x, y) {
                 if (this.checkCell(x, y, ["F"])) {
                     this.CLEARED[y][x] = "?";
                     return true;
@@ -151,6 +158,9 @@ module.exports = (server) => {
                             player.socket.emit("boardTime", { time: this.TIME });
                         }
                     }
+                    for (let spectatorSocket of this.SPECTATORS) {
+                        spectatorSocket.emit("boardTime", { time: this.TIME });
+                    }
                 }, 1000);
                 this.START_TIME = Date.now();
             }
@@ -162,17 +172,23 @@ module.exports = (server) => {
             reset(sendStats) {
                 // stops timer and deletes reference to board, letting it be deleted by garbage collector
                 this.stopTimer();
-                let playersList = this.PLAYERS.map(x => server.players.hasOwnProperty(x) ? server.players[x].displayName : "A Guest");
+                let playersList = this.PLAYERS.map(name => server.players.hasOwnProperty(name) ? server.players[name].displayName : "A Guest");
+                let spectatorsList = this.SPECTATORS.map(socket => server.players[socket.username].displayName);
+                let result = this.WIN ? "Win" : "Loss";
                 for (let i of this.PLAYERS) {
                     if (server.players.hasOwnProperty(i)) {
                         let player = server.players[i];
-                        if (player.connected) {
-                            if (sendStats) {
-                                player.socket.emit("gameStats", { time: this.GAMEDURATION, players: playersList });
-                            }
+                        if (sendStats && player.connected) {
+                            player.socket.emit("gameStats", { time: this.GAMEDURATION, result: result, players: playersList, spectators: spectatorsList });
                         }
                         delete player.board;
                     }
+                }
+                for (let spectatorSocket of this.SPECTATORS) {
+                    if (sendStats) {
+                        spectatorSocket.emit("gameStats", { time: this.GAMEDURATION, result: result, players: playersList, spectators: spectatorsList });
+                    }
+                    delete spectatorSocket.spectateBoard;
                 }
             }
         },

@@ -52,14 +52,17 @@ app.get("/spectate", (req, res) => {
 });
 app.post("/spectate", (req, res) => {
     let requestedUsername = req.query.name;
-    console.log(req.session.username);
+    // console.log(req.session.username);
+    // console.log(req.sessionID);
     // check if the requested user is currently playing
     //to be implemented: hasPlayer and getPlayer
-    if (req.session.username && server.players.hasOwnProperty(requestedUsername) && server.players[requestedUsername].board) {
-        res.send({ success: true });
-        let currentGame = server.players[requestedUsername].board;
-        server.players[req.session.username].socket.emit("boardData", { board: currentGame.CLEARED, gameOver: currentGame.GAMEOVER, startSpectating: true, time: currentGame.TIME }); // send the current board data to the client
-    } else res.redirect("/play");
+    if (server.players.hasOwnProperty(requestedUsername) && server.players[requestedUsername].connected) {
+        res.send({ success: true, username: requestedUsername });
+    } else if (!server.players.hasOwnProperty(requestedUsername)) {
+        res.send({ success: false, reason: "A player with the requested username does not exist." });
+    } else {
+        res.send({ success: false, reason: server.players[requestedUsername].displayName + " is not online!" });
+    }
 });
 app.get("/profile", (req, res) => {
     res.sendFile('profile.html', { root: '../public' });
@@ -111,7 +114,6 @@ var loginHandler = require("./src/loginHandler")(server);
 
 io.on("connection", (socket) => {
     let { session, sessionID } = socket.request;
-    session.socket = socket;
     let username = socket.username = session.username;
     if (!session.username) {
         session.isGuest = true;
@@ -120,16 +122,18 @@ io.on("connection", (socket) => {
             separator: " ",
             style: "capital"
         }); // big_red_donkey
-        socket.username = username = sessionID;
+        socket.username = username = session.username;//sessionID;
         server.players[username] = { username, displayName: session.username, wins: 0, losses: 0, gamesCreated: 0, isGuest: true };
     }
     server.players[username].connected = true;
-    server.players[username].socket = socket;
+    server.players[username].socket = session.socket = socket;
     server.onlinePlayers.push(server.players[username].displayName);
     let board = null;
 
     // connect event
     console.log(color.green, socket.id);
+    // console.log(Object.keys(server.players));
+    // console.log(session);
     // chatHandler.joinSocketToRoom(socket, "global");
     // chatHandler.joinSocketToRoom(socket, "room");
 
@@ -137,6 +141,17 @@ io.on("connection", (socket) => {
     socket.on("ping", (callback) => {
         callback();
     });
+
+    // login events
+    // socket.on("login", (data) => {
+    //     console.log(`received login: ${JSON.stringify(data)}`);
+    //     loginHandler.loginAccount(socket, data);
+    // });
+
+    // socket.on("register", (data) => {
+    //     console.log(`received signup: ${JSON.stringify(data)}`);
+    //     loginHandler.registerAccount(socket, data);
+    // });
 
     // game events
     socket.on("createBoard", (settings) => {
@@ -148,10 +163,13 @@ io.on("connection", (socket) => {
             board.reset();
             board = null;
         }
-        server.players[username].board = board = new Minesweeper.Board(settings, [username], username);
+        server.players[username].board = board = new Minesweeper.Board(settings, [username]);
         board.clearQueue();
         board.startTimer();
         socket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER, win: board.WIN });
+        for (let spectatorSocket of board.SPECTATORS) {
+            spectatorSocket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER, win: board.WIN, settings: board.SETTINGS, startSpectating: true, time: 0 });
+        }
         if (board.GAMEOVER) {
             board.reset(true);
             board = null;
@@ -160,6 +178,9 @@ io.on("connection", (socket) => {
 
     socket.on("resetBoard", () => {
         if (board != null) {
+            for (let spectatorSocket of board.SPECTATORS) {
+                delete spectatorSocket.spectateBoard;
+            }
             board.reset();
             board = null;
         }
@@ -173,7 +194,9 @@ io.on("connection", (socket) => {
                 board.clearQueue();
                 board.TIMESTAMPS.push({ time: Date.now() - board.START_TIME, x, y, board: JSON.stringify(board.CLEARED) });
                 socket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER, win: board.WIN });
-
+                for (let spectatorSocket of board.SPECTATORS) {
+                    spectatorSocket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER, win: board.WIN });
+                }
                 if (board.GAMEOVER) {
                     board.reset(true);
                     board = null;
@@ -198,7 +221,9 @@ io.on("connection", (socket) => {
                 board.clearQueue();
                 board.TIMESTAMPS.push({ time: Date.now() - board.START_TIME, x, y, board: JSON.stringify(board.CLEARED) });
                 socket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER, win: board.WIN });
-
+                for (let spectatorSocket of board.SPECTATORS) {
+                    spectatorSocket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER, win: board.WIN });
+                }
                 if (board.GAMEOVER) {
                     board.reset(true);
                     board = null;
@@ -213,6 +238,9 @@ io.on("connection", (socket) => {
             if (board.flagCell(x, y)) {
                 board.TIMESTAMPS.push({ time: Date.now() - board.START_TIME, x, y, board: JSON.stringify(board.CLEARED) });
                 socket.emit("boardData", { board: board.CLEARED });
+                for (let spectatorSocket of board.SPECTATORS) {
+                    spectatorSocket.emit("boardData", { board: board.CLEARED });
+                }
             }
         }
     });
@@ -223,14 +251,28 @@ io.on("connection", (socket) => {
             if (board.unflagCell(x, y)) {
                 board.TIMESTAMPS.push({ time: Date.now() - board.START_TIME, x, y, board: JSON.stringify(board.CLEARED) });
                 socket.emit("boardData", { board: board.CLEARED });
+                for (let spectatorSocket of board.SPECTATORS) {
+                    spectatorSocket.emit("boardData", { board: board.CLEARED });
+                }
             }
         }
     });
 
-    socket.on("spectate", (username) => {
-        console.log("Emitting spectate data");
-        let player = server.players[username];
-        socket.emit("boardData", { board: player.board.CLEARED, gameOver: player.board.GAMEOVER, win: player.board.WIN });
+    // socket.on("spectate", (username) => {
+    //     console.log("Emitting spectate data");
+    //     let player = server.players[username];
+    //     socket.emit("boardData", { board: player.board.CLEARED, gameOver: player.board.GAMEOVER, win: player.board.WIN });
+    // });
+
+    socket.on("startSpectating", (data) => {
+        let playerToSpectate = socket.playerToSpectate = server.players[data.name];
+        if (!playerToSpectate.spectatorSockets) playerToSpectate.spectatorSockets = [];
+        playerToSpectate.spectatorSockets.push(socket);
+        if (playerToSpectate.board) {
+            let currentGame = playerToSpectate.board;
+            currentGame.SPECTATORS.push(socket);
+            socket.emit("boardData", { board: currentGame.CLEARED, gameOver: currentGame.GAMEOVER, startSpectating: true, time: currentGame.TIME, settings: currentGame.SETTINGS }); // send the current board data to the client
+        } else socket.emit("boardData", { startSpectating: true, time: 0, settings: { width: 30, height: 16, mines: 99 } });
     });
 
     // chat and room events
@@ -255,7 +297,15 @@ io.on("connection", (socket) => {
         if (board != null) {
             board.reset();
             board = null;
-            console.log(color.red, "Deleted board for disconnected player");
+            console.log(color.red, "Deleted board for disconnected player " + username);
+        }
+        if (socket.spectateBoard) {
+            let board = socket.spectateBoard;
+            board.SPECTATORS.splice(board.SPECTATORS.indexOf(socket), 1);
+            console.log(color.red, "Stopped spectating board for disconnected player " + username);
+        }
+        if (socket.playerToSpectate) {
+            socket.playerToSpectate.spectatorSockets.splice(socket.playerToSpectate.spectatorSockets.indexOf(socket), 1);
         }
         delete session.socket;
         if (session.isGuest) {
