@@ -123,7 +123,7 @@ io.on("connection", (socket) => {
             style: "capital"
         }); // big_red_donkey
         socket.username = username = session.username;//sessionID;
-        server.players[username] = { username, displayName: session.username, wins: 0, losses: 0, gamesCreated: 0, isGuest: true };
+        server.players[username] = { username, displayName: session.username, wins: 0, losses: 0, gamesCreated: 0, isGuest: true, connected: true };
     }
     server.players[username].connected = true;
     server.players[username].socket = session.socket = socket;
