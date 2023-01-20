@@ -28,7 +28,7 @@ $(function () {
         $.post(window.location.pathname + window.location.search, "", (response) => {
             if (response.success) {
                 console.log("received spectate success");
-                
+
             } else {
                 alert("player is not in a game");
                 window.location.href = "/play";
@@ -36,10 +36,6 @@ $(function () {
         });
     } else {
         minesweeper.startGame(false);
-        let { chording } = localStorage;
-        if (!chording) {
-            localStorage.setItem("chording", "ALL");
-        }
         // set difficulty setting mins and maxes
         $("#custom_height").attr({
             "min": minesweeper.MIN.height,
@@ -105,7 +101,8 @@ class Minesweeper {
             this.MIN = { height: 1, width: 8, mines: 1 },
             this.MAX = { height: 100, width: 50 },
             this.GRID = [],
-            this.SPECTATING = false
+            this.SPECTATING = false,
+            this.LRCLICK = false
     }
     startGame(isSpectating = false) {
         // tell server to stop game
@@ -233,11 +230,10 @@ class Minesweeper {
                 let cell = $(e.target);
                 if (cell.hasClass("cell")) {
                     let [x, y] = this.getCellFromID(cell.attr("id"));
-                    if (e.buttons === 3) {
-                        if (this.cellIsClear(cell) && CHORDING.isLRCLICK) {
-                            this.selectCells(x, y);
-                            $("#face").attr("class", "faceooh");
-                        }
+                    if (e.buttons === 3 && this.cellIsClear(cell) && CHORDING.isLRCLICK) {
+                        this.selectCells(x, y);
+                        $("#face").attr("class", "faceooh");
+                        this.LRCLICK = true;
                         return;
                     }
                     switch (e.which) {
@@ -265,8 +261,8 @@ class Minesweeper {
                 if (cell.hasClass("cell")) {
                     let [x, y] = this.getCellFromID(cell.attr("id"));
                     // doesn't work
-                    if (e.buttons === 3) {
-                        if (CHORDING.isLRCLICK && this.satisfyFlags(x, y)) {
+                    if (this.LRCLICK) {
+                        if (this.satisfyFlags(x, y)) {
                             this.flagAndClear(x, y, true);
                         } else this.deselectCells(x, y);
                         $("#face").attr("class", "facesmile");
@@ -283,7 +279,7 @@ class Minesweeper {
                                 }
                                 // this.clearCell(x, y);
                                 socket.emit("clearCell", { x: x, y: y });
-                            } else if (!CHORDING.isSPACE && !CHORDING.isLRCLICK && this.satisfyFlags(x, y)) {
+                            } else if (!(CHORDING.isSPACE || CHORDING.isLRCLICK) && this.satisfyFlags(x, y)) {
                                 this.clearCells(x, y, false);
                             } else this.deselectCells(x, y);
                             $("#face").attr("class", "facesmile");
@@ -300,12 +296,17 @@ class Minesweeper {
                     this.hoverCell = cell;
                     [this.hoverX, this.hoverY] = this.getCellFromID(this.hoverCell.attr("id"));
                     e.preventDefault();
+                    if (e.buttons === 3 && this.cellIsClear(cell) && CHORDING.isLRCLICK) {
+                        this.selectCells(this.hoverX, this.hoverY);
+                        $("#face").attr("class", "faceooh");
+                        return;
+                    }
                     switch (e.buttons) {
                         case KEYCODE.LEFT_CLICK:
                             if (cell.hasClass("blank")) {
                                 this.selectCell(this.hoverX, this.hoverY);
                                 $("#face").attr("class", "faceooh");
-                            } else if (this.cellIsClear(cell)) {
+                            } else if (!(CHORDING.isSPACE || CHORDING.isLRCLICK) && this.cellIsClear(cell)) {
                                 this.selectCells(this.hoverX, this.hoverY);
                                 $("#face").attr("class", "faceooh");
                             }
@@ -453,7 +454,6 @@ class Minesweeper {
         } else if (clearCondition && this.satisfyFlags(x, y)) {
             // if left click is on, clear cells
             socket.emit("clearCells", { x, y });
-            console.log("t")
             this.clearCells(x, y);
         }
     }
