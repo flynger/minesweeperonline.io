@@ -122,7 +122,7 @@ io.on("connection", (socket) => {
         }); // big_red_donkey
         socket.username = username = sessionID;
         server.players[username] = { username, displayName: session.username, wins: 0, losses: 0, gamesCreated: 0, isGuest: true };
-    } 
+    }
     server.players[username].connected = true;
     server.players[username].socket = socket;
     server.onlinePlayers.push(server.players[username].displayName);
@@ -137,17 +137,6 @@ io.on("connection", (socket) => {
     socket.on("ping", (callback) => {
         callback();
     });
-
-    // login events
-    // socket.on("login", (data) => {
-    //     console.log(`received login: ${JSON.stringify(data)}`);
-    //     loginHandler.loginAccount(socket, data);
-    // });
-
-    // socket.on("register", (data) => {
-    //     console.log(`received signup: ${JSON.stringify(data)}`);
-    //     loginHandler.registerAccount(socket, data);
-    // });
 
     // game events
     socket.on("createBoard", (settings) => {
