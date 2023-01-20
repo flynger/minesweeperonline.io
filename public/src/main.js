@@ -1,6 +1,6 @@
 var minesweeper;
 
-let { chording = "ALL" } = localStorage
+let { chording = "ALL" } = localStorage;
 // if (!chording) { localStorage.setItem("chording", "ALL") };
 var CHORDING = { setting: chording, isSPACE: chording === "SPACE", isLRCLICK: chording === "LRCLICK", isLCLICK: chording === "LCLICK" };
 
