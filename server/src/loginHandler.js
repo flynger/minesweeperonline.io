@@ -53,6 +53,7 @@ module.exports = (server) => {
                 } else {
                     delete plyr.board;
                     delete plyr.socket;
+                    delete plyr.spectatorSockets;
                     plyr.connected = false;
                 }
             }

@@ -15,32 +15,24 @@
 
   <link href="css/style.css" rel="stylesheet" />
   <link href="css/login.css" rel="stylesheet" />
-  <!-- <script src="src/socket.js"></script> -->
   <script src="src/login.js"></script>
-  <script>
-    document.onreadystatechange = function () {
-      if (document.readyState !== "complete") {
-        document.querySelector("#site").style.display = "none";
-        document.querySelector("#loader").style.visibility = "visible";
-      } else {
-        document.querySelector("#loader").style.visibility = "hidden";
-        document.querySelector("#site").style.display = "block";
-      }
-    };
-    $(function () {
-      $("#header").load("header.html");
-      $("#footer").load("footer.html");
-      if (localStorage.getItem("theme") === "DARK") {
-        DarkReader.setFetchMethod(window.fetch);
-        DarkReader.enable();
-      }
-    });
-  </script>
 </head>
 
 <body>
-  <header id="header"></header>
-  <div id="loader" class="center"></div>
+  <header ondragstart="return false;" ondrop="return false;">
+    <div class="top-nav">
+      <a href="/home"><img src="res/logo.png" class="logo" /></a>
+      <div class="top-nav-left">
+        <a href="/profile">Profile</a>
+        <a href="/settings">Settings</a>
+      </div>
+      <div class="top-nav-right">
+        <a href="/login">Login</a>
+        <a href="/register">Register</a>
+      </div>
+    </div>
+  </header>
+  <!-- <div id="loader" class="center"></div> -->
   <div id="login-site">
     <div class="bg-image"></div>
     <div class="login-container">

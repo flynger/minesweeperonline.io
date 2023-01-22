@@ -12,7 +12,7 @@ require('locus');
 
 // server setup
 var app = express();
-var port = 80;
+var port = 3000;
 var name = "Minesweeper Online";
 var sessionMiddleware = sessions({
     secret: "e'eF?infFwa%%ofFia*Gesj8\\g4pdO!ih",
@@ -42,7 +42,7 @@ app.get("/play", (req, res) => {
     // console.log(req.sessionID);
 });
 app.get("/spectate", (req, res) => {
-    let requestedUsername = req.query.name;
+    let requestedUsername = req.query.name.toLowerCase();
     // check if the requested user is currently playing
     //to be implemented: hasPlayer and getPlayer
     if (server.players.hasOwnProperty(requestedUsername)) {
@@ -51,7 +51,7 @@ app.get("/spectate", (req, res) => {
     } else res.redirect("/play");
 });
 app.post("/spectate", (req, res) => {
-    let requestedUsername = req.query.name;
+    let requestedUsername = req.query.name.toLowerCase();
     // console.log(req.session.username);
     // console.log(req.sessionID);
     // check if the requested user is currently playing
@@ -117,13 +117,13 @@ io.on("connection", (socket) => {
     let username = socket.username = session.username;
     if (!session.username) {
         session.isGuest = true;
-        session.username = "Guest " + uniqueNamesGenerator({
+        let displayName = "Guest " + uniqueNamesGenerator({
             dictionaries: [adjectives, animals],
             separator: " ",
             style: "capital"
         }); // big_red_donkey
-        socket.username = username = session.username;//sessionID;
-        server.players[username] = { username, displayName: session.username, wins: 0, losses: 0, gamesCreated: 0, isGuest: true, connected: true };
+        socket.username = username = session.username = displayName.toLowerCase();//sessionID;
+        server.players[username] = { username, displayName, wins: 0, losses: 0, gamesCreated: 0, isGuest: true, connected: true };
     }
     server.players[username].connected = true;
     server.players[username].socket = session.socket = socket;
@@ -169,7 +169,7 @@ io.on("connection", (socket) => {
         if (board != null) {
             for (let spectatorSocket of board.SPECTATORS) {
                 delete spectatorSocket.spectateBoard;
-                // spectatorSocket.emit("boardData", { gameOver: false, startSpectating: true, time: 0 });
+                spectatorSocket.emit("boardData", { gameOver: false, startSpectating: true, time: 0, settings: board.SETTINGS });
             }
             board.reset();
             board = null;
@@ -259,7 +259,7 @@ io.on("connection", (socket) => {
         if (!playerToSpectate.spectatorSockets) playerToSpectate.spectatorSockets = [];
         playerToSpectate.spectatorSockets.push(socket);
         if (playerToSpectate.board) {
-            let currentGame = playerToSpectate.board;
+            let currentGame = socket.spectateBoard = playerToSpectate.board;
             currentGame.SPECTATORS.push(socket);
             socket.emit("boardData", { board: currentGame.CLEARED, gameOver: currentGame.GAMEOVER, startSpectating: true, time: currentGame.TIME, settings: currentGame.SETTINGS }); // send the current board data to the client
         } else socket.emit("boardData", { startSpectating: true, time: 0, settings: { width: 30, height: 16, mines: 99 } });
@@ -290,9 +290,9 @@ io.on("connection", (socket) => {
             console.log(color.red, "Deleted board for disconnected player " + username);
         }
         if (socket.spectateBoard) {
-            let board = socket.spectateBoard;
-            board.SPECTATORS.splice(board.SPECTATORS.indexOf(socket), 1);
-            console.log(color.red, "Stopped spectating board for disconnected player " + username);
+            let spectateBoard = socket.spectateBoard;
+            spectateBoard.SPECTATORS.splice(spectateBoard.SPECTATORS.indexOf(socket), 1);
+            console.log(color.red, "Stopped spectating board for disconnected player " + server.players[username].displayName);
         }
         if (socket.playerToSpectate) {
             socket.playerToSpectate.spectatorSockets.splice(socket.playerToSpectate.spectatorSockets.indexOf(socket), 1);

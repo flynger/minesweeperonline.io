@@ -8,7 +8,7 @@ module.exports = (server) => {
                 this.WIDTH = width, this.HEIGHT = height;
                 this.GRID = new Array(height).fill("").map(x => new Array(width).fill("0"));
                 this.CLEARED = new Array(height).fill("").map(x => new Array(width).fill("?"));
-                this.MINES = this.FLAGS = mines;
+                this.MINES = mines;
                 this.CLEAREDCELLS = this.TIME = 0;
                 this.TOTALCELLS = width * height - mines;
                 this.GAMEOVER = this.WIN = false;
@@ -94,7 +94,6 @@ module.exports = (server) => {
                         }
                     }
                     if (this.CLEAREDCELLS === this.TOTALCELLS) {
-                        this.FLAGS = 0;
                         for (let row in this.GRID) {
                             for (let col in this.GRID[row]) {
                                 if (this.GRID[row][col] === "X") {

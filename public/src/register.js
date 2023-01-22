@@ -1,4 +1,12 @@
 $(function () {
+    // $("#header").load("header.html", () => {
+    //     document.body.style.display = "block";
+        if (localStorage.getItem("theme") === "DARK") {
+            DarkReader.setFetchMethod(window.fetch);
+            DarkReader.enable();
+        }
+    //     $("#footer").load("footer.html");
+    // });
     $('#register-form').on('submit', function (e) {
         e.preventDefault();
         let data = $("#register-form").serialize();
