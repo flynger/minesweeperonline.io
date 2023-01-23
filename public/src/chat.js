@@ -58,6 +58,9 @@ function setupChat() {
             } else if (cmdFormatMessage.length > 1 && cmdFormatMessage[0] == "/spectate") {
                 // alert("spectate?name=" + cmdFormatMessage[1]);
                 window.location.href = "spectate?name=" + cmdFormatMessage[1].toLowerCase();
+            } else if (cmdFormatMessage.length > 1 && cmdFormatemesage[0] == "/coop") {
+                let partnerName = cmdFormatMessage [1].toLowerCase();
+                socket.emit("startCoop", {name: partnerName});
             } else {
                 socket.emit("chatMessage", { room: currentChat.id, msg: typedMessage });
             }
