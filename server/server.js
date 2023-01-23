@@ -127,8 +127,8 @@ io.on("connection", (socket) => {
     }
     server.players[username].connected = true;
     server.players[username].socket = session.socket = socket;
+    server.players[username].board = null;
     server.onlinePlayers.push(server.players[username].displayName);
-    let board = null;
 
     // connect event
     console.log(color.green, socket.id);
@@ -148,35 +148,54 @@ io.on("connection", (socket) => {
         //     return;
         // }
         // if board exists, delete it
-        if (board != null) {
-            board.reset();
-            board = null;
+        if (server.players[username].board != null) {
+            server.players[username].board.reset();
+            server.players[username].board = null;
         }
-        server.players[username].board = board = new Minesweeper.Board(settings, [username]);
+        let players = [username, ...server.players[username].coopPlayers];
+        let spectators = [];
+        for (let p of players) {
+            let player = server.players[p];
+            if (player.spectatorSockets) {
+                for (let spectatorSocket of player.spectatorSockets) {
+                    spectators.push(spectatorSocket);
+                    spectatorSocket.spectateBoard = this;
+                }
+                // spectators.push(...player.spectatorSockets);
+            }
+        }
+        let board = server.players[username].board = new Minesweeper.Board(settings, [username]);
         board.clearQueue();
         board.startTimer();
-        socket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER, win: board.WIN });
+        //socket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER, win: board.WIN });
+        for (let player of board.PLAYERS) {
+            let playerSocket = board.PLAYERS[player].socket;
+            server.players[player].board = board;
+            playerSocket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER, win: board.WIN, settings: board.SETTINGS, startPlaying: playerSocket != socket });
+        }
         for (let spectatorSocket of board.SPECTATORS) {
             spectatorSocket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER, win: board.WIN, settings: board.SETTINGS, startSpectating: true, time: 0 });
         }
         if (board.GAMEOVER) {
             board.reset(true);
-            board = null;
+            server.players[username].board = null;
         }
     });
 
     socket.on("resetBoard", () => {
+        let board = server.players[username].board;
         if (board != null) {
             for (let spectatorSocket of board.SPECTATORS) {
                 delete spectatorSocket.spectateBoard;
                 spectatorSocket.emit("boardData", { gameOver: false, startSpectating: true, time: 0, settings: board.SETTINGS });
             }
             board.reset();
-            board = null;
+            erver.players[username].board = null;
         }
     });
 
     socket.on("clearCell", (data) => {
+        let board = server.players[username].board;
         if (board != null) {
             let { x, y } = data;
             if (board.checkCell(x, y, ["?"])) {
@@ -189,13 +208,14 @@ io.on("connection", (socket) => {
                 }
                 if (board.GAMEOVER) {
                     board.reset(true);
-                    board = null;
+                    server.players[username].board = null;
                 }
             }
         }
     });
 
     socket.on("clearCells", (data) => {
+        let board = server.players[username].board;
         if (board != null) {
             let { x, y } = data;
             if (x < board.WIDTH && y < board.HEIGHT && board.satisfyFlags(x, y)) {
@@ -216,13 +236,14 @@ io.on("connection", (socket) => {
                 }
                 if (board.GAMEOVER) {
                     board.reset(true);
-                    board = null;
+                    server.players[username].board = null;
                 }
             }
         }
     });
 
     socket.on("addFlag", (data) => {
+        let board = server.players[username].board;
         if (board != null) {
             let { x, y } = data;
             if (board.flagCell(x, y)) {
@@ -236,6 +257,7 @@ io.on("connection", (socket) => {
     });
 
     socket.on("removeFlag", (data) => {
+        let board = server.players[username].board;
         if (board != null) {
             let { x, y } = data;
             if (board.unflagCell(x, y)) {
