@@ -2,7 +2,7 @@ module.exports = (server) => {
     var gameHandler = {
         Board: class {
             // creates a board
-            constructor({ startX, startY, width, height, mines }, players) {
+            constructor({ startX, startY, width, height, mines }, players, spectators) {
                 console.log("Board created!");
                 this.SETTINGS = { width, height, mines };
                 this.WIDTH = width, this.HEIGHT = height;
@@ -15,16 +15,8 @@ module.exports = (server) => {
                 this.CLEARQUEUE = [];
                 this.TIMESTAMPS = [];
                 this.PLAYERS = players;
-                this.SPECTATORS = [];
-                for (let p of this.PLAYERS) {
-                    let player = server.players[p];
-                    if (player.spectatorSockets) {
-                        for (let spectatorSocket of player.spectatorSockets) {
-                            spectatorSocket.spectateBoard = this;
-                        }
-                        this.SPECTATORS.push(...player.spectatorSockets);
-                    }
-                }
+                this.SPECTATORS = spectators;
+                
 
                 for (let v = -1; v <= 1; v++) {
                     for (let h = -1; h <= 1; h++) {
