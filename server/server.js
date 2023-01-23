@@ -159,12 +159,11 @@ io.on("connection", (socket) => {
             if (player.spectatorSockets) {
                 for (let spectatorSocket of player.spectatorSockets) {
                     spectators.push(spectatorSocket);
-                    spectatorSocket.spectateBoard = this;
                 }
                 // spectators.push(...player.spectatorSockets);
             }
         }
-        let board = server.players[username].board = new Minesweeper.Board(settings, [username]);
+        let board = server.players[username].board = new Minesweeper.Board(settings, players, spectators);
         board.clearQueue();
         board.startTimer();
         //socket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER, win: board.WIN });
@@ -174,6 +173,7 @@ io.on("connection", (socket) => {
             playerSocket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER, win: board.WIN, settings: board.SETTINGS, startPlaying: playerSocket != socket });
         }
         for (let spectatorSocket of board.SPECTATORS) {
+            spectatorSocket.spectateBoard = board;
             spectatorSocket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER, win: board.WIN, settings: board.SETTINGS, startSpectating: true, time: 0 });
         }
         if (board.GAMEOVER) {
@@ -286,6 +286,18 @@ io.on("connection", (socket) => {
             socket.emit("boardData", { board: currentGame.CLEARED, gameOver: currentGame.GAMEOVER, startSpectating: true, time: currentGame.TIME, settings: currentGame.SETTINGS }); // send the current board data to the client
         } else socket.emit("boardData", { startSpectating: true, time: 0, settings: { width: 30, height: 16, mines: 99 } });
     });
+
+    socket.on("startCoop", (data) => {
+        let hostPlayer = socket.hostPlayer = server.players[data.name];
+        if (!hostPlayer.coopSockets) hostPlayer.coopSockets = [];
+        hostPlayer.coopSockets.push(socket);
+        if (hostPlayer.board) {
+            let currentGame = server.players[username].board = hostPlayer.board;
+            currentGame.PLAYERS.push(username);
+            socket.emit("boardData", { board: currentGame.CLEARED, gameOver: currentGame.GAMEOVER, startPlaying: true, time: currentGame.TIME, settings: currentGame.SETTINGS }); // send the current board data to the client
+        } else socket.emit("boardData", { startSpectating: true, time: 0, settings: { width: 30, height: 16, mines: 99 } });
+    });
+
 
     // chat and room events
     socket.on("joinRoom", (data) => {

@@ -164,7 +164,7 @@ module.exports = (server) => {
                 // stops timer and deletes reference to board, letting it be deleted by garbage collector
                 this.stopTimer();
                 let playersList = this.PLAYERS.map(name => server.players.hasOwnProperty(name) ? server.players[name].displayName : "A Guest");
-                let spectatorsList = this.SPECTATORS.map(socket => server.players[socket.username].displayName);
+                let spectatorsList = Array.from(new Set(this.SPECTATORS.map(socket => server.players[socket.username].displayName)));
                 let result = this.WIN ? "Win" : "Loss";
                 for (let i of this.PLAYERS) {
                     if (server.players.hasOwnProperty(i)) {
