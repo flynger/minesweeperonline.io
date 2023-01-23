@@ -54,6 +54,13 @@ socket.on("boardData", (data) => {
         if (!data.board) {
             return;
         }
+    } else if (data.startPlaying) {
+        minesweeper.SETTINGS = data.settings;
+        minesweeper.startGame(false);
+        minesweeper.updateTimer(data.time);
+        if (!data.board) {
+            return;
+        }
     }
     for (let row in minesweeper.GRID) {
         for (let col in minesweeper.GRID[row]) {
