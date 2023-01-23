@@ -318,9 +318,10 @@ io.on("connection", (socket) => {
     socket.on("disconnect", () => {
         console.log(color.red, socket.id);
         // if board exists, delete it
+        let board = server.players[username].board;
         if (board != null) {
             board.reset();
-            board = null;
+            server.players[username].board = null;
             console.log(color.red, "Deleted board for disconnected player " + username);
         }
         if (socket.spectateBoard) {
