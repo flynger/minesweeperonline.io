@@ -128,7 +128,10 @@ io.on("connection", (socket) => {
     server.players[username].connected = true;
     server.players[username].socket = session.socket = socket;
     server.players[username].board = null;
+    if (!server.players[username].hasOwnProperty("spectatorSockets")) server.players[username].spectatorSockets = [];
+    if (!server.players[username].hasOwnProperty("coopPlayers")) server.players[username].coopPlayers = [];
     server.onlinePlayers.push(server.players[username].displayName);
+    console.log(server.onlinePlayers);
 
     // connect event
     console.log(color.green, socket.id);
@@ -168,7 +171,7 @@ io.on("connection", (socket) => {
         board.startTimer();
         //socket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER, win: board.WIN });
         for (let player of board.PLAYERS) {
-            let playerSocket = board.PLAYERS[player].socket;
+            let playerSocket = server.players[player].socket;
             server.players[player].board = board;
             playerSocket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER, win: board.WIN, settings: board.SETTINGS, startPlaying: playerSocket != socket });
         }
@@ -278,7 +281,6 @@ io.on("connection", (socket) => {
 
     socket.on("startSpectating", (data) => {
         let playerToSpectate = socket.playerToSpectate = server.players[data.name];
-        if (!playerToSpectate.spectatorSockets) playerToSpectate.spectatorSockets = [];
         playerToSpectate.spectatorSockets.push(socket);
         if (playerToSpectate.board) {
             let currentGame = socket.spectateBoard = playerToSpectate.board;
@@ -332,6 +334,8 @@ io.on("connection", (socket) => {
         if (socket.playerToSpectate) {
             socket.playerToSpectate.spectatorSockets.splice(socket.playerToSpectate.spectatorSockets.indexOf(socket), 1);
         }
+        server.onlinePlayers.splice(server.onlinePlayers.indexOf(server.players[username].displayName), 1);
+        console.log(server.onlinePlayers);
         delete session.socket;
         if (session.isGuest) {
             delete server.players[username];

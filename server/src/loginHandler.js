@@ -54,6 +54,7 @@ module.exports = (server) => {
                     delete plyr.board;
                     delete plyr.socket;
                     delete plyr.spectatorSockets;
+                    delete plyr.coopPlayers;
                     plyr.connected = false;
                 }
             }
