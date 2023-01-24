@@ -19,6 +19,15 @@ body {
     margin: 0;
 }
 
+#site {
+    font-family: 'Franklin Gothic', 'Arial Narrow', Arial, sans-serif;
+    /* other options: Garamond */
+    min-width: min-content;
+    border: 0;
+    padding: 0;
+    margin: 0;
+}
+
 /* ===== Scrollbar CSS ===== */
 /* Firefox */
 * {

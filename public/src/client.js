@@ -1,4 +1,5 @@
 var latency = -1;
+var username;
 
 setInterval(() => {
     const start = Date.now();
@@ -9,8 +10,9 @@ setInterval(() => {
     });
 }, 1000);
 
-socket.on("connect", (ms) => {
+socket.on("username", (name) => {
     // connect event
+    username = name;
 });
 
 socket.on("pong", (ms) => {
@@ -48,15 +50,17 @@ socket.on("roomJoinFailure", (data) => {
 
 socket.on("boardData", (data) => {
     if (data.startSpectating) {
+        console.log(data);
         minesweeper.SETTINGS = data.settings;
-        minesweeper.startGame(true);
+        minesweeper.startGame(true, false);
         minesweeper.updateTimer(data.time);
         if (!data.board) {
             return;
         }
     } else if (data.startPlaying) {
+        console.log(data);
         minesweeper.SETTINGS = data.settings;
-        minesweeper.startGame(false);
+        minesweeper.startGame(false, false);
         minesweeper.updateTimer(data.time);
         if (!data.board) {
             return;
@@ -118,5 +122,40 @@ socket.on("gameStats", (data) => {
     }
     $("#time").html(data.time);
     $("#result").html(data.result);
-    $("#result-block")[0].style.display = "flex";
-}); 
+    $("#result-block")[0].style.display = "inline-block";
+});
+
+socket.on("requestCoop", (data) => {
+    addServerMessage("Received co-op request from " + data.displayName, currentChat.id);
+
+    $("#dialog-text").html(`You have been invited to play together by ${data.displayName}. Accept the request?`);
+    $("#dialog-confirm").dialog({
+        title: "Co-op request from " + data.displayName,
+        resizable: false,
+        draggable: false,
+        height: "auto",
+        width: 400,
+        modal: true,
+        buttons: {
+            "Accept request": function () {
+                $(this).dialog("close");
+                socket.emit("startCoop", data);
+            },
+            "Ignore": function () {
+                $(this).dialog("close");
+            }
+        }
+    });
+});
+
+socket.on("playersOnline", (onlinePlayers) => {
+    $("#users-list").html("");
+    let text = "";
+    for (let player of onlinePlayers) {
+        if (player.toLowerCase() != username) {
+            text += "<tr><td>" + player + "&nbsp; <button onclick='window.location.href=" + '"/spectate?name=' + player + '"' + "'>Spectate</button>&nbsp; <button onclick='inviteToGame(\"" + player.toLowerCase() + "\")'>Invite</button></td>";
+        }
+        else text += "<tr><td>" + player + " (You)</td>";
+    }
+    $("#users-list").html(text);
+});

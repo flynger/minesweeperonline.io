@@ -16,7 +16,7 @@ module.exports = (server) => {
                 this.TIMESTAMPS = [];
                 this.PLAYERS = players;
                 this.SPECTATORS = spectators;
-                
+
 
                 for (let v = -1; v <= 1; v++) {
                     for (let h = -1; h <= 1; h++) {
@@ -169,14 +169,24 @@ module.exports = (server) => {
                 for (let i of this.PLAYERS) {
                     if (server.players.hasOwnProperty(i)) {
                         let player = server.players[i];
-                        if (sendStats && player.connected) {
-                            player.socket.emit("gameStats", { time: this.GAMEDURATION, result: result, players: playersList, spectators: spectatorsList });
+                        if (sendStats) {
+                            // update wins and losses
+                            if (this.WIN) {
+                                player.wins++;
+                            } else {
+                                player.losses++;
+                            }
+                            // send game results
+                            if (player.connected) {
+                                player.socket.emit("gameStats", { time: this.GAMEDURATION, result: result, players: playersList, spectators: spectatorsList });
+                            }
                         }
                         delete player.board;
                     }
                 }
                 for (let spectatorSocket of this.SPECTATORS) {
                     if (sendStats) {
+                        // send game results
                         spectatorSocket.emit("gameStats", { time: this.GAMEDURATION, result: result, players: playersList, spectators: spectatorsList });
                     }
                     delete spectatorSocket.spectateBoard;

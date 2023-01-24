@@ -33,8 +33,21 @@ $(function () {
                 socket.emit("startSpectating", { name: response.username });
                 console.log("spectating " + response.username);
             } else {
-                alert(response.reason);
-                window.location.href = "/play";
+                $("#dialog-text").html(response.reason);
+                $("#dialog-confirm").dialog({
+                    title: "Cannot spectate",
+                    resizable: false,
+                    draggable: false,
+                    height: "auto",
+                    width: 400,
+                    modal: true,
+                    buttons: {
+                        "Go Back": function () {
+                            $(this).dialog("close");
+                            window.location.href = "/play";
+                        }
+                    }
+                });
             }
         });
     } else {
@@ -51,35 +64,40 @@ $(function () {
         });
 
         $("#custom").on("click", () => {
-            $(".difficulty-select").toggle();
-            $("#custom-settings").toggle();
+            if (minesweeper.HOST) {
+                $(".difficulty-select").toggle();
+                $("#custom-settings").toggle();
+            }
         });
 
         // setup events
         $(".difficulty-select").on("click", e => {
-            let $e = $(e.currentTarget).closest('.difficulty-select');
-            selectedDifficulty = $e.attr("value");
-            minesweeper.startGame();
+            if (minesweeper.HOST) {
+                let $e = $(e.currentTarget).closest('.difficulty-select');
+                selectedDifficulty = $e.attr("value");
+                minesweeper.startGame();
+            }
         });
 
         $(".custom-select").on("change", e => {
-            // limit height and width
-            limitInput($("#custom_height"), minesweeper.MIN.height, minesweeper.MAX.height)
-            limitInput($("#custom_width"), minesweeper.MIN.width, minesweeper.MAX.width)
+            if (minesweeper.HOST) {
+                // limit height and width
+                limitInput($("#custom_height"), minesweeper.MIN.height, minesweeper.MAX.height)
+                limitInput($("#custom_width"), minesweeper.MIN.width, minesweeper.MAX.width)
 
-            // limit mines
-            let maxMines = +$("#custom_height").val() * +$("#custom_width").val() - 1;
-            limitInput($("#custom_mines"), minesweeper.MIN.mines, maxMines)
+                // limit mines
+                let maxMines = +$("#custom_height").val() * +$("#custom_width").val() - 1;
+                limitInput($("#custom_mines"), minesweeper.MIN.mines, maxMines)
 
-            // update mins and maxes of element
-            $("#custom_mines").attr({
-                "min": minesweeper.MIN.mines,
-                "max": maxMines
-            });
-
-            minesweeper.updateCustomSettings();
-            selectedDifficulty = "CUSTOM";
-            minesweeper.startGame();
+                // update mins and maxes of element
+                $("#custom_mines").attr({
+                    "min": minesweeper.MIN.mines,
+                    "max": maxMines
+                });
+                minesweeper.updateCustomSettings();
+                selectedDifficulty = "CUSTOM";
+                minesweeper.startGame();
+            }
         });
     }
     setupChat(); // chat setup
@@ -112,9 +130,9 @@ class Minesweeper {
             this.SPECTATING = false,
             this.LRCLICK = false
     }
-    startGame(isSpectating = false) {
+    startGame(isSpectating = false, isHost = true) {
         // tell server to stop game
-        if (!isSpectating) {
+        if (!isSpectating && isHost) {
             socket.emit("resetBoard", {});
             // update custom settings before creating board
             this.updateCustomSettings();
@@ -125,6 +143,7 @@ class Minesweeper {
         this.FLAGS = this.SETTINGS.mines;
         this.hoverCell, this.hoverX, this.hoverY = null;
         this.SPECTATING = isSpectating;
+        this.HOST = isHost;
 
         // reset board and input events
         this.GRID = new Array(this.SETTINGS.height).fill("").map(x => new Array(this.SETTINGS.width).fill("?"));
@@ -132,9 +151,18 @@ class Minesweeper {
         this.resetBoard();
         this.updateFlagCounter();
         if (!isSpectating) {
+            if (!isHost) {
+                $("#face").unbind("mouseup mouseout");
+            }
             this.createMouseEvents();
             this.createKeyboardEvents();
+        } else {
+            $("#game").unbind("mousedown mouseup mouseout mouseover");
         }
+
+        // if (!isHost) {
+
+        // }
     }
     resetBoard() {
         $("#game").html("");
@@ -157,7 +185,7 @@ class Minesweeper {
 
         // - 48.5 when adding flag and time icon
         let margin = 364 - (this.TILE_SIZE / 2) * (30 - this.SETTINGS.width);
-        grid += this.createImg("facesmile", "face", "margin-left:" + margin + "px; margin-right: " + margin + "px;", this.SPECTATING ? "" : "onclick='minesweeper.startGame()'");
+        grid += this.createImg("facesmile", "face", "margin-left:" + margin + "px; margin-right: " + margin + "px;"); // , this.SPECTATING ? "" : "onclick='minesweeper.startGame()'"
         // grid += this.createImg("timeicon timeicon", "timeicon");
         grid += this.createImg("time0", "seconds_hundreds");
         grid += this.createImg("time0", "seconds_tens");
@@ -336,7 +364,7 @@ class Minesweeper {
                 if (this.hoverCell && this.hoverCell.hasClass("cell")) {
                     this.flagAndClear(this.hoverX, this.hoverY, !(CHORDING.isLCLICK || CHORDING.isLRCLICK));
                 }
-            } else if (e.which === KEYCODE.BACKTICK && e.target == document.body) {
+            } else if (this.HOST && e.which === KEYCODE.BACKTICK && e.target == document.body) {
                 // check BACKTICK
                 e.preventDefault();
                 this.startGame();
@@ -439,15 +467,17 @@ class Minesweeper {
         $("#seconds_hundreds").attr("class", "time" + timeString[0]);
     }
     setFace(type) {
+        let f = () => $("#face").attr("class", type);
         if (!this.SPECTATING) {
-            let f = () => $("#face").attr("class", type);
             $("#face")
                 .attr("class", type)
                 .off("mouseout mouseup")
                 .on("mouseout mouseup", f)
-                .on("mouseup", () => this.startGame());
+            if (this.HOST) {
+                $("#face").on("mouseup", () => this.startGame());
+            }
         } else {
-            $("#face").attr("class", type)
+            f();
         }
     }
 }

@@ -55,12 +55,12 @@ function setupChat() {
             console.log(cmdFormatMessage);
             if (cmdFormatMessage[0] == "/ping") {
                 addServerMessage("Your ping is " + latency + "ms.", currentChat.id);
-            } else if (cmdFormatMessage.length > 1 && cmdFormatMessage[0] == "/spectate") {
-                // alert("spectate?name=" + cmdFormatMessage[1]);
-                window.location.href = "spectate?name=" + cmdFormatMessage[1].toLowerCase();
-            } else if (cmdFormatMessage.length > 1 && cmdFormatemesage[0] == "/coop") {
-                let partnerName = cmdFormatMessage [1].toLowerCase();
-                socket.emit("startCoop", {name: partnerName});
+            } else if (cmdFormatMessage.length > 1 && (cmdFormatMessage[0] == "/spectate" || cmdFormatMessage[0] == "/spec")) {
+                let name = cmdFormatMessage[1].toLowerCase();
+                window.location.href = "spectate?name=" + name;
+            } else if (cmdFormatMessage.length > 1 && (cmdFormatMessage[0] == "/coop" || cmdFormatMessage[0] == "/inv" || cmdFormatMessage[0] == "/invite")) {
+                let partnerName = cmdFormatMessage[1].toLowerCase();
+                inviteToGame(partnerName);
             } else {
                 socket.emit("chatMessage", { room: currentChat.id, msg: typedMessage });
             }
@@ -78,7 +78,7 @@ function addChatMessage(user, msg, room) {
     addTextToChat("<b>" + user + ":</b><text> " + msg + "</text>", room);
 }
 
-function addServerMessage(msg, room) {
+function addServerMessage(msg, room=currentChat.id) {
     addTextToChat("<text style='color:red;'>" + msg + "</text>", room);
 }
 
@@ -127,4 +127,8 @@ function splitByFirstOccurrence(str, sep) { // string, separator
         return [str.substring(0, i), str.substring(i + 1)];
     }
     else return [str];
+}
+
+function inviteToGame(username) {
+    socket.emit("requestCoop", {name: username});
 }

@@ -9,7 +9,7 @@ module.exports = (server) => {
     console.log(`accounts: ${JSON.stringify(accounts)}`);
 
     var loginHandler = {
-        registerAccount: (req) => {
+        registerAccount: (req, res) => {
             let displayName = req.body.username;
             let username = displayName.toLowerCase();
             let password = req.body.password;
@@ -29,7 +29,7 @@ module.exports = (server) => {
                 return { success: true };
             }
         },
-        loginAccount: (req) => {
+        loginAccount: (req, res) => {
             let displayName = req.body.username;
             let username = req.body.username.toLowerCase();
             if (accounts[username] === req.body.password) {
@@ -38,6 +38,7 @@ module.exports = (server) => {
                 if (!players[username]) {
                     players[username] = { username, displayName, wins: 0, losses: 0, gamesCreated: 0, connected: false };
                 }
+                res.cookie("signedIn", "true");
                 return { success: true };
                 // server.gameHandler.socketToPlayer[socket.id] = username;
                 // socket.emit("loginSuccess");
@@ -55,6 +56,7 @@ module.exports = (server) => {
                     delete plyr.socket;
                     delete plyr.spectatorSockets;
                     delete plyr.coopPlayers;
+                    delete plyr.coopRequests;
                     plyr.connected = false;
                 }
             }

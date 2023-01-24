@@ -30,12 +30,17 @@
         //         // document.querySelector(".site").style.display = "block";
         //     }
         // };
-
+        if (localStorage.getItem("theme") === "DARK") {
+            $(".site").addClass("dark-mode");
+            DarkReader.setFetchMethod(window.fetch)
+            DarkReader.enable();
+        }
         $(function () {
-            if (localStorage.getItem("theme") === "DARK") {
-                $(".site").addClass("dark-mode");
-                DarkReader.setFetchMethod(window.fetch)
-                DarkReader.enable();
+            $("#tabs").tabs();
+            if (document.cookie.includes("signedIn=true")) {
+                $("#logoutLink").show();
+                $("#loginLink").hide();
+                $("#registerLink").hide();
             }
             //     $("#header").load("header.html");
             //     $("#footer").load("footer.html");
@@ -54,64 +59,101 @@
                 <a href="/settings">Settings</a>
             </div>
             <div class="top-nav-right">
-                <a href="/login">Login</a>
-                <a href="/register">Register</a>
+                <a id="logoutLink" href="/logout" style="display: none;">Log out</a>
+                <a id="loginLink" href="/login">Login</a>
+                <a id="registerLink" href="/register">Register</a>
             </div>
         </div>
     </header>
-    <!-- <div id="loader" class="center"></div> -->
-    <div class="site" style="display: flex; flex-wrap: wrap; justify-content: center;">
-        <div id="options">
-            <a class="difficulty-select" value="BEGINNER" href="javascript:void(0)"><span>Beginner (9 x 9) 10
-                    Mines&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></a>
-            <a class="difficulty-select" value="INTERMEDIATE" href="javascript:void(0)"><span>Intermediate (16 x 16)
-                    40 Mines&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></a>
-            <a class="difficulty-select" value="EXPERT" href="javascript:void(0)"><span>Expert (16 x 30) 99
-                    Mines&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></a>
-            <a id="custom" href="javascript:void(0)"
-                style="color: #337ab7; text-decoration: none;">Custom&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
-            <div id="custom-settings">
-                <span>Height &nbsp;</span>
-                <input type="number" class="custom-select" value="20" id="custom_height" autocomplete="off">
-                &nbsp;&nbsp;
-                <span>Width &nbsp;</span>
-                <input type="number" class="custom-select" value="30" id="custom_width" autocomplete="off">&nbsp;&nbsp;
-                <span>Mines &nbsp;</span>
-                <input type="number" class="custom-select" value="145" id="custom_mines" autocomplete="off">
+    <div id="tabs">
+        <ul>
+            <li><a href="#site"><span>Game</span></a></li>
+            <li><a href="#users-contain"><span>Players</span></a></li>
+        </ul>
+
+        <!-- <div id="loader" class="center"></div> -->
+        <div id="users-contain" class="ui-widget">
+            <h2>Players:</h2>
+            <table id="users" class="ui-widget ui-widget-content">
+                <thead>
+                    <tr class="ui-widget-header">
+                        <th>Name</th>
+                        <!-- <th>In-game</th>
+                    <th>Invite</th> -->
+                    </tr>
+                </thead>
+                <tbody id="users-list">
+                    <tr>
+                        <td>Loading...</td>
+                    </tr>
+                    <!-- <tr>
+                        <td>John Doe&nbsp; <button>Spectate</button>&nbsp; <button>Invite</button></td>
+                    </tr>
+                    <tr>
+                        <td>Jane Doe</td>
+                    </tr> -->
+                </tbody>
+            </table>
+        </div>
+        <div id="site" class="site">
+            <div id="dialog-confirm" title="Title" style="display: none;">
+                <!-- class="ui-icon ui-icon-signal-diag" <span style="float:left; margin:12px 12px 20px 0;"></span> -->
+                <p id="dialog-text"></p>
             </div>
-        </div>
-        <div class="break"></div>
-        <br> 
-        <div id="game-container" class="z200" oncontextmenu="return false;">
-            <!-- <br>
-            <span class="flag"></span> -->
-            <!-- <br> -->
-            <div id="game">
-            </div>
-        </div>
-        <div class="break"></div>
-        <div id="result-block">
-            <b>Game Results</b>
-            <div><span id="player-name"></span></div>
-            <div>Result: <b id="result"></b></div>
-            <div>Time: <b id="time"></b>s</div>
-            <div><span id="spectator-name"></span></div>
-        </div>
-        <div id="chat">
-            <div id="chat-bar">Chat</div>
-            <div id="chat-body">
-                <div id="chat-rooms">
+            <div id="options" style="justify-content: center ;">
+                <a class="difficulty-select" value="BEGINNER" href="javascript:void(0)"><span>Beginner (9 x 9) - 10
+                        Mines&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></a>
+                <a class="difficulty-select" value="INTERMEDIATE" href="javascript:void(0)"><span>Intermediate (16 x 16)
+                        -
+                        40 Mines&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></a>
+                <a class="difficulty-select" value="EXPERT" href="javascript:void(0)"><span>Expert (16 x 30) - 99
+                        Mines&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></a>
+                <a id="custom" href="javascript:void(0)"
+                    style="color: #337ab7; text-decoration: none;">Custom&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+                <div id="custom-settings">
+                    <span>Height &nbsp;</span>
+                    <input type="number" class="custom-select" value="20" id="custom_height" autocomplete="off">
+                    &nbsp;&nbsp;
+                    <span>Width &nbsp;</span>
+                    <input type="number" class="custom-select" value="30" id="custom_width"
+                        autocomplete="off">&nbsp;&nbsp;
+                    <span>Mines &nbsp;</span>
+                    <input type="number" class="custom-select" value="145" id="custom_mines" autocomplete="off">
                 </div>
-                <br>
-                <p id="chatText"></p>
-                <br>
-                <input id="chatInput" type="text" placeholder="Type message here..." maxlength="50">
-                <br>
-                <br>
-                <div id="roomSelector">
-                    Room:
-                    <input id="roomInput" type="text">
-                    <button id="roomButton" type="button">Join</button>
+            </div>
+            <div id="game-container" class="z200" oncontextmenu="return false;">
+                <!-- <br>
+            <span class="flag"></span> -->
+                <!-- <br> -->
+                <div id="game">
+                </div>
+                <div id="result-block">
+                    <b>Game Results</b>
+                    <div><span id="player-name"></span></div>
+                    <div>Result: <b id="result"></b></div>
+                    <div>Time: <b id="time"></b>s</div>
+                    <div><span id="spectator-name"></span></div>
+                    <!-- <div>Lorem ipsum: fsfsf</div>
+                <div>blh blah: fas</div> -->
+                </div>
+            </div>
+
+            <div id="chat">
+                <div id="chat-bar">Chat</div>
+                <div id="chat-body">
+                    <div id="chat-rooms">
+                    </div>
+                    <br>
+                    <p id="chatText"></p>
+                    <br>
+                    <input id="chatInput" type="text" placeholder="Type message here..." maxlength="50">
+                    <br>
+                    <br>
+                    <div id="roomSelector">
+                        Room:
+                        <input id="roomInput" type="text">
+                        <button id="roomButton" type="button">Join</button>
+                    </div>
                 </div>
             </div>
         </div>

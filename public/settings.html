@@ -16,23 +16,40 @@
   <link href="css/settings.css" rel="stylesheet" />
   <!-- <script src="src/socket.js"></script> -->
   <script>
+    if (localStorage.getItem("theme") === "DARK") {
+      DarkReader.setFetchMethod(window.fetch);
+      DarkReader.enable();
+    }
     $(function () {
-      $("#header").load("header.html");
-      $("#footer").load("footer.html");
+      // $("#header").load("header.html");
+      // $("#footer").load("footer.html");
       $("#settings-tabs").tabs().addClass("ui-tabs-vertical ui-helper-clearfix");
       $("#settings-tabs li").removeClass("ui-corner-top").addClass("ui-corner-left");
-      if (localStorage.getItem("theme") === "DARK") {
-        DarkReader.setFetchMethod(window.fetch);
-        DarkReader.enable();
+      if (document.cookie.includes("signedIn=true")) {
+        $("#logoutLink").show();
+        $("#loginLink").hide();
+        $("#registerLink").hide();
       }
     });
   </script>
   <script src="src/settings.js"></script>
 </head>
 
-<div id="header"></div>
-
 <body oncontextmenu="return false;">
+  <header ondragstart="return false;" ondrop="return false;">
+    <div class="top-nav">
+      <a href="/home"><img src="res/logo.png" class="logo" /></a>
+      <div class="top-nav-left">
+        <a href="/profile">Profile</a>
+        <a href="/settings">Settings</a>
+      </div>
+      <div class="top-nav-right">
+        <a id="logoutLink" href="/logout" style="display: none;">Log out</a>
+        <a id="loginLink" href="/login">Login</a>
+        <a id="registerLink" href="/register">Register</a>
+      </div>
+    </div>
+  </header>
   <div class="site" style="display: flex; justify-content: center;">
     <br>
     <div id="settings-tabs" ondragstart="return false;" ondrop="return false;">

@@ -78,3 +78,11 @@
 #roomSelector {
     margin-left: 10px;
 }
+
+#roomInput {
+    width: 160px;
+}
+
+#roomButton {
+    margin-left: 7px;
+}

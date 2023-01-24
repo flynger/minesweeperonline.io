@@ -6,7 +6,7 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.0/socket.io.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-  
+
   <script src="libraries/jquery-3.6.0.js"></script>
   <script src="libraries/jquery-ui.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.5.0/p5.min.js"></script>
@@ -16,24 +16,74 @@
   <link href="css/style.css" rel="stylesheet" />
   <link href="css/profile.css" rel="stylesheet" />
   <script>
+    if (localStorage.getItem("theme") === "DARK") {
+      DarkReader.setFetchMethod(window.fetch);
+      DarkReader.enable();
+    }
     $(function () {
-      $("#header").load("header.html");
-      $("#footer").load("footer.html");
-      if (localStorage.getItem("theme") === "DARK") { 
-        DarkReader.setFetchMethod(window.fetch);
-        DarkReader.enable();
+      // $("#header").load("header.html");
+      // $("#footer").load("footer.html");
+      if (document.cookie.includes("signedIn=true")) {
+        $("#logoutLink").show();
+        $("#loginLink").hide();
+        $("#registerLink").hide();
       }
+
+      $.post(window.location.pathname + window.location.search, "", (response) => {
+        if (response.success) {
+          let { username, displayName, wins, losses, gamesCreated, connected } = response.data;
+          $("#username").html(displayName + (connected ? " (in-game)" : ""));
+          $("#leaderboard-name").html(displayName);
+          $("#games-created").html(gamesCreated);
+          $("#games-finished").html(wins + losses);
+          $("#games-wins").html(wins);
+          $("#games-losses").html(losses);
+          $("#win-percent").html(wins / (wins + losses) * 100 + "%");
+          if (connected) {
+            $("#spectate-button").show();
+            $("#spectate-button").click(() => window.location.href = "/spectate?name=" + username);
+          }
+        } else {
+          $("#dialog-text").html("You need an account to view your profile.");
+          $("#dialog-confirm").dialog({
+            title: "",
+            resizable: false,
+            draggable: false,
+            height: "auto",
+            width: 400,
+            modal: true,
+            buttons: {
+              "Go Back": function () {
+                $(this).dialog("close");
+                window.location.href = "/login";
+              }
+            }
+          });
+        }
+      });
     });
   </script>
 </head>
 
-<div id="header"></div>
-
 <body oncontextmenu="return false;">
+  <header ondragstart="return false;" ondrop="return false;">
+    <div class="top-nav">
+      <a href="/home"><img src="res/logo.png" class="logo" /></a>
+      <div class="top-nav-left">
+        <a href="/profile">Profile</a>
+        <a href="/settings">Settings</a>
+      </div>
+      <div class="top-nav-right">
+        <a id="logoutLink" href="/logout" style="display: none;">Log out</a>
+        <a id="loginLink" href="/login">Login</a>
+        <a id="registerLink" href="/register">Register</a>
+      </div>
+    </div>
+  </header>
   <div class="site">
-    <table id="friends-table" class="friends">
+    <table id="button-table" class="friends">
       <tr>
-        <td>
+        <!-- <td>
           <div class="button">
             <h3>Add Friend</h3>
           </div>
@@ -42,9 +92,9 @@
           <div class="button">
             <h3>Send Message</h3>
           </div>
-        </td>
-          <td>
-          <div class="button">
+        </td> -->
+        <td>
+          <div id="spectate-button" class="button" style="display: none;">
             <h3>Spectate</h3>
           </div>
         </td>
@@ -53,67 +103,83 @@
     <title>Profile</title>
     <h1>Profile</h1>
     <div class="profile">
-      <img src="https://via.placeholder.com/100" alt="Profile Picture">
-      <h1>John Doe</h1>
+      <img
+        src="https://st3.depositphotos.com/6672868/13701/v/600/depositphotos_137014128-stock-illustration-user-profile-icon.jpg"
+        alt="Profile Picture">
+      <h1 id="username">Loading...</h1>
     </div>
-    <h2>Friends</h2>
-    <table  class="friends">
+    <!-- <h2>Friends</h2>
+    <table class="friends">
       <tr>
         <td>
           <div class="friends">
-            <img src="https://via.placeholder.com/100" alt="Profile Picture">
+            <img
+              src="https://st3.depositphotos.com/6672868/13701/v/600/depositphotos_137014128-stock-illustration-user-profile-icon.jpg"
+              alt="Profile Picture">
           </div>
         </td>
 
         <td>
           <div class="friends">
-            <img src="https://via.placeholder.com/100" alt="Profile Picture">
+            <img
+              src="https://st3.depositphotos.com/6672868/13701/v/600/depositphotos_137014128-stock-illustration-user-profile-icon.jpg"
+              alt="Profile Picture">
           </div>
         </td>
 
         <td>
           <div class="friends">
-            <img src="https://via.placeholder.com/100" alt="Profile Picture">
+            <img
+              src="https://st3.depositphotos.com/6672868/13701/v/600/depositphotos_137014128-stock-illustration-user-profile-icon.jpg"
+              alt="Profile Picture">
           </div>
         </td>
       </tr>
       <tr>
         <td>
           <div class="friends">
-            <h3>John Doe</h3>
+            <h3>Loading...</h3>
           </div>
         </td>
 
         <td>
           <div class="friends">
-            <h3>John Doe</h3>
+            <h3>Loading...</h3>
           </div>
         </td>
 
         <td>
           <div class="friends">
-            <h3>John Doe</h3>
+            <h3>Loading...</h3>
           </div>
         </td>
       </tr>
-    </table>
+    </table> -->
     <h2>Statistics</h2>
     <table id="tablelabel" style="width: 25%">
+      <!-- <tr>
+        <th>Sweeper Score</th>
+        <td>700</td>
+      </tr> -->
       <tr>
-        <th>Total Games</th>
-        <td>500</td>
+        <th>Games Created</th>
+        <td id="games-created">Loading...</td>
+      </tr>
+      <tr>
+        <th>Games Finished</th>
+        <td id="games-finished">Loading...</td>
       </tr>
       <tr>
         <th>Wins</th>
-        <td>250</td>
+        <td id="games-wins">Loading...</td>
       </tr>
       <tr>
         <th>Losses</th>
-        <td>250</td>
+        <td id="games-losses">Loading...</td>
       </tr>
       <tr>
         <th>Win Percentage</th>
-        <td>50%</td>
+        <td id="win-percent">Loading...%</td>
       </tr>
     </table>
 
@@ -126,8 +192,8 @@
           <th>Score</th>
         </tr>
         <tr>
-          <td>1</td>
-          <td>John Doe</td>
+          <td>N/A</td>
+          <td id="leaderboard-name">Loading...</td>
           <td>1000</td>
         </tr>
       </table>
