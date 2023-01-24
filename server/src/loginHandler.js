@@ -6,6 +6,7 @@ This file implements server-sided chat functionality including storing user data
 const { json } = require("express");
 
 module.exports = (server) => {
+    //gets the data and exports to server.js
     const jsonfile = require("../node_modules/jsonfile");
     const accounts = jsonfile.readFileSync("./data/accounts.json");
     const playerData = jsonfile.readFileSync("./data/players.json");
@@ -34,6 +35,7 @@ module.exports = (server) => {
                 return { success: true };
             }
         },
+        //logs in account
         loginAccount: (req, res) => {
             let displayName = req.body.username;
             let username = req.body.username.toLowerCase();
@@ -51,6 +53,7 @@ module.exports = (server) => {
                 return { success: false, reason: "The username or password is incorrect." };
             }
         },
+        //saves data after server closes
         saveData: () => {
             for (let p in players) {
                 let plyr = players[p];
