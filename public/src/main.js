@@ -52,7 +52,7 @@ $(function () {
 
         $("#custom").on("click", () => {
             $(".difficulty-select").toggle();
-            $(".custom-select").toggle();
+            $("#custom-settings").toggle();
         });
 
         // setup events
