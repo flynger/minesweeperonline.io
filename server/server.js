@@ -193,7 +193,7 @@ io.on("connection", (socket) => {
                 spectatorSocket.emit("boardData", { gameOver: false, startSpectating: true, time: 0, settings: board.SETTINGS });
             }
             board.reset();
-            erver.players[username].board = null;
+            server.players[username].board = null;
         }
     });
 
