@@ -6,6 +6,7 @@ This file implements main client-sided functionality
 var latency = -1;
 var username;
 
+//implements the /ping command
 setInterval(() => {
     const start = Date.now();
 
@@ -15,8 +16,8 @@ setInterval(() => {
     });
 }, 1000);
 
+//connect command
 socket.on("username", (name) => {
-    // connect event
     username = name;
 });
 
@@ -24,6 +25,7 @@ socket.on("pong", (ms) => {
     latency = ms;
 });
 
+//tells the server a chat message was sent
 socket.on("chatMessage", (data) => {
     if (data.user === "Server") {
         addServerMessage(data.msg, data.room);
@@ -32,6 +34,7 @@ socket.on("chatMessage", (data) => {
     }
 });
 
+//joins room
 socket.on("roomJoinSuccess", (data) => {
     if (data.room === requestedRoom.id) {
         chatRooms[requestedRoom.id] = requestedRoom;
@@ -46,6 +49,7 @@ socket.on("roomJoinSuccess", (data) => {
     }
 });
 
+//executes if join room fails
 socket.on("roomJoinFailure", (data) => {
     if (data.room === requestedRoom.id) {
         addServerMessage(data.error, currentChat.id);
@@ -53,6 +57,7 @@ socket.on("roomJoinFailure", (data) => {
     }
 });
 
+//executes once the client receives the board sent by the server
 socket.on("boardData", (data) => {
     if (data.startSpectating) {
         // console.log(data);
@@ -107,7 +112,7 @@ socket.on("boardData", (data) => {
             }
         }
     }
-    // scuffed win/loss code
+    // win/loss code
     minesweeper.updateFlagCounter();
     if (data.gameOver) {
         $("#game").off();
@@ -115,10 +120,12 @@ socket.on("boardData", (data) => {
     }
 });
 
+//displays the updated time
 socket.on("boardTime", (data) => {
     minesweeper.updateTimer(data.time);
 });
 
+//displays stats
 socket.on("gameStats", (data) => {
     minesweeper.updateTimer(Math.floor(data.time));
     $("#player-name").html("Player" + (data.players.length > 1 ? "s" : "") + ": " + data.players.join(", "));
@@ -130,6 +137,7 @@ socket.on("gameStats", (data) => {
     $("#result-block")[0].style.display = "inline-flex";
 });
 
+//displays the request dialog box to the player requested
 socket.on("requestCoop", (data) => {
     addServerMessage("Received co-op request from " + data.displayName, currentChat.id);
 
@@ -153,6 +161,7 @@ socket.on("requestCoop", (data) => {
     });
 });
 
+//joins the coop
 socket.on("coopJoined", (data) => {
     addServerMessage(data.displayName + " join the co-op!", currentChat.id);
 
@@ -172,6 +181,7 @@ socket.on("coopJoined", (data) => {
     });
 });
 
+//coop on hold
 socket.on("coopOnHold", (data) => {
     addServerMessage(data.displayName + " went offline", currentChat.id);
 
@@ -191,6 +201,7 @@ socket.on("coopOnHold", (data) => {
     });
 });
 
+//executes if a coop partner disconnects
 socket.on("coopLeft", (data) => {
     addServerMessage(data.displayName + " left the co-op", currentChat.id);
 
@@ -210,13 +221,14 @@ socket.on("coopLeft", (data) => {
     });
 });
 
+//displays the online players
 socket.on("playersOnline", (onlinePlayers) => {
     onlinePlayers = onlinePlayers.sort();
     $("#users-list").html("");
     let text = "";
     for (let player of onlinePlayers) {
         if (player.toLowerCase() != username) {
-            text += "<tr><td>" + player + "&nbsp; <button onclick='window.location.href=" + '"/spectate?name=' + player + '"' + "'>Spectate</button>&nbsp; <button onclick='inviteToGame(\"" + player.toLowerCase() + "\"); $(this).prop(\"disabled\", true);'>Invite</button> &nbsp;<a href='/profile?name=" + player.toLowerCase() +"'>Profile</a></td>";
+            text += "<tr><td>" + player + "&nbsp; <button onclick='window.location.href=" + '"/spectate?name=' + player + '"' + "'>Spectate</button>&nbsp; <button onclick='inviteToGame(\"" + player.toLowerCase() + "\"); $(this).prop(\"disabled\", true);'>Invite</button> &nbsp;<a href='/profile?name=" + player.toLowerCase() + "'>Profile</a></td>";
         }
         else text += "<tr><td>" + player + " (You)</td>";
     }
