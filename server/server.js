@@ -362,7 +362,7 @@ io.on("connection", (socket) => {
 
     socket.on("startCoop", (data) => {
         console.log(username + " accepted co-op request");
-        if (server.players[username].coopRequests.includes(data.name) && server.players[data.name].connected) {
+        if (server.players[username].coopRequests.includes(data.name) && server.players[data.name] && server.players[data.name].connected) {
             let board = server.players[username].board;
             if (board != null) {
                 board.reset();
