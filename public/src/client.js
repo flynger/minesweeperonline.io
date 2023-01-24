@@ -211,7 +211,7 @@ socket.on("playersOnline", (onlinePlayers) => {
     let text = "";
     for (let player of onlinePlayers) {
         if (player.toLowerCase() != username) {
-            text += "<tr><td>" + player + "&nbsp; <button onclick='window.location.href=" + '"/spectate?name=' + player + '"' + "'>Spectate</button>&nbsp; <button onclick='inviteToGame(\"" + player.toLowerCase() + "\"); $(this).prop(\"disabled\", true);'>Invite</button> <a href='/profile?name=" + player.toLowerCase() +"'>Profile</a></td>";
+            text += "<tr><td>" + player + "&nbsp; <button onclick='window.location.href=" + '"/spectate?name=' + player + '"' + "'>Spectate</button>&nbsp; <button onclick='inviteToGame(\"" + player.toLowerCase() + "\"); $(this).prop(\"disabled\", true);'>Invite</button> &nbsp;<a href='/profile?name=" + player.toLowerCase() +"'>Profile</a></td>";
         }
         else text += "<tr><td>" + player + " (You)</td>";
     }
