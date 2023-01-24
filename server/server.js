@@ -37,30 +37,33 @@ app.use(sessionMiddleware);
 
 // url masks
 app.get("/", (req, res) => {
+    // redirect to game
     res.redirect("/play");
 });
 app.get("/home", (req, res) => {
+    // redirect to game
     res.redirect("/play");
 });
 app.get("/play", (req, res) => {
+    // game page
     res.sendFile('play.html', { root: '../public' });
-    // console.log(req.sessionID);
 });
 app.get("/spectate", (req, res) => {
+    // get the requested username parameter
     let requestedUsername = req.query.name.toLowerCase();
-    // check if the requested user is currently playing
-    //to be implemented: hasPlayer and getPlayer
+    // check if the requested user exists
     if (server.players.hasOwnProperty(requestedUsername)) {
-        // console.log({ requestedUsername });
+        // send the client the game page so they can spectate
         res.sendFile('play.html', { root: '../public' });
-    } else res.redirect("/play");
+    } else {
+        // redirect the client to game if invalid username
+        res.redirect("/play");
+    }
 });
 app.post("/spectate", (req, res) => {
+    // get the requested username parameter
     let requestedUsername = req.query.name.toLowerCase();
-    // console.log(req.session.username);
-    // console.log(req.sessionID);
-    // check if the requested user is currently playing
-    //to be implemented: hasPlayer and getPlayer
+    // check if the requested user is currently playing and handle the spectate request
     if (server.players.hasOwnProperty(requestedUsername) && server.players[requestedUsername].connected) {
         res.send({ success: true, username: requestedUsername, displayName: server.players[requestedUsername].displayName });
     } else if (!server.players.hasOwnProperty(requestedUsername)) {
@@ -70,13 +73,17 @@ app.post("/spectate", (req, res) => {
     }
 });
 app.get("/profile", (req, res) => {
+    // get the requested username parameter
     let requestedUsername = req.query.name ? req.query.name.toLowerCase() : req.session.username ? req.session.username : "";
+    // send profile page if player exists, else redirect to login
     if (requestedUsername && server.players.hasOwnProperty(requestedUsername)) {
         res.sendFile('profile.html', { root: '../public' });
     } else res.redirect("/login");
 });
 app.post("/profile", (req, res) => {
+    // get the requested username parameter
     let requestedUsername = req.query.name ? req.query.name.toLowerCase() : req.session.username ? req.session.username : "";
+    // send profile data if player exists
     if (requestedUsername && server.players.hasOwnProperty(requestedUsername)) {
         let { username, displayName, wins, losses, gamesCreated, connected } = server.players[requestedUsername];
         res.send({ success: true, data: { username, displayName, wins, losses, gamesCreated, connected } });
@@ -85,41 +92,45 @@ app.post("/profile", (req, res) => {
     }
 });
 app.get("/settings", (req, res) => {
+    // settings page
     res.sendFile('settings.html', { root: '../public' });
 });
 app.get("/login", (req, res) => {
+    // send client login page if not logged in
     if (!req.session.username) {
         res.sendFile('login.html', { root: '../public' });
     }
+    // redirect client to game page if logged in
     else res.redirect("/play");
 });
 app.post("/login", (req, res) => {
-    // console.log(req.body);
-    // console.log(req.session);
-    // let username = req.body.username;
-    // let password = req.body.password;
+    // handle login request and send response
     res.send(loginHandler.loginAccount(req, res));
 });
 app.get("/register", (req, res) => {
+    // send client register page if not logged in
     if (!req.session.username) {
         res.sendFile('register.html', { root: '../public' });
     }
+    // redirect client to game page if logged in
     else res.redirect("/play");
 });
 app.post("/register", (req, res) => {
-    // let username = req.body.username;
-    // let password = req.body.password;
+    // handle register request and send response
     res.send(loginHandler.registerAccount(req, res));
 });
 app.get("/logout", (req, res) => {
+    // logout user if logged in
     if (req.session.username) {
         res.clearCookie("signedIn");
         delete req.session.username;
         delete req.session.isGuest;
     }
+    // redirect client to login page
     res.redirect("/login");
 });
 
+// express and socket.io initialization
 var expressServer = app.listen(port, () => console.log(color.blue, `Starting Server: ${name} on port ${port}`));
 var io = socket(expressServer, {
     pingInterval: 900,
@@ -127,16 +138,17 @@ var io = socket(expressServer, {
 });
 io.use((socket, next) => sessionMiddleware(socket.request, {}, next)); // gives request 
 
-// our source files
+// server variable
 var server = {
     io: io,
     onlinePlayers: []
 }
+// our source file initialization
 var Minesweeper = require("./src/gameHandler")(server);
 var chatHandler = require("./src/chatHandler")(server);
 var loginHandler = require("./src/loginHandler")(server);
-// var playerHandler = require("./src/playerHandler")(server);
 
+// update global player list every 5 seconds
 setInterval(() => {
     console.log("sending global players list");
     io.emit("playersOnline", server.onlinePlayers);
