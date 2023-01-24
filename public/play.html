@@ -60,8 +60,8 @@
         </div>
     </header>
     <!-- <div id="loader" class="center"></div> -->
-    <div class="site">
-        <div id="options" style="justify-content: center ;">
+    <div class="site" style="display: flex; flex-wrap: wrap; justify-content: center;">
+        <div id="options">
             <a class="difficulty-select" value="BEGINNER" href="javascript:void(0)"><span>Beginner (9 x 9) 10
                     Mines&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></a>
             <a class="difficulty-select" value="INTERMEDIATE" href="javascript:void(0)"><span>Intermediate (16 x 16)
@@ -80,23 +80,23 @@
                 <input type="number" class="custom-select" value="145" id="custom_mines" autocomplete="off">
             </div>
         </div>
+        <div class="break"></div>
+        <br> 
         <div id="game-container" class="z200" oncontextmenu="return false;">
             <!-- <br>
             <span class="flag"></span> -->
             <!-- <br> -->
             <div id="game">
             </div>
-            <div id="result-block">
-                <b>Game Results</b>
-                <div><span id="player-name"></span></div>
-                <div>Result: <b id="result"></b></div>
-                <div>Time: <b id="time"></b>s</div>
-                <div><span id="spectator-name"></span></div>
-                <!-- <div>Lorem ipsum: fsfsf</div>
-                <div>blh blah: fas</div> -->
-            </div>
         </div>
-
+        <div class="break"></div>
+        <div id="result-block">
+            <b>Game Results</b>
+            <div><span id="player-name"></span></div>
+            <div>Result: <b id="result"></b></div>
+            <div>Time: <b id="time"></b>s</div>
+            <div><span id="spectator-name"></span></div>
+        </div>
         <div id="chat">
             <div id="chat-bar">Chat</div>
             <div id="chat-body">

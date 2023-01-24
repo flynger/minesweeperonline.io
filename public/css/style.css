@@ -147,3 +147,7 @@ body {
     right: 0;
     margin: auto;
 }
+
+.break {
+    flex-basis: 100%;
+}

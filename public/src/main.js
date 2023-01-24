@@ -66,7 +66,7 @@ $(function () {
             // limit height and width
             limitInput($("#custom_height"), minesweeper.MIN.height, minesweeper.MAX.height)
             limitInput($("#custom_width"), minesweeper.MIN.width, minesweeper.MAX.width)
- 
+
             // limit mines
             let maxMines = +$("#custom_height").val() * +$("#custom_width").val() - 1;
             limitInput($("#custom_mines"), minesweeper.MIN.mines, maxMines)
@@ -187,7 +187,7 @@ class Minesweeper {
             grid += this.createImg("border-h");
         }
         grid += this.createImg("borderbr");
-        
+
         // set the grid as html
         $("#game").html(grid);
     }
