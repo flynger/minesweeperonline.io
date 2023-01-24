@@ -4,6 +4,9 @@ let { chording = "ALL" } = localStorage;
 // if (!chording) { localStorage.setItem("chording", "ALL") };
 var CHORDING = { setting: chording, isSPACE: chording === "SPACE", isLRCLICK: chording === "LRCLICK", isLCLICK: chording === "LCLICK" };
 
+// default expert difficulty selected
+var selectedDifficulty = "EXPERT";
+
 // custom names for keycodes
 const KEYCODE = {
     LEFT_CLICK: 1, // LMB
@@ -36,6 +39,7 @@ $(function () {
         });
     } else {
         minesweeper.startGame(false);
+
         // set difficulty setting mins and maxes
         $("#custom_height").attr({
             "min": minesweeper.MIN.height,
@@ -45,15 +49,24 @@ $(function () {
             "min": minesweeper.MIN.width,
             "max": minesweeper.MAX.width
         });
-        // setup events
-        $("input[name='difficulty']").on("click", e => {
-            e.target.blur();
+
+        $("#custom").on("click", () => {
+            $(".difficulty-select").toggle();
+            $(".custom-select").toggle();
         });
-        $(".difficulty-select").on("change", () => {
+
+        // setup events
+        $(".difficulty-select").on("click", e => {
+            let $e = $(e.currentTarget).closest('.difficulty-select');
+            selectedDifficulty = $e.attr("value");
+            minesweeper.startGame();
+        });
+
+        $(".custom-select").on("change", e => {
             // limit height and width
             limitInput($("#custom_height"), minesweeper.MIN.height, minesweeper.MAX.height)
             limitInput($("#custom_width"), minesweeper.MIN.width, minesweeper.MAX.width)
-
+ 
             // limit mines
             let maxMines = +$("#custom_height").val() * +$("#custom_width").val() - 1;
             limitInput($("#custom_mines"), minesweeper.MIN.mines, maxMines)
@@ -65,12 +78,7 @@ $(function () {
             });
 
             minesweeper.updateCustomSettings();
-        });
-        $(".difficulty-select").on("mousedown", () => {
-            $('#custom').prop('checked', true);
-        });
-        $("#startGame").on("click", e => {
-            e.target.blur();
+            selectedDifficulty = "CUSTOM";
             minesweeper.startGame();
         });
     }
@@ -110,7 +118,7 @@ class Minesweeper {
             socket.emit("resetBoard", {});
             // update custom settings before creating board
             this.updateCustomSettings();
-            this.SETTINGS = this[$("input[name='difficulty']:checked").val()];
+            this.SETTINGS = this[selectedDifficulty];
         }
         this.TOTALCELLS = (this.SETTINGS.width * this.SETTINGS.height) - this.SETTINGS.mines;
         this.OPENCELLS = 0;
@@ -179,7 +187,7 @@ class Minesweeper {
             grid += this.createImg("border-h");
         }
         grid += this.createImg("borderbr");
-
+        
         // set the grid as html
         $("#game").html(grid);
     }
@@ -230,7 +238,6 @@ class Minesweeper {
                 let cell = $(e.target);
                 if (cell.hasClass("cell")) {
                     let [x, y] = this.getCellFromID(cell.attr("id"));
-                    // doesn't work
                     if (this.LRCLICK) {
                         if (this.satisfyFlags(x, y)) {
                             this.flagAndClear(x, y, true);
