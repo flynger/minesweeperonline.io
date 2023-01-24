@@ -57,7 +57,7 @@ app.post("/spectate", (req, res) => {
     // check if the requested user is currently playing
     //to be implemented: hasPlayer and getPlayer
     if (server.players.hasOwnProperty(requestedUsername) && server.players[requestedUsername].connected) {
-        res.send({ success: true, username: requestedUsername });
+        res.send({ success: true, username: requestedUsername, displayName: server.players[requestedUsername].displayName });
     } else if (!server.players.hasOwnProperty(requestedUsername)) {
         res.send({ success: false, reason: "A player with the requested username does not exist." });
     } else {

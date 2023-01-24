@@ -20,7 +20,7 @@ div#users-contain {
 div#users-contain table {
     margin: 1em 0;
     border-collapse: collapse;
-    width: 400px;
+    min-width: max-content;
 }
 
 div#users-contain table td,
