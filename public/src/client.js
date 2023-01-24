@@ -122,7 +122,7 @@ socket.on("gameStats", (data) => {
     }
     $("#time").html(data.time);
     $("#result").html(data.result);
-    $("#result-block")[0].style.display = "inline-block";
+    $("#result-block")[0].style.display = "inline-flex";
 });
 
 socket.on("requestCoop", (data) => {

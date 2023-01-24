@@ -35,8 +35,8 @@ div#users-contain table th {
 } */
 
 #game-container {
-    display: flex;
-    justify-content: center;
+    display: inline-flex;
+    float: left;
 }
 
 #game {
