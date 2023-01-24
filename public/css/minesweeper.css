@@ -12,6 +12,11 @@
     /* width: max-content; */
 }
 
+.difficulty-select {
+    color: #337ab7;
+    text-decoration: none;
+}
+
 div#users-contain {
     width: 100%;
     margin: 20px 0;
@@ -20,7 +25,7 @@ div#users-contain {
 div#users-contain table {
     margin: 1em 0;
     border-collapse: collapse;
-    width: 400px;
+    min-width: max-content;
 }
 
 div#users-contain table td,
@@ -55,6 +60,7 @@ div#users-contain table th {
 
 #custom-settings {
     display: none;
+    font-size: 15px;
 }
 
 #result-block {
@@ -73,6 +79,10 @@ div#users-contain table th {
 .difficulty-select {
     color: #337ab7;
     text-decoration: none;
+}
+
+.ui-widget-content a {
+    color: #337ab7;
 }
 
 .custom-select {

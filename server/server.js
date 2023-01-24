@@ -17,7 +17,7 @@ require('locus');
 
 // server setup
 var app = express();
-var port = 3000;
+var port = 80;
 var name = "Minesweeper Online";
 var sessionMiddleware = sessions({
     secret: "e'eF?infFwa%%ofFia*Gesj8\\g4pdO!ih",
@@ -51,7 +51,7 @@ app.get("/spectate", (req, res) => {
     // check if the requested user is currently playing
     //to be implemented: hasPlayer and getPlayer
     if (server.players.hasOwnProperty(requestedUsername)) {
-        console.log({ requestedUsername });
+        // console.log({ requestedUsername });
         res.sendFile('play.html', { root: '../public' });
     } else res.redirect("/play");
 });
@@ -62,7 +62,7 @@ app.post("/spectate", (req, res) => {
     // check if the requested user is currently playing
     //to be implemented: hasPlayer and getPlayer
     if (server.players.hasOwnProperty(requestedUsername) && server.players[requestedUsername].connected) {
-        res.send({ success: true, username: requestedUsername });
+        res.send({ success: true, username: requestedUsername, displayName: server.players[requestedUsername].displayName });
     } else if (!server.players.hasOwnProperty(requestedUsername)) {
         res.send({ success: false, reason: "A player with the requested username does not exist." });
     } else {
@@ -162,7 +162,7 @@ io.on("connection", (socket) => {
     if (!server.players[username].hasOwnProperty("coopPlayers")) server.players[username].coopPlayers = [];
     if (!server.players[username].hasOwnProperty("coopRequests")) server.players[username].coopRequests = [];
     server.onlinePlayers.push(server.players[username].displayName);
-    console.log(server.onlinePlayers);
+    // console.log(server.onlinePlayers);
 
     // connect event
     console.log(color.green, socket.id);
@@ -354,7 +354,7 @@ io.on("connection", (socket) => {
 
     socket.on("requestCoop", (data) => {
         let requestedPlayer = server.players[data.name];
-        if (server.players.hasOwnProperty(data.name) && requestedPlayer.connected) {
+        if (server.players.hasOwnProperty(data.name) && requestedPlayer.connected && !server.players[username].coopPlayers.includes(data.name)) {
             if (!requestedPlayer.coopRequests.includes(username)) {
                 console.log("added co-op request to " + data.name);
                 requestedPlayer.coopRequests.push(username);
@@ -377,6 +377,9 @@ io.on("connection", (socket) => {
             let hostPlayer = socket.hostPlayer = server.players[data.name];
             hostPlayer.coopPlayers.push(username);
             server.players[username].coopRequests.splice(server.players[username].coopRequests.indexOf(data.name), 1);
+            if (hostPlayer.connected) {
+                hostPlayer.socket.emit("coopJoined", { displayName: server.players[username].displayName });
+            }
             if (hostPlayer.board) {
                 let currentGame = server.players[username].board = hostPlayer.board;
                 currentGame.PLAYERS.push(username);
@@ -415,10 +418,21 @@ io.on("connection", (socket) => {
                     server.players[player].board = null;
                 }
             }
+            for (let player of server.players[username].coopPlayers) {
+                server.players[player].socket.emit("coopOnHold", { displayName: server.players[username].displayName });
+            }
             server.players[username].board = null;
             console.log(color.red, "Deleted board for disconnected player " + username);
         } else if (socket.hasOwnProperty("hostPlayer")) {
             socket.hostPlayer.coopPlayers.splice(socket.hostPlayer.coopPlayers.indexOf(username), 1);
+            for (let player of socket.hostPlayer.coopPlayers) {
+                if (server.players[player].connected) {
+                    server.players[player].socket.emit("coopLeft", { displayName: server.players[username].displayName });
+                }
+            }
+            if (socket.hostPlayer.connected) {
+                socket.hostPlayer.socket.emit("coopLeft", { displayName: server.players[username].displayName });
+            }
             // console.log("coopPlayers: " + socket.hostPlayer.coopPlayers);
             if (board != null) {
                 board.PLAYERS.splice(board.PLAYERS.indexOf(username), 1);
@@ -435,7 +449,7 @@ io.on("connection", (socket) => {
         }
 
         server.onlinePlayers.splice(server.onlinePlayers.indexOf(server.players[username].displayName), 1);
-        console.log(server.onlinePlayers);
+        // console.log(server.onlinePlayers);
         delete session.socket;
         if (session.isGuest) {
             delete server.players[username];
@@ -443,6 +457,7 @@ io.on("connection", (socket) => {
     });
     // send username
     socket.emit("username", username);
+    socket.emit("playersOnline", server.onlinePlayers);
 });
 
 /* to broadcast event to all users: io.sockets.emit(key, data);

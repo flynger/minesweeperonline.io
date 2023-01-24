@@ -57,7 +57,7 @@ function setupChat() {
             // send chat to server
             let typedMessage = $("#chatInput").val();
             let cmdFormatMessage = splitByFirstOccurrence(typedMessage, " ");
-            console.log(cmdFormatMessage);
+            // console.log(cmdFormatMessage);
             if (cmdFormatMessage[0] == "/ping") {
                 addServerMessage("Your ping is " + latency + "ms.", currentChat.id);
             } else if (cmdFormatMessage.length > 1 && (cmdFormatMessage[0] == "/spectate" || cmdFormatMessage[0] == "/spec")) {

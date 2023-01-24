@@ -36,7 +36,7 @@ $(function () {
         $.post(window.location.pathname + window.location.search, "", (response) => {
             if (response.success) {
                 socket.emit("startSpectating", { name: response.username });
-                console.log("spectating " + response.username);
+                $("#options").html("Spectating " + response.displayName);
             } else {
                 $("#dialog-text").html(response.reason);
                 $("#dialog-confirm").dialog({
@@ -55,6 +55,7 @@ $(function () {
                 });
             }
         });
+        $("#options").html("Spectating");
     } else {
         minesweeper.startGame(false);
 

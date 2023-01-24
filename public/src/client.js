@@ -55,7 +55,7 @@ socket.on("roomJoinFailure", (data) => {
 
 socket.on("boardData", (data) => {
     if (data.startSpectating) {
-        console.log(data);
+        // console.log(data);
         minesweeper.SETTINGS = data.settings;
         minesweeper.startGame(true, false);
         minesweeper.updateTimer(data.time);
@@ -63,7 +63,7 @@ socket.on("boardData", (data) => {
             return;
         }
     } else if (data.startPlaying) {
-        console.log(data);
+        // console.log(data);
         minesweeper.SETTINGS = data.settings;
         minesweeper.startGame(false, false);
         minesweeper.updateTimer(data.time);
@@ -153,12 +153,70 @@ socket.on("requestCoop", (data) => {
     });
 });
 
+socket.on("coopJoined", (data) => {
+    addServerMessage(data.displayName + " join the co-op!", currentChat.id);
+
+    $("#dialog-text").html(`${data.displayName} accepted the co-op request and joined the co-op.`);
+    $("#dialog-confirm").dialog({
+        title: "Co-op request to " + data.displayName,
+        resizable: false,
+        draggable: false,
+        height: "auto",
+        width: 400,
+        modal: true,
+        buttons: {
+            "Ok": function () {
+                $(this).dialog("close");
+            }
+        }
+    });
+});
+
+socket.on("coopOnHold", (data) => {
+    addServerMessage(data.displayName + " went offline", currentChat.id);
+
+    $("#dialog-text").html(`${data.displayName} disconnected and went offline. You can continue waiting until they rejoin.`);
+    $("#dialog-confirm").dialog({
+        title: data.displayName + " is offline",
+        resizable: false,
+        draggable: false,
+        height: "auto",
+        width: 400,
+        modal: true,
+        buttons: {
+            "Ok": function () {
+                $(this).dialog("close");
+            }
+        }
+    });
+});
+
+socket.on("coopLeft", (data) => {
+    addServerMessage(data.displayName + " left the co-op", currentChat.id);
+
+    $("#dialog-text").html(`${data.displayName} disconnected and left the co-op.`);
+    $("#dialog-confirm").dialog({
+        title: data.displayName + " left",
+        resizable: false,
+        draggable: false,
+        height: "auto",
+        width: 400,
+        modal: true,
+        buttons: {
+            "Ok": function () {
+                $(this).dialog("close");
+            }
+        }
+    });
+});
+
 socket.on("playersOnline", (onlinePlayers) => {
+    onlinePlayers = onlinePlayers.sort();
     $("#users-list").html("");
     let text = "";
     for (let player of onlinePlayers) {
         if (player.toLowerCase() != username) {
-            text += "<tr><td>" + player + "&nbsp; <button onclick='window.location.href=" + '"/spectate?name=' + player + '"' + "'>Spectate</button>&nbsp; <button onclick='inviteToGame(\"" + player.toLowerCase() + "\")'>Invite</button></td>";
+            text += "<tr><td>" + player + "&nbsp; <button onclick='window.location.href=" + '"/spectate?name=' + player + '"' + "'>Spectate</button>&nbsp; <button onclick='inviteToGame(\"" + player.toLowerCase() + "\"); $(this).prop(\"disabled\", true);'>Invite</button> &nbsp;<a href='/profile?name=" + player.toLowerCase() +"'>Profile</a></td>";
         }
         else text += "<tr><td>" + player + " (You)</td>";
     }
