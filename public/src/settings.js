@@ -5,8 +5,12 @@ This file implements logic for the settings page
 */
 // handles events for settings page
 $(function () {
+<<<<<<< Updated upstream
     // sets radio buttons to settings stored in local storage
     let { theme = "LIGHT", chording="ALL" } = localStorage;
+=======
+    let { theme = "LIGHT", chording = "ALL" } = localStorage;
+>>>>>>> Stashed changes
     $("input[name='theme']").val([theme]);
     $("input[name='chording']").val([chording]);
 

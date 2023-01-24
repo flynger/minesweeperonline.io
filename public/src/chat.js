@@ -92,8 +92,12 @@ function addChatMessage(user, msg, room) {
     addTextToChat("<b>" + user + ":</b><text> " + msg + "</text>", room);
 }
 
+<<<<<<< Updated upstream
 // adds chat messages sent by the server
 function addServerMessage(msg, room=currentChat.id) {
+=======
+function addServerMessage(msg, room = currentChat.id) {
+>>>>>>> Stashed changes
     addTextToChat("<text style='color:red;'>" + msg + "</text>", room);
 }
 
@@ -149,5 +153,5 @@ function splitByFirstOccurrence(str, sep) { // string, separator
 }
 
 function inviteToGame(username) {
-    socket.emit("requestCoop", {name: username});
+    socket.emit("requestCoop", { name: username });
 }
