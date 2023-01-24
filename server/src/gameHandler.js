@@ -1,3 +1,8 @@
+/*
+Alex Ge, Arnav Singh, Richard Wei, Will Gannon
+
+This file implements server-sided minesweeper functionality, including clearing, flagging, and communicating the info to spectators and coop players
+*/
 module.exports = (server) => {
     var gameHandler = {
         Board: class {

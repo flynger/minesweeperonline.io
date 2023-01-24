@@ -1,3 +1,8 @@
+/*
+Alex Ge, Arnav Singh, Richard Wei, Will Gannon
+
+This file implements server-sided chat functionality
+*/
 module.exports = (server) => {
     const filters = require("../libs/filters"); // chat filters
     var { io } = server; // tells you what properties of server are imported

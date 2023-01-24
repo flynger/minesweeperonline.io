@@ -1,3 +1,8 @@
+/*
+Alex Ge, Arnav Singh, Richard Wei, Will Gannon
+
+This file implements main server-sided functionality with the help of supporting files like chatHandler
+*/
 // libraries
 const bodyParser = require("./node_modules/body-parser");
 const cors = require("./node_modules/cors");

@@ -1,3 +1,8 @@
+/*
+Alex Ge, Arnav Singh, Richard Wei, Will Gannon
+
+This file implements the logic for the register page
+*/
 $(function () {
     // $("#header").load("header.html", () => {
     //     document.body.style.display = "block";
