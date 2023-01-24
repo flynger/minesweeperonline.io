@@ -1,3 +1,8 @@
+/*
+Alex Ge, Arnav Singh, Richard Wei, Will Gannon
+
+This file implements server-sided chat functionality including storing user data after it is submitted
+*/
 const { json } = require("express");
 
 module.exports = (server) => {

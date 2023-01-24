@@ -1,3 +1,8 @@
+/*
+Alex Ge, Arnav Singh, Richard Wei, Will Gannon
+
+This file implements logic for the login page
+*/
 if (localStorage.getItem("theme") === "DARK") {
     DarkReader.setFetchMethod(window.fetch);
     DarkReader.enable();

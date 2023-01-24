@@ -1,3 +1,8 @@
+/*
+Alex Ge, Arnav Singh, Richard Wei, Will Gannon
+
+This file implements the main logic for the minesweeper game
+*/
 var minesweeper;
 
 let { chording = "ALL" } = localStorage;

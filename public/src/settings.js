@@ -1,3 +1,8 @@
+/*
+Alex Ge, Arnav Singh, Richard Wei, Will Gannon
+
+This file implements logic for the settings page
+*/
 $(function () {
     let { theme = "LIGHT", chording="ALL" } = localStorage;
     $("input[name='theme']").val([theme]);

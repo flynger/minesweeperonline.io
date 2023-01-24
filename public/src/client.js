@@ -1,3 +1,8 @@
+/*
+Alex Ge, Arnav Singh, Richard Wei, Will Gannon
+
+This file implements main client-sided functionality 
+*/
 var latency = -1;
 var username;
 

@@ -1,4 +1,9 @@
 // constants
+/*
+Alex Ge, Arnav Singh, Richard Wei, Will Gannon
+
+This file implements client-sided chat functionality
+*/
 var chatBarDefault = "0px";
 var chatBarOpen = "425px";
 var roomColors = {
