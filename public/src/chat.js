@@ -4,6 +4,8 @@ Alex Ge, Arnav Singh, Richard Wei, Will Gannon
 
 This file implements client-sided chat functionality
 */
+
+// constants
 var chatBarDefault = "0px";
 var chatBarOpen = "425px";
 var roomColors = {
@@ -26,7 +28,9 @@ var requestedRoom = false;
 joinRoom("Global");
 var currentChat = requestedRoom;
 
+// creates event handlers for chat
 function setupChat() {
+    // chat bar visual
     $("#chat-bar").on("click", e => {
         e.preventDefault();
         switch (e.which) {
@@ -36,6 +40,7 @@ function setupChat() {
         }
     });
 
+    // adds ui for different chat rooms
     $("#roomButton").on("click", e => {
         if (requestedRoom) {
             addServerMessage("You already have a room join request in queue.", currentChat.id);
@@ -51,6 +56,7 @@ function setupChat() {
         }
     });
 
+    // handles messages and commands sent in chat
     $("#chatInput").on("keypress", e => {
         // check ENTER
         if ($("#chatInput:focus") && $("#chatInput").val() && e.which === KEYCODE.ENTER) {
@@ -75,18 +81,27 @@ function setupChat() {
     });
 }
 
+// turns on and off the ui for chat
 function toggleChat() {
     $("#chat-body").stop().slideToggle(200);
 }
 
+
+// adds chat messages sent by users
 function addChatMessage(user, msg, room) {
     addTextToChat("<b>" + user + ":</b><text> " + msg + "</text>", room);
 }
 
+<<<<<<< Updated upstream
+// adds chat messages sent by the server
 function addServerMessage(msg, room=currentChat.id) {
+=======
+function addServerMessage(msg, room = currentChat.id) {
+>>>>>>> Stashed changes
     addTextToChat("<text style='color:red;'>" + msg + "</text>", room);
 }
 
+// adds text to the chat rooms
 function addTextToChat(text, room) {
     chatRooms[room].output += text + "<br>";
     updateCurrentChat();
@@ -101,6 +116,7 @@ function joinRoom(room) {
     socket.emit("joinRoom", { requestedRoom: requestedRoom.id });
 }
 
+// changes css styles for chat room buttons
 function selectChat(chat) {
     $("#select" + currentChat.displayName).css({ "background-color": roomColors.unselected, "border-bottom-style": "solid" });
     currentChat.input = $("#chatInput").val();
@@ -110,6 +126,7 @@ function selectChat(chat) {
     updateCurrentChat();
 }
 
+// updates chat when messages are sent
 function updateChatRooms() {
     let roomsHTML = "";
     for (let room in chatRooms) {
@@ -119,6 +136,7 @@ function updateChatRooms() {
     $("#chat-rooms").html(roomsHTML + "<div id='chatRoomPadding' style='width:" + (296 - 62 * countRooms()) + "px'></div>");
 }
 
+// updates chat when messages are sent
 function updateCurrentChat() {
     $("#chatText").html(currentChat.output);
     $("#chatText")[0].scrollTo(0, $("#chatText")[0].scrollHeight);
@@ -135,5 +153,5 @@ function splitByFirstOccurrence(str, sep) { // string, separator
 }
 
 function inviteToGame(username) {
-    socket.emit("requestCoop", {name: username});
+    socket.emit("requestCoop", { name: username });
 }

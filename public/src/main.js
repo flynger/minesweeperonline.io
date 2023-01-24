@@ -234,9 +234,11 @@ class Minesweeper {
         let otherText = other ? "' " + other : "";
         return "<div class='" + type + idText + styleText + otherText + "'></div>";
     }
+    // creates mouse event handlers
     createMouseEvents() {
         $("#game")
             .unbind("mousedown mouseup")
+            // mousedown handles clicks for the game animations
             .on("mousedown", e => {
                 e.preventDefault();
                 let cell = $(e.target);
@@ -266,7 +268,7 @@ class Minesweeper {
                     }
                 }
             })
-
+            // mouseup handles clearing for the game
             .on("mouseup", e => {
                 e.preventDefault();
                 let cell = $(e.target);
@@ -301,6 +303,7 @@ class Minesweeper {
                 }
             })
 
+            // handles when a mouse button is down and a cell is under the mouse button
             .on("mouseover", e => {
                 let cell = $(e.target);
                 if (cell.hasClass("cell")) {
@@ -335,6 +338,7 @@ class Minesweeper {
                 }
             })
 
+            // deselects and removes animation when the mouse exits the game
             .on("mouseout", e => {
                 e.preventDefault();
                 let cell = $(e.target);
@@ -362,7 +366,9 @@ class Minesweeper {
             });
         this.setFace("facesmile");
     }
+    // creates event handlers for keyboard events
     createKeyboardEvents() {
+        // handles space clearing and resetting the game
         $(document.body).unbind("keypress").on("keypress", e => {
             if (e.which === KEYCODE.SPACE && e.target == document.body) {
                 // check SPACE
@@ -385,15 +391,18 @@ class Minesweeper {
         });
         return this.cellIsClear(this.getCanvasCell(x, y)) && this.getCanvasCell(x, y).hasClass("open" + flags);
     }
+    // sends server data for what cells to clear
     clearCells(x, y) { /* removed overrideFlags */
         // this.do3x3Operation(x, y, (thisX, thisY, thisCell) => {
         //     if (!this.cellIsClear(thisCell) && (thisCell.hasClass("blank") || thisCell.hasClass("selected"))) socket.emit("clearCell", { x: thisX, y: thisY });
         // });
         socket.emit("clearCells", { x, y });
     }
+    // checks if the cell is already clear
     cellIsClear(cell) {
         return cell.attr("class").includes("open");
     }
+    // sends data to server to flag and clear cells
     flagAndClear(x, y, clearCondition) {
         let cell = this.getCanvasCell(x, y);
         if (cell.hasClass("blank")) {
@@ -408,6 +417,7 @@ class Minesweeper {
             this.clearCells(x, y);
         }
     }
+    // returns client-side cells
     getCanvasCell(x, y) {
         return $(`#${y}_${x}`);
     }
@@ -416,6 +426,7 @@ class Minesweeper {
         // return x, y of cell
         return [+cellX, +cellY];
     }
+    // animations for mouse clicks
     selectCell(x, y) {
         let cell = this.getCanvasCell(x, y);
         // if cell exists and is blank
@@ -442,6 +453,7 @@ class Minesweeper {
             this.deselectCell(thisX, thisY);
         });
     }
+    // runs callback function on 3x3 area
     do3x3Operation(x, y, func) {
         for (let ny = y - 1; ny <= y + 1; ny++) {
             for (let nx = x - 1; nx <= x + 1; nx++) {
@@ -450,6 +462,7 @@ class Minesweeper {
             }
         }
     }
+    // updates counter to new sprites based on board data server sends
     updateFlagCounter() {
         let flagString = "" + limitNumber(this.FLAGS, -99, 999);
         while (flagString.length < 3) {
@@ -463,6 +476,7 @@ class Minesweeper {
         $("#mines_tens").attr("class", "time" + flagString[1]);
         $("#mines_hundreds").attr("class", "time" + flagString[0]);
     }
+    // updates timer counter to new sprites based on board data server sends
     updateTimer(time) {
         let timeString = "" + limitNumber(time, 0, 999);
         while (timeString.length < 3) {
@@ -472,6 +486,7 @@ class Minesweeper {
         $("#seconds_tens").attr("class", "time" + timeString[1]);
         $("#seconds_hundreds").attr("class", "time" + timeString[0]);
     }
+    // animations for the face
     setFace(type) {
         let f = () => $("#face").attr("class", type);
         if (!this.SPECTATING) {
@@ -488,10 +503,12 @@ class Minesweeper {
     }
 }
 
+// random number generator
 function randomNumber(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+// limits input numbers for custom game
 function limitNumber(val, min, max) {
     if (val < min) return min;
     else if (val > max) return max;

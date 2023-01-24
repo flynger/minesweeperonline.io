@@ -3,13 +3,14 @@ Alex Ge, Arnav Singh, Richard Wei, Will Gannon
 
 This file implements the logic for the register page
 */
+// handles register page submissions
 $(function () {
     // $("#header").load("header.html", () => {
     //     document.body.style.display = "block";
-        if (localStorage.getItem("theme") === "DARK") {
-            DarkReader.setFetchMethod(window.fetch);
-            DarkReader.enable();
-        }
+    if (localStorage.getItem("theme") === "DARK") {
+        DarkReader.setFetchMethod(window.fetch);
+        DarkReader.enable();
+    }
     //     $("#footer").load("footer.html");
     // });
     $('#register-form').on('submit', function (e) {
