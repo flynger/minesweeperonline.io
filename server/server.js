@@ -155,15 +155,17 @@ setInterval(() => {
 }, 5000);
 
 io.on("connection", (socket) => {
+    // get socket's session details
     let { session, sessionID } = socket.request;
     let username = socket.username = session.username;
     if (!session.username) {
+        // assign guest account if not logged in
         session.isGuest = true;
         let displayName = "Guest " + uniqueNamesGenerator({
             dictionaries: [adjectives, animals],
             separator: " ",
             style: "capital"
-        }); // big_red_donkey
+        });
         socket.username = username = session.username = displayName.toLowerCase();//sessionID;
         server.players[username] = { username, displayName, wins: 0, losses: 0, gamesCreated: 0, isGuest: true, connected: true };
     }
@@ -174,22 +176,17 @@ io.on("connection", (socket) => {
     if (!server.players[username].hasOwnProperty("coopPlayers")) server.players[username].coopPlayers = [];
     if (!server.players[username].hasOwnProperty("coopRequests")) server.players[username].coopRequests = [];
     server.onlinePlayers.push(server.players[username].displayName);
-    // console.log(server.onlinePlayers);
 
     // connect event
     console.log(color.green, socket.id);
-    // console.log(Object.keys(server.players));
-    // console.log(session);
-    // chatHandler.joinSocketToRoom(socket, "global");
-    // chatHandler.joinSocketToRoom(socket, "room");
 
     // add events
     socket.on("ping", (callback) => {
         callback();
     });
-
-    // game events
+    
     socket.on("createBoard", (settings) => {
+        // handle board create event
         if (!socket.hasOwnProperty("hostPlayer")) {
             if (settings.width > 50 || settings.height > 100) {
                 return;
@@ -208,7 +205,6 @@ io.on("connection", (socket) => {
                     for (let spectatorSocket of player.spectatorSockets) {
                         spectators.push(spectatorSocket);
                     }
-                    // spectators.push(...player.spectatorSockets);
                 }
             }
             console.log("starting game with players: " + players);
@@ -216,7 +212,6 @@ io.on("connection", (socket) => {
             let board = server.players[username].board = new Minesweeper.Board(settings, players, spectators);
             board.clearQueue();
             board.startTimer();
-            //socket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER, win: board.WIN });
             for (let player of board.PLAYERS) {
                 let playerSocket = server.players[player].socket;
                 server.players[player].board = board;
@@ -235,6 +230,7 @@ io.on("connection", (socket) => {
     });
 
     socket.on("resetBoard", () => {
+        // handle board reset event
         if (!socket.hasOwnProperty("hostPlayer")) {
             let board = server.players[username].board;
             if (board != null) {
@@ -257,6 +253,7 @@ io.on("connection", (socket) => {
     });
 
     socket.on("clearCell", (data) => {
+        // handle cell clear event
         let board = server.players[username].board;
         if (board != null) {
             let { x, y } = data;
@@ -264,7 +261,6 @@ io.on("connection", (socket) => {
                 board.clearCell(x, y, socket.username);
                 board.clearQueue();
                 board.TIMESTAMPS.push({ time: Date.now() - board.START_TIME, x, y, board: JSON.stringify(board.CLEARED) });
-                // socket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER, win: board.WIN });
                 for (let player of board.PLAYERS) {
                     let playerSocket = server.players[player].socket;
                     playerSocket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER, win: board.WIN });
@@ -281,14 +277,14 @@ io.on("connection", (socket) => {
     });
 
     socket.on("clearCells", (data) => {
+        // handle chording (clearCells) event
         let board = server.players[username].board;
         if (board != null) {
             let { x, y } = data;
             if (x < board.WIDTH && y < board.HEIGHT && board.satisfyFlags(x, y)) {
-                // console.log("clearing cells around cell:", data);
                 for (let v = -1; v <= 1; v++) {
                     for (let h = -1; h <= 1; h++) {
-                        if (board.checkCell(x + h, y + v, ["?"])) { // space does weird stuff !!! check
+                        if (board.checkCell(x + h, y + v, ["?"])) {
                             board.CLEARQUEUE.push([x + h, y + v]);
                             board.CLEARED[y + v][x + h] = "Q";
                         }
@@ -296,7 +292,6 @@ io.on("connection", (socket) => {
                 }
                 board.clearQueue();
                 board.TIMESTAMPS.push({ time: Date.now() - board.START_TIME, x, y, board: JSON.stringify(board.CLEARED) });
-                //socket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER, win: board.WIN });
                 for (let player of board.PLAYERS) {
                     let playerSocket = server.players[player].socket;
                     playerSocket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER, win: board.WIN });
@@ -313,12 +308,12 @@ io.on("connection", (socket) => {
     });
 
     socket.on("addFlag", (data) => {
+        // handle add flag event
         let board = server.players[username].board;
         if (board != null) {
             let { x, y } = data;
             if (board.flagCell(x, y)) {
                 board.TIMESTAMPS.push({ time: Date.now() - board.START_TIME, x, y, board: JSON.stringify(board.CLEARED) });
-                // socket.emit("boardData", { board: board.CLEARED });
                 for (let player of board.PLAYERS) {
                     let playerSocket = server.players[player].socket;
                     playerSocket.emit("boardData", { board: board.CLEARED });
@@ -331,12 +326,12 @@ io.on("connection", (socket) => {
     });
 
     socket.on("removeFlag", (data) => {
+        // handle remove flag event
         let board = server.players[username].board;
         if (board != null) {
             let { x, y } = data;
             if (board.unflagCell(x, y)) {
                 board.TIMESTAMPS.push({ time: Date.now() - board.START_TIME, x, y, board: JSON.stringify(board.CLEARED) });
-                // socket.emit("boardData", { board: board.CLEARED });
                 for (let player of board.PLAYERS) {
                     let playerSocket = server.players[player].socket;
                     playerSocket.emit("boardData", { board: board.CLEARED });
@@ -348,13 +343,8 @@ io.on("connection", (socket) => {
         }
     });
 
-    // socket.on("spectate", (username) => {
-    //     console.log("Emitting spectate data");
-    //     let player = server.players[username];
-    //     socket.emit("boardData", { board: player.board.CLEARED, gameOver: player.board.GAMEOVER, win: player.board.WIN });
-    // });
-
     socket.on("startSpectating", (data) => {
+        // handle spectate request
         let playerToSpectate = socket.playerToSpectate = server.players[data.name];
         playerToSpectate.spectatorSockets.push(socket);
         if (playerToSpectate.board) {
@@ -365,6 +355,7 @@ io.on("connection", (socket) => {
     });
 
     socket.on("requestCoop", (data) => {
+        // handle invite to co-op request
         let requestedPlayer = server.players[data.name];
         if (server.players.hasOwnProperty(data.name) && requestedPlayer.connected && !server.players[username].coopPlayers.includes(data.name)) {
             if (!requestedPlayer.coopRequests.includes(username)) {
@@ -378,7 +369,7 @@ io.on("connection", (socket) => {
     });
 
     socket.on("startCoop", (data) => {
-        console.log(username + " accepted co-op request");
+        // handle co-op accept request
         if (server.players[username].coopRequests.includes(data.name) && server.players[data.name] && server.players[data.name].connected) {
             let board = server.players[username].board;
             if (board != null) {
@@ -403,6 +394,7 @@ io.on("connection", (socket) => {
 
     // chat and room events
     socket.on("joinRoom", (data) => {
+        // handle room join request
         let result = chatHandler.joinSocketToRoom(socket, data.requestedRoom);
         if (result.error) {
             socket.emit("roomJoinFailure", { room: data.requestedRoom, error: result.error });
@@ -412,7 +404,7 @@ io.on("connection", (socket) => {
     });
 
     socket.on("chatMessage", (data) => {
-        // console.log(color.yellow, socket.id);
+        // handle chat packet
         chatHandler.processChat(socket, data)
     });
 
