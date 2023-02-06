@@ -73,6 +73,9 @@ $(function () {
             if (minesweeper.HOST) {
                 $(".difficulty-select").toggle();
                 $("#custom-settings").toggle();
+                minesweeper.updateCustomSettings();
+                selectedDifficulty = "CUSTOM";
+                minesweeper.startGame();
             }
         });
 

@@ -430,7 +430,7 @@ io.on("connection", (socket) => {
         } else if (socket.hasOwnProperty("hostPlayer")) {
             socket.hostPlayer.coopPlayers.splice(socket.hostPlayer.coopPlayers.indexOf(username), 1);
             for (let player of socket.hostPlayer.coopPlayers) {
-                if (server.players[player].connected) {
+                if (server.players[player] && server.players[player].connected) {
                     server.players[player].socket.emit("coopLeft", { displayName: server.players[username].displayName });
                 }
             }
