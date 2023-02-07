@@ -26,7 +26,7 @@ var sessionMiddleware = sessions({
     resave: false
 });
 
-app.use(express.static("../public"));
+app.use(express.static("./public"));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(
     cors({
@@ -46,7 +46,7 @@ app.get("/home", (req, res) => {
 });
 app.get("/play", (req, res) => {
     // game page
-    res.sendFile('play.html', { root: '../public' });
+    res.sendFile('play.html', { root: './public' });
 });
 app.get("/spectate", (req, res) => {
     // get the requested username parameter
@@ -54,7 +54,7 @@ app.get("/spectate", (req, res) => {
     // check if the requested user exists
     if (server.players.hasOwnProperty(requestedUsername)) {
         // send the client the game page so they can spectate
-        res.sendFile('play.html', { root: '../public' });
+        res.sendFile('play.html', { root: './public' });
     } else {
         // redirect the client to game if invalid username
         res.redirect("/play");
@@ -77,7 +77,7 @@ app.get("/profile", (req, res) => {
     let requestedUsername = req.query.name ? req.query.name.toLowerCase() : req.session.username ? req.session.username : "";
     // send profile page if player exists, else redirect to login
     if (requestedUsername && server.players.hasOwnProperty(requestedUsername)) {
-        res.sendFile('profile.html', { root: '../public' });
+        res.sendFile('profile.html', { root: './public' });
     } else res.redirect("/login");
 });
 app.post("/profile", (req, res) => {
@@ -93,12 +93,12 @@ app.post("/profile", (req, res) => {
 });
 app.get("/settings", (req, res) => {
     // settings page
-    res.sendFile('settings.html', { root: '../public' });
+    res.sendFile('settings.html', { root: './public' });
 });
 app.get("/login", (req, res) => {
     // send client login page if not logged in
     if (!req.session.username) {
-        res.sendFile('login.html', { root: '../public' });
+        res.sendFile('login.html', { root: './public' });
     }
     // redirect client to game page if logged in
     else res.redirect("/play");
@@ -110,7 +110,7 @@ app.post("/login", (req, res) => {
 app.get("/register", (req, res) => {
     // send client register page if not logged in
     if (!req.session.username) {
-        res.sendFile('register.html', { root: '../public' });
+        res.sendFile('register.html', { root: './public' });
     }
     // redirect client to game page if logged in
     else res.redirect("/play");
