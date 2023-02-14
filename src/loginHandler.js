@@ -31,7 +31,7 @@ module.exports = (server) => {
                 players[username] = { username, displayName, wins: 0, losses: 0, gamesCreated: 0, connected: false };
                 console.log(`signed up, Username: ${username} Password: ${password}`);
                 console.log(players);
-                loginHandler.loginAccount(req);
+                loginHandler.loginAccount(req, res);
                 return { success: true };
             }
         },
