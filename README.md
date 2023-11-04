@@ -1,5 +1,5 @@
 # minesweeperonline.io
-minesweeperonline.io is a web-based implementation of the classic single-player Minesweeper game, enhanced with a multiplayer twist. This project allows multiple players to collaborate in real-time, solving the Minesweeper puzzle together.
+minesweeperonline.io is a browser version of the classic single-player Minesweeper game, enhanced with a multiplayer twist. This allows multiple players to collaborate in real-time, solving the Minesweeper puzzle together.
 
 
 Minesweeper is a timeless puzzle game that challenges players to reveal hidden mines on a grid without detonating them. By adding a multiplayer element to this classic game, we bring a new level of excitement and competition to the table. 
