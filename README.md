@@ -1,13 +1,12 @@
 # minesweeperonline.io
-Devs: flynger, richard-wei23, GeWangzi. A minesweeper multiplayer game.
-
-
 minesweeperonline.io is a web-based implementation of the classic single-player Minesweeper game, enhanced with a multiplayer twist. This project allows multiple players to collaborate in real-time, solving the Minesweeper puzzle together.
-Why the Project is Useful
 
 Minesweeper is a timeless puzzle game that challenges players to reveal hidden mines on a grid without detonating them. By adding a multiplayer element to this classic game, we bring a new level of excitement and competition to the table. 
+
 Players can enjoy a familiar game with friends and family, adding a competitive edge to see who can solve the puzzle first.
+
 It's an excellent educational tool for teaching critical thinking, problem-solving, and strategic planning.
+
 It fosters a sense of community and engagement as players can compete and collaborate with others worldwide.
 
 How Users Can Get Started with the Project
