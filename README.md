@@ -1,4 +1,4 @@
-[# minesweeperonline.io(https://www.minesweeperonline.io/)]
+#[minesweeperonline.io(https://www.minesweeperonline.io/)]
 minesweeperonline.io is a browser version of the classic single-player Minesweeper game, enhanced with a multiplayer twist. This allows multiple players to collaborate in real-time, solving the Minesweeper puzzle together.
 
 
