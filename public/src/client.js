@@ -223,14 +223,37 @@ socket.on("coopLeft", (data) => {
 
 //displays the online players
 socket.on("playersOnline", (onlinePlayers) => {
-    onlinePlayers = onlinePlayers.sort();
+    onlinePlayers = [...new Set(onlinePlayers)].sort();
     $("#users-list").html("");
     let text = "";
     for (let player of onlinePlayers) {
         if (player.toLowerCase() != username) {
-            text += "<tr><td>" + player + "&nbsp; <button onclick='window.location.href=" + '"/spectate?name=' + player + '"' + "'>Spectate</button>&nbsp; <button onclick='inviteToGame(\"" + player.toLowerCase() + "\"); $(this).prop(\"disabled\", true);'>Invite</button> &nbsp;<a href='/profile?name=" + player.toLowerCase() + "'>Profile</a></td>";
+            text += "<tr><td>" + player + "&nbsp; <button onclick='window.location.href=" + '"/spectate?name=' + player + '"' + "'>Spectate</button>&nbsp; <button onclick='inviteToGame(\"" + player.toLowerCase() + "\"); $(this).prop(\"disabled\", true);'>Invite</button> &nbsp;<a href='/profile?name=" + player.toLowerCase() + "' target='_blank'>Profile</a></td>";
         }
         else text += "<tr><td>" + player + " (You)</td>";
     }
     $("#users-list").html(text);
 });
+
+socket.on("kickPlayer", (data) => {
+    addServerMessage("Disconnected: " + data.msg, currentChat.id);
+
+    $("#dialog-text").html(data.msg);
+    $("#dialog-confirm").dialog({
+        title: "Disconnected",
+        resizable: false,
+        draggable: false,
+        height: "auto",
+        width: 400,
+        modal: true,
+        closeOnEscape: false,
+        buttons: {
+            "Leave": function () {
+                window.location.href = "about:blank";
+            }
+        }
+    });
+    $("#game").off();
+    $("#face").off();
+    $(".difficulty-select").off();
+})

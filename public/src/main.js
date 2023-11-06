@@ -496,9 +496,13 @@ class Minesweeper {
             $("#face")
                 .attr("class", type)
                 .off("mouseout mouseup")
-                .on("mouseout mouseup", f)
+                .on("mouseout", f)
             if (this.HOST) {
-                $("#face").on("mouseup", () => this.startGame());
+                $("#face").on("mouseup", () => {
+                    if ($("#face").attr("class") == "facepressed") {
+                        this.startGame();
+                    }
+                });
             }
         } else {
             f();

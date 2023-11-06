@@ -169,9 +169,18 @@ io.on("connection", (socket) => {
         socket.username = username = session.username = displayName.toLowerCase();//sessionID;
         server.players[username] = { username, displayName, wins: 0, losses: 0, gamesCreated: 0, isGuest: true, connected: true };
     }
+    if (server.players[username].socket) {
+        let board = server.players[username].board;
+        server.players[username].socket.emit("kickPlayer", { msg: "Login detected from another location. Please double-check you are not playing on multiple tabs with the same account." });
+        server.players[username].socket.disconnect();
+        if (board) {
+            socket.emit("boardData", { board: board.CLEARED, gameOver: board.GAMEOVER, win: board.WIN, settings: board.SETTINGS, startPlaying: true, time: board.TIME });
+        }
+    } else {
+        server.players[username].board = null;
+    }
     server.players[username].connected = true;
     server.players[username].socket = session.socket = socket;
-    server.players[username].board = null;
     if (!server.players[username].hasOwnProperty("spectatorSockets")) server.players[username].spectatorSockets = [];
     if (!server.players[username].hasOwnProperty("coopPlayers")) server.players[username].coopPlayers = [];
     if (!server.players[username].hasOwnProperty("coopRequests")) server.players[username].coopRequests = [];
@@ -184,7 +193,7 @@ io.on("connection", (socket) => {
     socket.on("ping", (callback) => {
         callback();
     });
-    
+
     socket.on("createBoard", (settings) => {
         // handle board create event
         if (!socket.hasOwnProperty("hostPlayer")) {
@@ -454,6 +463,7 @@ io.on("connection", (socket) => {
 
         server.onlinePlayers.splice(server.onlinePlayers.indexOf(server.players[username].displayName), 1);
         // console.log(server.onlinePlayers);
+        delete server.players[username].socket;
         delete session.socket;
         if (session.isGuest) {
             delete server.players[username];
